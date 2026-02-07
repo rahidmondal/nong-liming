@@ -24,7 +24,7 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: ({ url }) => url.origin === self.location.origin && url.pathname.startsWith('/api/'),
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/'),
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',
