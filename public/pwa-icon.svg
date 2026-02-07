@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title>NongLiming App Icon</title>
+  <defs>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffc978" />
+      <stop offset="100%" stop-color="#56b3ff" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="120" fill="#0b0f1a" />
+  <rect x="52" y="52" width="408" height="408" rx="96" fill="url(#glow)" opacity="0.2" />
+  <path
+    d="M156 156h200a24 24 0 0 1 24 24v152a24 24 0 0 1-24 24H156a24 24 0 0 1-24-24V180a24 24 0 0 1 24-24Z"
+    fill="#111827"
+  />
+  <text
+    x="256"
+    y="290"
+    font-family="Sarabun, 'Segoe UI', sans-serif"
+    font-size="96"
+    font-weight="700"
+    fill="#f7f4ef"
+    text-anchor="middle"
+  >
+    NL
+  </text>
+</svg>

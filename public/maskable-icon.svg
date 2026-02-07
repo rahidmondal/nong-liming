@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title>NongLiming Maskable Icon</title>
+  <rect width="512" height="512" fill="#0b0f1a" />
+  <circle cx="256" cy="256" r="180" fill="#1b2435" />
+  <circle cx="256" cy="256" r="150" fill="#ffc978" opacity="0.18" />
+  <text
+    x="256"
+    y="290"
+    font-family="Sarabun, 'Segoe UI', sans-serif"
+    font-size="96"
+    font-weight="700"
+    fill="#f7f4ef"
+    text-anchor="middle"
+  >
+    NL
+  </text>
+</svg>

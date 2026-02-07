@@ -1,73 +1,25 @@
-# React + TypeScript + Vite
+# Nong LiMing
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Nong LiMing is a friendly, focused "Indic-Thai Bridge" PWA that helps you learn Thai faster by leaning on what you
+already know: Indic-script phonetics for sound accuracy and English SVO grammar for sentence logic. The app is built for
+short, consistent study blocks, turning 15-minute sessions into meaningful progress toward advanced, real-world fluency.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React (Vite): App UI and fast dev build pipeline
+- TypeScript (Strict Mode): Safer, more predictable code
+- Tailwind CSS v4: Utility-first styling with a flat CSS import
+- Vite PWA: Service worker, manifest, and offline readiness
+- Dexie: IndexedDB wrapper for local-first learning data
+- Lucide React: Icon set for crisp UI icons
+- Zustand: Lightweight state management
+- Sarabun (Google Fonts): Authentic Thai typography
 
-## React Compiler
+## Scripts
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+- `pnpm dev` - Start the dev server
+- `pnpm build` - Build the app
+- `pnpm preview` - Preview the build
+- `pnpm lint` - Run ESLint
+- `pnpm lint:fix` - Fix lint issues
+- `pnpm format` - Format with Prettier
