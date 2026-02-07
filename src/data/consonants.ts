@@ -1,0 +1,52 @@
+import type { ThaiConsonant } from '../types/alphabet';
+
+export const consonants: ThaiConsonant[] = [
+  {
+    id: 'ko-kai',
+    thaiChar: 'ก',
+    thaiName: 'ก ไก่',
+    hindiEquiv: 'क',
+    sanskritRoot: 'ka',
+    class: 'mid',
+    startSound: 'k',
+    finalSound: 'k',
+  },
+  {
+    id: 'kho-khai',
+    thaiChar: 'ข',
+    thaiName: 'ข ไข่',
+    hindiEquiv: 'ख',
+    sanskritRoot: 'kha',
+    class: 'high',
+    startSound: 'kh',
+    finalSound: 'k',
+  },
+  {
+    id: 'kho-khuat',
+    thaiChar: 'ฃ',
+    thaiName: 'ฃ ขวด',
+    hindiEquiv: 'ख',
+    class: 'high',
+    startSound: 'kh',
+    finalSound: 'k',
+  },
+  {
+    id: 'kho-khwai',
+    thaiChar: 'ค',
+    thaiName: 'ค ควาย',
+    hindiEquiv: 'ख',
+    sanskritRoot: 'kha',
+    class: 'low',
+    startSound: 'kh',
+    finalSound: 'k',
+  },
+  {
+    id: 'kho-khon',
+    thaiChar: 'ฅ',
+    thaiName: 'ฅ คน',
+    hindiEquiv: 'ख',
+    class: 'low',
+    startSound: 'kh',
+    finalSound: 'k',
+  },
+];

@@ -17,9 +17,26 @@ short, consistent study blocks, turning 15-minute sessions into meaningful progr
 
 ## Scripts
 
-- `pnpm dev` - Start the dev server
-- `pnpm build` - Build the app
-- `pnpm preview` - Preview the build
-- `pnpm lint` - Run ESLint
-- `pnpm lint:fix` - Fix lint issues
-- `pnpm format` - Format with Prettier
+```bash
+pnpm dev       # Dev server
+pnpm build     # Production build
+pnpm test      # Run tests
+pnpm lint      # ESLint
+pnpm format    # Prettier
+```
+
+## Architecture
+
+```
+src/
+  /types         # Domain types
+  /data          # Static data (consonants, vocabulary)
+  /features      # Feature modules (alphabet, vocabulary, grammar)
+  /components    # Shared UI components
+  /hooks         # Custom hooks
+  /store         # Zustand stores
+```
+
+## Features
+
+- **Varnamala Grid** — Thai consonants mapped to Hindi/Sanskrit equivalents with class-based styling (mid/high/low)

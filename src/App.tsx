@@ -1,3 +1,5 @@
+import { AlphabetGrid } from './features/alphabet/AlphabetGrid';
+
 function App() {
   return (
     <div className="min-h-screen">
@@ -44,6 +46,8 @@ function App() {
             </p>
           </article>
         </section>
+
+        <AlphabetGrid />
       </div>
     </div>
   );
