@@ -10,7 +10,9 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -32,6 +34,7 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "@vitest/coverage-v8": "4.0.18",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
