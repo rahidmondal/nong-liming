@@ -1,7 +1,11 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+
+const packageJson = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8')) as { version: string };
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -52,4 +56,7 @@ export default defineConfig({
       },
     }),
   ],
+  define: {
+    'import.meta.env.PACKAGE_VERSION': JSON.stringify(packageJson.version),
+  },
 });
