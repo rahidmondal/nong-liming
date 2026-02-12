@@ -1,10 +1,14 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Clock, Layers, Library, Plus, Sparkles } from 'lucide-react';
+import { ArrowLeft, Clock, FileUp, Layers, Library, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ModeToggle } from '../../components/mode-toggle';
 import { db } from '../../lib/db';
 import type { Deck } from '../../types/flashcard';
+import { AddCardDialog } from './AddCardDialog';
+import { CreateDeckDialog } from './CreateDeckDialog';
+import { ImportDialog } from './ImportDialog';
 
 export function DecksPage() {
   const decks = useLiveQuery<Deck[]>(() => db.decks.orderBy('createdAt').reverse().toArray());
@@ -28,6 +32,18 @@ export function DecksPage() {
   }, [decks]);
 
   const isLoading = decks === undefined;
+
+  const [showCreateDeck, setShowCreateDeck] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [addCardDeckId, setAddCardDeckId] = useState<number | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+
+  const handleDeleteDeck = async (deckId: number) => {
+    await db.cards.where('deckId').equals(deckId).delete();
+    await db.reviewLogs.where('deckId').equals(deckId).delete();
+    await db.decks.delete(deckId);
+    setConfirmDeleteId(null);
+  };
 
   const container = {
     hidden: { opacity: 0 },
@@ -98,59 +114,158 @@ export function DecksPage() {
             </div>
             <div className="flex flex-col gap-3 w-full max-w-[240px]">
               <button
-                disabled
-                className="flex items-center justify-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-xl font-medium shadow-md hover:shadow-lg transition-all opacity-60 cursor-not-allowed"
+                onClick={() => {
+                  setShowCreateDeck(true);
+                }}
+                className="flex items-center justify-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-xl font-medium shadow-md hover:shadow-lg transition-all"
               >
                 <Plus className="w-4 h-4" />
                 Create Deck
               </button>
               <button
-                disabled
-                className="flex items-center justify-center gap-2 px-5 py-3 bg-card text-foreground rounded-xl font-medium border border-border shadow-sm hover:shadow-md transition-all opacity-60 cursor-not-allowed"
+                onClick={() => {
+                  setShowImport(true);
+                }}
+                className="flex items-center justify-center gap-2 px-5 py-3 bg-card text-foreground rounded-xl font-medium border border-border shadow-sm hover:shadow-md transition-all"
               >
+                <FileUp className="w-4 h-4" />
                 Import .apkg
               </button>
             </div>
-            <p className="text-xs text-muted-foreground/60 mt-2">Import &amp; Create features coming in Phase 2</p>
           </motion.div>
         )}
 
         {/* Deck List */}
         {!isLoading && decks.length > 0 && (
-          <motion.div variants={container} initial="hidden" animate="show" className="space-y-3">
-            {decks.map(deck => {
-              const deckId = deck.id;
-              const counts = deckId !== undefined ? cardCounts?.[deckId] : undefined;
-              return (
-                <motion.div key={deckId} variants={item}>
-                  <div className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer overflow-hidden">
-                    <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400 mr-4">
-                      <Layers className="w-6 h-6" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-lg truncate">{deck.name}</h3>
-                      {deck.description && <p className="text-sm text-muted-foreground truncate">{deck.description}</p>}
-                      <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Layers className="w-3 h-3" />
-                          {counts?.total ?? '...'} cards
-                        </span>
-                        {(counts?.due ?? 0) > 0 && (
-                          <span className="flex items-center gap-1 text-accent font-medium">
-                            <Clock className="w-3 h-3" />
-                            {counts?.due} due
-                          </span>
-                        )}
+          <>
+            {/* Action buttons bar */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowCreateDeck(true);
+                }}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium shadow-sm hover:shadow-md transition-all text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                New Deck
+              </button>
+              <button
+                onClick={() => {
+                  setShowImport(true);
+                }}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-card text-foreground rounded-xl font-medium border border-border shadow-sm hover:shadow-md transition-all text-sm"
+              >
+                <FileUp className="w-4 h-4" />
+                Import .apkg
+              </button>
+            </div>
+
+            <motion.div variants={container} initial="hidden" animate="show" className="space-y-3">
+              {decks.map(deck => {
+                const deckId = deck.id;
+                const counts = deckId !== undefined ? cardCounts?.[deckId] : undefined;
+                const isConfirmingDelete = deckId !== undefined && confirmDeleteId === deckId;
+                return (
+                  <motion.div key={deckId} variants={item}>
+                    <div className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all overflow-hidden">
+                      <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400 mr-4">
+                        <Layers className="w-6 h-6" />
                       </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg truncate">{deck.name}</h3>
+                        {deck.description && (
+                          <p className="text-sm text-muted-foreground truncate">{deck.description}</p>
+                        )}
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Layers className="w-3 h-3" />
+                            {counts?.total ?? '...'} cards
+                          </span>
+                          {(counts?.due ?? 0) > 0 && (
+                            <span className="flex items-center gap-1 text-accent font-medium">
+                              <Clock className="w-3 h-3" />
+                              {counts?.due} due
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Action buttons */}
+                      {deckId !== undefined && !isConfirmingDelete && (
+                        <div className="relative z-10 flex items-center gap-1">
+                          <button
+                            onClick={() => {
+                              setAddCardDeckId(deckId);
+                            }}
+                            className="p-2 rounded-lg hover:bg-primary/10 transition-colors"
+                            aria-label={`Add card to ${deck.name}`}
+                          >
+                            <Plus className="w-5 h-5 text-primary" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setConfirmDeleteId(deckId);
+                            }}
+                            className="p-2 rounded-lg hover:bg-destructive/10 transition-colors"
+                            aria-label={`Delete ${deck.name}`}
+                          >
+                            <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Delete confirmation */}
+                      {isConfirmingDelete && (
+                        <div className="relative z-10 flex items-center gap-2">
+                          <span className="text-xs text-destructive font-medium">Delete?</span>
+                          <button
+                            onClick={() => void handleDeleteDeck(deckId)}
+                            className="px-3 py-1.5 bg-destructive text-destructive-foreground rounded-lg text-xs font-medium hover:bg-destructive/90 transition-colors"
+                          >
+                            Yes
+                          </button>
+                          <button
+                            onClick={() => {
+                              setConfirmDeleteId(null);
+                            }}
+                            className="px-3 py-1.5 bg-muted text-foreground rounded-lg text-xs font-medium hover:bg-muted/80 transition-colors"
+                          >
+                            No
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </motion.div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          </>
         )}
       </main>
+
+      {/* Dialogs */}
+      <CreateDeckDialog
+        open={showCreateDeck}
+        onClose={() => {
+          setShowCreateDeck(false);
+        }}
+      />
+      <ImportDialog
+        open={showImport}
+        onClose={() => {
+          setShowImport(false);
+        }}
+      />
+      {addCardDeckId !== null && (
+        <AddCardDialog
+          open
+          deckId={addCardDeckId}
+          onClose={() => {
+            setAddCardDeckId(null);
+          }}
+        />
+      )}
     </div>
   );
 }
