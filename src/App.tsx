@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from './components/theme-provider';
 import { DecksPage } from './features/flashcards/DecksPage';
+import { StudyPage } from './features/flashcards/StudyPage';
 import { LandingPage } from './features/landing/LandingPage';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/decks" element={<DecksPage />} />
+              <Route path="/decks/:id/study" element={<StudyPage />} />
             </Routes>
           </div>
           <footer className="w-full py-4 text-center text-sm text-muted-foreground border-t border-border bg-background/50 backdrop-blur-sm">

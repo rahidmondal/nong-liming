@@ -26,8 +26,9 @@ export interface ReviewLog {
   id?: number;
   cardId: number;
   deckId: number;
-  rating: 1 | 2 | 3 | 4;
-  reviewedAt: Date;
+  quality: number;
   previousInterval: number;
   newInterval: number;
+  easeFactor: number;
+  reviewedAt: Date;
 }

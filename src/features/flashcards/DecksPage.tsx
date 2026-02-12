@@ -2,7 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Clock, FileUp, Layers, Library, Plus, Sparkles, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ModeToggle } from '../../components/mode-toggle';
 import { db } from '../../lib/db';
 import type { Deck } from '../../types/flashcard';
@@ -44,6 +44,8 @@ export function DecksPage() {
     await db.decks.delete(deckId);
     setConfirmDeleteId(null);
   };
+
+  const navigate = useNavigate();
 
   const container = {
     hidden: { opacity: 0 },
@@ -168,26 +170,39 @@ export function DecksPage() {
                 return (
                   <motion.div key={deckId} variants={item}>
                     <div className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all overflow-hidden">
-                      <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400 mr-4">
-                        <Layers className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-lg truncate">{deck.name}</h3>
-                        {deck.description && (
-                          <p className="text-sm text-muted-foreground truncate">{deck.description}</p>
-                        )}
-                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Layers className="w-3 h-3" />
-                            {counts?.total ?? '...'} cards
-                          </span>
-                          {(counts?.due ?? 0) > 0 && (
-                            <span className="flex items-center gap-1 text-accent font-medium">
-                              <Clock className="w-3 h-3" />
-                              {counts?.due} due
-                            </span>
+                      <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                      <div
+                        className="flex items-center flex-1 min-w-0 cursor-pointer"
+                        onClick={() => {
+                          if (deckId !== undefined) void navigate(`/decks/${String(deckId)}/study`);
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={e => {
+                          if ((e.key === 'Enter' || e.key === ' ') && deckId !== undefined)
+                            void navigate(`/decks/${String(deckId)}/study`);
+                        }}
+                      >
+                        <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400 mr-4">
+                          <Layers className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-lg truncate">{deck.name}</h3>
+                          {deck.description && (
+                            <p className="text-sm text-muted-foreground truncate">{deck.description}</p>
                           )}
+                          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Layers className="w-3 h-3" />
+                              {counts?.total ?? '...'} cards
+                            </span>
+                            {(counts?.due ?? 0) > 0 && (
+                              <span className="flex items-center gap-1 text-accent font-medium">
+                                <Clock className="w-3 h-3" />
+                                {counts?.due} due
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
 
