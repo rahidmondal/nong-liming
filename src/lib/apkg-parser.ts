@@ -1,35 +1,31 @@
 import JSZip from 'jszip';
 import initSqlJs from 'sql.js';
 
-/** A single parsed card with front/back text content */
+const SQL_CONFIG = {
+  locateFile: () => '/sql-wasm.wasm',
+};
+
 export interface ParsedCard {
   front: string;
   back: string;
 }
 
-/** A parsed deck containing its name and cards */
 export interface ParsedDeck {
   name: string;
   cards: ParsedCard[];
 }
 
-/** Field info extracted from an Anki note model */
 export interface AnkiField {
   name: string;
   ord: number;
 }
 
-/** Note model (note type) extracted from the col table */
 export interface AnkiModel {
   id: string;
   name: string;
   fields: AnkiField[];
 }
 
-/**
- * Extract the SQLite database bytes from an .apkg zip file.
- * Supports both `collection.anki2` (older) and `collection.anki21` (newer) formats.
- */
 export async function extractDbFromApkg(file: File): Promise<Uint8Array> {
   const zip = await JSZip.loadAsync(file);
 
@@ -46,10 +42,6 @@ export async function extractDbFromApkg(file: File): Promise<Uint8Array> {
   throw new Error('Invalid .apkg file: could not find collection.anki2 or collection.anki21 inside the archive.');
 }
 
-/**
- * Parse the models (note types) JSON from the `col` table.
- * Returns a map of model ID → AnkiModel.
- */
 export function parseModels(modelsJson: string): Map<string, AnkiModel> {
   const modelsMap = new Map<string, AnkiModel>();
   const raw = JSON.parse(modelsJson) as Record<string, { name: string; flds: { name: string; ord: number }[] }>;
@@ -65,10 +57,6 @@ export function parseModels(modelsJson: string): Map<string, AnkiModel> {
   return modelsMap;
 }
 
-/**
- * Parse the decks JSON from the `col` table.
- * Returns a map of deck ID → deck name.
- */
 export function parseDeckNames(decksJson: string): Map<string, string> {
   const decksMap = new Map<string, string>();
   const raw = JSON.parse(decksJson) as Record<string, { name: string }>;
@@ -80,13 +68,8 @@ export function parseDeckNames(decksJson: string): Map<string, string> {
   return decksMap;
 }
 
-/** Separator used between fields in Anki notes */
 const FIELD_SEPARATOR = '\x1f';
 
-/**
- * Strip basic HTML tags from a string.
- * Anki stores content with HTML formatting.
- */
 export function stripHtml(html: string): string {
   return html
     .replace(/<br\s*\/?>/gi, '\n')
@@ -110,21 +93,12 @@ interface CardRow {
   did: string;
 }
 
-/**
- * Parse an .apkg file and extract all decks with their cards.
- *
- * @param file - The .apkg File object from a file input
- * @param frontFieldIndex - Which field index to use as "front" (default: 0)
- * @param backFieldIndex - Which field index to use as "back" (default: 1)
- * @returns Array of parsed decks with their cards
- */
 export async function parseApkgFile(file: File, frontFieldIndex = 0, backFieldIndex = 1): Promise<ParsedDeck[]> {
   const dbBytes = await extractDbFromApkg(file);
-  const SQL = await initSqlJs();
+  const SQL = await initSqlJs(SQL_CONFIG);
   const sqlDb = new SQL.Database(dbBytes);
 
   try {
-    // 1. Read collection metadata
     const colResult = sqlDb.exec('SELECT models, decks FROM col LIMIT 1');
     if (colResult.length === 0 || colResult[0].values.length === 0) {
       throw new Error('Invalid .apkg: col table is empty.');
@@ -136,7 +110,6 @@ export async function parseApkgFile(file: File, frontFieldIndex = 0, backFieldIn
     const models = parseModels(modelsJson);
     const deckNames = parseDeckNames(decksJson);
 
-    // 2. Read all notes
     const notesResult = sqlDb.exec('SELECT id, mid, flds FROM notes');
     const notesMap = new Map<number, NoteRow>();
 
@@ -149,7 +122,6 @@ export async function parseApkgFile(file: File, frontFieldIndex = 0, backFieldIn
       }
     }
 
-    // 3. Read all cards and group by deck
     const cardsResult = sqlDb.exec('SELECT nid, did FROM cards');
     const deckCardsMap = new Map<string, ParsedCard[]>();
 
@@ -166,7 +138,6 @@ export async function parseApkgFile(file: File, frontFieldIndex = 0, backFieldIn
         const model = models.get(note.mid);
         const fields = note.flds.split(FIELD_SEPARATOR);
 
-        // Determine front/back field indices
         const fIdx = model ? Math.min(frontFieldIndex, model.fields.length - 1) : frontFieldIndex;
         const bIdx = model ? Math.min(backFieldIndex, model.fields.length - 1) : backFieldIndex;
 
@@ -185,7 +156,6 @@ export async function parseApkgFile(file: File, frontFieldIndex = 0, backFieldIn
       }
     }
 
-    // 4. Build result
     const decks: ParsedDeck[] = [];
     for (const [deckId, cards] of deckCardsMap) {
       decks.push({
@@ -200,13 +170,9 @@ export async function parseApkgFile(file: File, frontFieldIndex = 0, backFieldIn
   }
 }
 
-/**
- * Get the available note models from an .apkg file.
- * Useful for letting the user choose field mapping before import.
- */
 export async function getApkgModels(file: File): Promise<AnkiModel[]> {
   const dbBytes = await extractDbFromApkg(file);
-  const SQL = await initSqlJs();
+  const SQL = await initSqlJs(SQL_CONFIG);
   const sqlDb = new SQL.Database(dbBytes);
 
   try {
