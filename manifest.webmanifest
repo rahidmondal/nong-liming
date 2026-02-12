@@ -1,0 +1,72 @@
+{
+  "name": "NongLiMing",
+  "short_name": "nong-liming",
+  "description": "Learn Thai using Indic phonetics with English SVO grammar in focused, mobile-first sessions.",
+  "id": "/nong-liming/?source=pwa",
+  "start_url": "/nong-liming/?source=pwa",
+  "scope": "/nong-liming/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#0b0f1a",
+  "theme_color": "#0b0f1a",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/nong-liming/pwa-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/nong-liming/maskable-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/nong-liming/screenshot-vertical.svg",
+      "sizes": "1080x1920",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/nong-liming/screenshot-horizontal.svg",
+      "sizes": "1920x1080",
+      "type": "image/svg+xml",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Daily Warmup",
+      "short_name": "Warmup",
+      "description": "Jump into a 5-minute phonetics drill.",
+      "url": "/nong-liming/?screen=warmup",
+      "icons": [
+        {
+          "src": "/nong-liming/pwa-icon.svg",
+          "sizes": "512x512",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Script Map",
+      "short_name": "Script Map",
+      "description": "Browse Thai-to-Indic character mapping.",
+      "url": "/nong-liming/?screen=script-map"
+    },
+    {
+      "name": "Progress",
+      "short_name": "Progress",
+      "description": "See your weekly learning streaks.",
+      "url": "/nong-liming/?screen=progress"
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": []
+}
