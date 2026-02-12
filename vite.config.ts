@@ -9,6 +9,7 @@ const packageJson = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/nong-liming/',
   plugins: [
     tailwindcss(),
     react(),

@@ -34,7 +34,11 @@ export function LandingPage() {
           className="text-center space-y-4"
         >
           <div className="w-32 h-32 mx-auto flex items-center justify-center filter drop-shadow-lg">
-            <img src="/pwa-icon.svg" alt="Nong Li Ming Logo" className="w-full h-full object-contain" />
+            <img
+              src={`${import.meta.env.BASE_URL}pwa-icon.svg`}
+              alt="Nong Li Ming Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
           <h1 className="text-3xl font-bold text-foreground">
             Hi, I am <br />

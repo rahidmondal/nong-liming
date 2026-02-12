@@ -2,7 +2,7 @@ import JSZip from 'jszip';
 import initSqlJs from 'sql.js';
 
 const SQL_CONFIG = {
-  locateFile: () => '/sql-wasm.wasm',
+  locateFile: (file: string) => `${import.meta.env.BASE_URL}${file}`,
 };
 
 export interface ParsedCard {

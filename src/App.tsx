@@ -8,7 +8,7 @@ import { LandingPage } from './features/landing/LandingPage';
 function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="nong-liming-ui-theme">
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <div className="flex flex-col min-h-screen">
           <div className="grow">
             <Routes>
