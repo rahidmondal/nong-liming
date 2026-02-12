@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Clock, FileUp, Layers, Library, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { ArrowLeft, BarChart3, Clock, FileUp, Layers, Library, Plus, Sparkles, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ModeToggle } from '../../components/mode-toggle';
@@ -73,7 +73,16 @@ export function DecksPage() {
             My Decks
           </h1>
         </div>
-        <ModeToggle />
+        <div className="flex items-center gap-2">
+          <Link
+            to="/stats"
+            className="p-2 rounded-lg hover:bg-card transition-colors text-muted-foreground hover:text-primary"
+            aria-label="View statistics"
+          >
+            <BarChart3 className="w-5 h-5" />
+          </Link>
+          <ModeToggle />
+        </div>
       </header>
 
       <main className="flex-1 w-full flex flex-col gap-6 mt-2">
