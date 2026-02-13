@@ -57,6 +57,11 @@ export default defineConfig({
       },
     }),
   ],
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+    },
+  },
   define: {
     'import.meta.env.PACKAGE_VERSION': JSON.stringify(packageJson.version),
   },
