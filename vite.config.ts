@@ -131,17 +131,6 @@ export default defineConfig({
               networkTimeoutSeconds: 3,
             },
           },
-          {
-            urlPattern: ({ request }) => request.destination === 'audio' || request.destination === 'video',
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'media-cache',
-              expiration: {
-                maxEntries: 200,
-                maxAgeSeconds: 30 * 24 * 60 * 60,
-              },
-            },
-          },
         ],
       },
     }),

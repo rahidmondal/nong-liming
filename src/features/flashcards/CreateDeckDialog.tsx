@@ -1,5 +1,4 @@
 import { db } from '@/lib/db';
-import { DEFAULT_DECK_CONFIG } from '@/types/flashcard';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useState } from 'react';
@@ -24,7 +23,6 @@ export function CreateDeckDialog({ open, onClose }: CreateDeckDialogProps) {
       await db.decks.add({
         name: name.trim(),
         description: description.trim() || undefined,
-        ...DEFAULT_DECK_CONFIG,
         createdAt: now,
         updatedAt: now,
       });
