@@ -10,7 +10,7 @@ function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="nong-liming-ui-theme">
       <BrowserRouter basename={BASE_PATH}>
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-dvh">
           <div className="grow">
             <Routes>
               <Route path="/" element={<LandingPage />} />

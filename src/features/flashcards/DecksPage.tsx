@@ -61,7 +61,7 @@ export function DecksPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-6 max-w-md mx-auto relative">
+    <div className="min-h-full flex flex-col items-center p-6 max-w-md mx-auto relative">
       {/* Header */}
       <header className="w-full flex justify-between items-center py-6">
         <div className="flex items-center gap-3">
@@ -119,11 +119,11 @@ export function DecksPage() {
             </div>
             <div className="space-y-2">
               <h2 className="text-xl font-semibold text-foreground">No decks yet</h2>
-              <p className="text-muted-foreground text-sm max-w-[260px]">
+              <p className="text-muted-foreground text-sm max-w-65">
                 Create your first flashcard deck or import an Anki (.apkg) file to get started.
               </p>
             </div>
-            <div className="flex flex-col gap-3 w-full max-w-[240px]">
+            <div className="flex flex-col gap-3 w-full max-w-65">
               <button
                 onClick={() => {
                   setShowCreateDeck(true);

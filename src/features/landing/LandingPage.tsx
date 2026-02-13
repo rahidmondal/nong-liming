@@ -20,7 +20,7 @@ export function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-6 max-w-md mx-auto relative">
+    <div className="min-h-full flex flex-col items-center p-6 max-w-md mx-auto relative">
       <header className="w-full flex justify-between items-center py-6">
         <div className="text-2xl font-bold text-primary font-sarabun">น้องลีมิง</div>
         <ModeToggle />

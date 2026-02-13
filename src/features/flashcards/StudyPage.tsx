@@ -108,7 +108,7 @@ export function StudyPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-full flex items-center justify-center">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
@@ -119,7 +119,7 @@ export function StudyPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-6 max-w-md mx-auto">
+    <div className="min-h-full flex flex-col items-center p-6 max-w-md mx-auto">
       {/* Header */}
       <header className="w-full flex items-center gap-3 py-6">
         <Link to="/decks" className="p-2 -ml-2 rounded-lg hover:bg-card transition-colors" aria-label="Back to decks">
@@ -147,7 +147,7 @@ export function StudyPage() {
               <CheckCircle2 className="w-10 h-10 text-accent" />
             </div>
             <h2 className="text-xl font-semibold text-foreground">All caught up!</h2>
-            <p className="text-sm text-muted-foreground max-w-[260px]">
+            <p className="text-sm text-muted-foreground max-w-65">
               No cards are due for review right now. Come back later!
             </p>
             <Link
@@ -174,7 +174,7 @@ export function StudyPage() {
             </div>
 
             {/* Flashcard */}
-            <div className="w-full flex-1 flex items-center justify-center min-h-[300px]">
+            <div className="w-full flex-1 flex items-center justify-center min-h-75">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={`${String(currentCard.id)}-${phase}`}
@@ -185,7 +185,7 @@ export function StudyPage() {
                   className="w-full"
                 >
                   <div
-                    className={`w-full min-h-[280px] p-8 rounded-2xl border shadow-lg flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${
+                    className={`w-full min-h-70 p-8 rounded-2xl border shadow-lg flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${
                       phase === 'front'
                         ? 'bg-card border-border hover:border-primary/50'
                         : 'bg-linear-to-br from-card to-primary/5 border-primary/30'
@@ -262,7 +262,7 @@ export function StudyPage() {
               <p className="text-muted-foreground">Great work on your study session.</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 max-w-[280px] mx-auto">
+            <div className="grid grid-cols-2 gap-4 max-w-70 mx-auto">
               <div className="bg-card rounded-xl border border-border p-4 text-center">
                 <p className="text-2xl font-bold text-foreground">{sessionStats.reviewed}</p>
                 <p className="text-xs text-muted-foreground">Cards Reviewed</p>
@@ -275,7 +275,7 @@ export function StudyPage() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 w-full max-w-[240px] mx-auto">
+            <div className="flex flex-col gap-3 w-full max-w-60 mx-auto">
               <button
                 onClick={handleRestart}
                 className="flex items-center justify-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-xl font-medium shadow-md hover:shadow-lg transition-all"

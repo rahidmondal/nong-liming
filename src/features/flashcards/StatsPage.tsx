@@ -38,7 +38,7 @@ export function StatsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-full flex items-center justify-center">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
@@ -49,7 +49,7 @@ export function StatsPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-6 max-w-md mx-auto">
+    <div className="min-h-full flex flex-col items-center p-6 max-w-md mx-auto">
       {/* Header */}
       <header className="w-full flex justify-between items-center py-6">
         <div className="flex items-center gap-3">
@@ -162,7 +162,7 @@ export function StatsPage() {
               <TrendingUp className="w-4 h-4" />
               Last 30 Days
             </h2>
-            <div className="flex items-end gap-[3px] h-24">
+            <div className="flex items-end gap-0.75 h-24">
               {daily.map(d => {
                 const height = d.count > 0 ? Math.max(8, (d.count / maxDailyCount) * 100) : 4;
                 const dayLabel = new Date(d.date).toLocaleDateString('en', { weekday: 'narrow' });
