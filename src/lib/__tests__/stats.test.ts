@@ -1,5 +1,5 @@
+import { getStreaks } from '@/lib/stats';
 import { describe, expect, it } from 'vitest';
-import { getStreaks } from '../stats';
 
 describe('getStreaks', () => {
   it('returns 0/0 for empty input', () => {

@@ -1,8 +1,8 @@
+import { parseApkgFile, type ParsedDeck } from '@/lib/apkg-parser';
+import { db } from '@/lib/db';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FileUp, Loader2, X } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { parseApkgFile, type ParsedDeck } from '../../lib/apkg-parser';
-import { db } from '../../lib/db';
 
 interface ImportDialogProps {
   open: boolean;

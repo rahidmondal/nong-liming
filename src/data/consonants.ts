@@ -1,4 +1,4 @@
-import type { ThaiConsonant } from '../types/alphabet';
+import type { ThaiConsonant } from '@/types/alphabet';
 
 export const consonants: ThaiConsonant[] = [
   {

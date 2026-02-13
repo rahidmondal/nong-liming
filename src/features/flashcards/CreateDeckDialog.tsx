@@ -1,7 +1,7 @@
+import { db } from '@/lib/db';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useState } from 'react';
-import { db } from '../../lib/db';
 
 interface CreateDeckDialogProps {
   open: boolean;

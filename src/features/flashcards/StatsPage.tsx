@@ -1,10 +1,10 @@
+import { ModeToggle } from '@/components/mode-toggle';
+import type { DailyReviewCount, DeckStats, OverallStats } from '@/lib/stats';
+import { getDailyReviews, getDeckStats, getOverallStats } from '@/lib/stats';
 import { motion } from 'framer-motion';
 import { ArrowLeft, BarChart3, BookOpen, Flame, Layers, Star, TrendingUp, Zap } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ModeToggle } from '../../components/mode-toggle';
-import type { DailyReviewCount, DeckStats, OverallStats } from '../../lib/stats';
-import { getDailyReviews, getDeckStats, getOverallStats } from '../../lib/stats';
 
 export function StatsPage() {
   const [overall, setOverall] = useState<OverallStats | null>(null);

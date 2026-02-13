@@ -1,9 +1,9 @@
+import { ThemeProvider } from '@/components/theme-provider';
+import { DecksPage } from '@/features/flashcards/DecksPage';
+import { StatsPage } from '@/features/flashcards/StatsPage';
+import { StudyPage } from '@/features/flashcards/StudyPage';
+import { LandingPage } from '@/features/landing/LandingPage';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ThemeProvider } from './components/theme-provider';
-import { DecksPage } from './features/flashcards/DecksPage';
-import { StatsPage } from './features/flashcards/StatsPage';
-import { StudyPage } from './features/flashcards/StudyPage';
-import { LandingPage } from './features/landing/LandingPage';
 
 function App() {
   return (

@@ -1,7 +1,7 @@
+import { ModeToggle } from '@/components/mode-toggle';
 import { motion } from 'framer-motion';
 import { BookOpen, Layers, PenTool } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ModeToggle } from '../../components/mode-toggle';
 
 export function LandingPage() {
   const container = {

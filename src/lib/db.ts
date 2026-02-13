@@ -1,5 +1,5 @@
+import type { Card, Deck, ReviewLog } from '@/types/flashcard';
 import Dexie, { type EntityTable } from 'dexie';
-import type { Card, Deck, ReviewLog } from '../types/flashcard';
 
 const db = new Dexie('NongLimingDB') as Dexie & {
   decks: EntityTable<Deck, 'id'>;

@@ -1,8 +1,8 @@
+import { ThemeProvider } from '@/components/theme-provider';
+import { LandingPage } from '@/features/landing/LandingPage';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
-import { ThemeProvider } from '../../../components/theme-provider';
-import { LandingPage } from '../LandingPage';
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

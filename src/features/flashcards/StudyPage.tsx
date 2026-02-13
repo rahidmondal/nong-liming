@@ -1,11 +1,11 @@
+import { db } from '@/lib/db';
+import { calculateNextReview, QUALITY_MAP, type QualityLabel } from '@/lib/sm2';
+import type { Card, Deck } from '@/types/flashcard';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, RotateCcw } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { db } from '../../lib/db';
-import { calculateNextReview, QUALITY_MAP, type QualityLabel } from '../../lib/sm2';
-import type { Card, Deck } from '../../types/flashcard';
 
 type StudyPhase = 'loading' | 'front' | 'back' | 'done';
 

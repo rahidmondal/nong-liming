@@ -1,5 +1,5 @@
+import { parseDeckNames, parseModels, stripHtml } from '@/lib/apkg-parser';
 import { describe, expect, it } from 'vitest';
-import { parseDeckNames, parseModels, stripHtml } from '../apkg-parser';
 
 describe('stripHtml', () => {
   it('strips simple HTML tags', () => {

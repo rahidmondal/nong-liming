@@ -1,11 +1,11 @@
+import { ModeToggle } from '@/components/mode-toggle';
+import { db } from '@/lib/db';
+import type { Deck } from '@/types/flashcard';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion } from 'framer-motion';
 import { ArrowLeft, BarChart3, Clock, FileUp, Layers, Library, Plus, Sparkles, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ModeToggle } from '../../components/mode-toggle';
-import { db } from '../../lib/db';
-import type { Deck } from '../../types/flashcard';
 import { AddCardDialog } from './AddCardDialog';
 import { CreateDeckDialog } from './CreateDeckDialog';
 import { ImportDialog } from './ImportDialog';

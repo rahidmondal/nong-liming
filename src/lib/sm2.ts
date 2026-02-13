@@ -1,4 +1,4 @@
-import type { Card } from '../types/flashcard';
+import type { Card } from '@/types/flashcard';
 
 export type ReviewQuality = 0 | 1 | 2 | 3 | 4 | 5;
 

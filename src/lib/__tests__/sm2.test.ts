@@ -1,5 +1,5 @@
+import { calculateNextReview, QUALITY_MAP } from '@/lib/sm2';
 import { describe, expect, it } from 'vitest';
-import { calculateNextReview, QUALITY_MAP } from '../sm2';
 
 const defaultCard = {
   easeFactor: 2.5,
