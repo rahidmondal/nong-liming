@@ -9,21 +9,25 @@ export interface CardStatusBreakdown {
   new: number;
   learning: number;
   review: number;
+  relearning: number;
 }
 
 export interface DeckStats {
   deckId: number;
   deckName: string;
   totalCards: number;
+  totalNotes: number;
   newCards: number;
   learningCards: number;
   reviewCards: number;
+  relearningCards: number;
   averageEase: number;
 }
 
 export interface OverallStats {
   totalDecks: number;
   totalCards: number;
+  totalNotes: number;
   totalReviews: number;
   currentStreak: number;
   longestStreak: number;
@@ -104,6 +108,7 @@ export async function getOverallStats(): Promise<OverallStats> {
   const totalDecks = await db.decks.count();
   const allCards = await db.cards.toArray();
   const totalCards = allCards.length;
+  const totalNotes = await db.notes.count();
   const totalReviews = await db.reviewLogs.count();
 
   const today = toDateKey(new Date());
@@ -113,7 +118,7 @@ export async function getOverallStats(): Promise<OverallStats> {
   const reviewDates = allLogs.map(l => toDateKey(l.reviewedAt));
   const { current, longest } = getStreaks(reviewDates);
 
-  const cardBreakdown: CardStatusBreakdown = { new: 0, learning: 0, review: 0 };
+  const cardBreakdown: CardStatusBreakdown = { new: 0, learning: 0, review: 0, relearning: 0 };
   for (const card of allCards) {
     cardBreakdown[card.status]++;
   }
@@ -121,6 +126,7 @@ export async function getOverallStats(): Promise<OverallStats> {
   return {
     totalDecks,
     totalCards,
+    totalNotes,
     totalReviews,
     currentStreak: current,
     longestStreak: longest,
@@ -136,27 +142,42 @@ export async function getDeckStats(): Promise<DeckStats[]> {
   for (const deck of decks) {
     if (deck.id === undefined) continue;
     const cards = await db.cards.where('deckId').equals(deck.id).toArray();
+    const noteCount = await db.notes.where('deckId').equals(deck.id).count();
 
     let totalEase = 0;
     let newCards = 0;
     let learningCards = 0;
     let reviewCards = 0;
+    let relearningCards = 0;
 
     for (const card of cards) {
       totalEase += card.easeFactor;
-      if (card.status === 'new') newCards++;
-      else if (card.status === 'learning') learningCards++;
-      else reviewCards++;
+      switch (card.status) {
+        case 'new':
+          newCards++;
+          break;
+        case 'learning':
+          learningCards++;
+          break;
+        case 'review':
+          reviewCards++;
+          break;
+        case 'relearning':
+          relearningCards++;
+          break;
+      }
     }
 
     result.push({
       deckId: deck.id,
       deckName: deck.name,
       totalCards: cards.length,
+      totalNotes: noteCount,
       newCards,
       learningCards,
       reviewCards,
-      averageEase: cards.length > 0 ? totalEase / cards.length : 2.5,
+      relearningCards,
+      averageEase: cards.length > 0 ? totalEase / cards.length : 250,
     });
   }
 

@@ -1,5 +1,5 @@
-import { parseApkgFile, type ParsedDeck } from '@/lib/apkg-parser';
-import { db } from '@/lib/db';
+import { useToast } from '@/components/toast-provider';
+import { parseApkgFile, type ParsedApkg } from '@/lib/apkg-parser';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FileUp, Loader2, X } from 'lucide-react';
 import { useRef, useState } from 'react';
@@ -9,20 +9,23 @@ interface ImportDialogProps {
   onClose: () => void;
 }
 
-type ImportStep = 'select' | 'parsing' | 'preview' | 'importing' | 'done' | 'error';
+type ImportStep = 'select' | 'parsing' | 'preview' | 'error';
+
+import { importApkgToDb } from '@/lib/import-utils';
+
+const runImport = importApkgToDb;
 
 export function ImportDialog({ open, onClose }: ImportDialogProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<ImportStep>('select');
-  const [parsedDecks, setParsedDecks] = useState<ParsedDeck[]>([]);
+  const [parsedResult, setParsedResult] = useState<ParsedApkg | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
-  const [importedCount, setImportedCount] = useState(0);
+  const toast = useToast();
 
   const resetState = () => {
     setStep('select');
-    setParsedDecks([]);
+    setParsedResult(null);
     setErrorMessage('');
-    setImportedCount(0);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -39,13 +42,13 @@ export function ImportDialog({ open, onClose }: ImportDialogProps) {
 
     setStep('parsing');
     try {
-      const decks = await parseApkgFile(file);
-      if (decks.length === 0) {
+      const result = await parseApkgFile(file);
+      if (result.decks.length === 0) {
         setErrorMessage('No cards found in this .apkg file.');
         setStep('error');
         return;
       }
-      setParsedDecks(decks);
+      setParsedResult(result);
       setStep('preview');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to parse .apkg file.';
@@ -54,44 +57,47 @@ export function ImportDialog({ open, onClose }: ImportDialogProps) {
     }
   };
 
-  const handleImport = async () => {
-    setStep('importing');
-    try {
-      let totalCards = 0;
-      for (const parsedDeck of parsedDecks) {
-        const now = new Date();
-        const deckId = await db.decks.add({
-          name: parsedDeck.name,
-          createdAt: now,
-          updatedAt: now,
+  const handleImport = () => {
+    if (!parsedResult) return;
+
+    const totalNotes = parsedResult.decks.reduce((sum, d) => sum + d.notes.length, 0);
+    const deckCount = parsedResult.decks.length;
+
+    handleClose();
+
+    const toastId = toast.show('Importing cards…', {
+      type: 'loading',
+      detail: `0 / ${String(totalNotes)} cards`,
+      persistent: true,
+      id: 'import-progress',
+    });
+
+    void runImport(parsedResult, (count: number) => {
+      toast.update(toastId, {
+        detail: `${String(count)} / ${String(totalNotes)} cards`,
+      });
+    })
+      .then((importedCount: number) => {
+        toast.update(toastId, {
+          type: 'success',
+          message: 'Import complete!',
+          detail: `${String(importedCount)} cards across ${String(deckCount)} deck${deckCount > 1 ? 's' : ''}`,
+          persistent: false,
         });
-
-        const cards = parsedDeck.cards.map(card => ({
-          deckId: Number(deckId),
-          front: card.front,
-          back: card.back,
-          status: 'new' as const,
-          nextReview: now,
-          interval: 0,
-          easeFactor: 2.5,
-          repetitions: 0,
-          createdAt: now,
-          updatedAt: now,
-        }));
-
-        await db.cards.bulkAdd(cards);
-        totalCards += cards.length;
-      }
-      setImportedCount(totalCards);
-      setStep('done');
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to import cards.';
-      setErrorMessage(message);
-      setStep('error');
-    }
+      })
+      .catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : 'Import failed';
+        toast.update(toastId, {
+          type: 'error',
+          message: 'Import failed',
+          detail: message,
+          persistent: false,
+        });
+      });
   };
 
-  const totalCards = parsedDecks.reduce((sum, d) => sum + d.cards.length, 0);
+  const totalNotes = parsedResult?.decks.reduce((sum, d) => sum + d.notes.length, 0) ?? 0;
+  const totalModels = parsedResult?.models.length ?? 0;
 
   return (
     <AnimatePresence>
@@ -157,21 +163,31 @@ export function ImportDialog({ open, onClose }: ImportDialogProps) {
             )}
 
             {/* Step: Preview */}
-            {step === 'preview' && (
+            {step === 'preview' && parsedResult && (
               <div className="space-y-4">
                 <div className="bg-background rounded-xl border border-input p-4 space-y-2">
                   <p className="text-sm font-medium text-foreground">Found:</p>
-                  {parsedDecks.map((deck, i) => (
+                  {parsedResult.decks.map((deck, i) => (
                     <div key={i} className="flex justify-between text-sm">
                       <span className="text-foreground truncate mr-2">{deck.name}</span>
-                      <span className="text-muted-foreground whitespace-nowrap">{deck.cards.length} cards</span>
+                      <span className="text-muted-foreground whitespace-nowrap">{deck.notes.length} notes</span>
                     </div>
                   ))}
-                  <div className="pt-2 border-t border-border flex justify-between text-sm font-medium">
-                    <span>Total</span>
-                    <span className="text-primary">{totalCards} cards</span>
+                  <div className="pt-2 border-t border-border space-y-1">
+                    <div className="flex justify-between text-sm font-medium">
+                      <span>Total Notes</span>
+                      <span className="text-primary">{totalNotes}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span>Note Types</span>
+                      <span>{totalModels}</span>
+                    </div>
                   </div>
                 </div>
+
+                <p className="text-xs text-muted-foreground text-center">
+                  Import will run in the background — you can continue using the app.
+                </p>
 
                 <div className="flex gap-3">
                   <button
@@ -183,43 +199,12 @@ export function ImportDialog({ open, onClose }: ImportDialogProps) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => void handleImport()}
+                    onClick={handleImport}
                     className="flex-1 px-4 py-3 bg-primary text-primary-foreground rounded-xl font-medium shadow-md hover:shadow-lg transition-all"
                   >
-                    Import {totalCards} Cards
+                    Import {totalNotes} Notes
                   </button>
                 </div>
-              </div>
-            )}
-
-            {/* Step: Importing */}
-            {step === 'importing' && (
-              <div className="flex flex-col items-center gap-4 py-8">
-                <Loader2 className="w-10 h-10 text-primary animate-spin" />
-                <p className="text-sm text-muted-foreground">Importing cards to your library...</p>
-              </div>
-            )}
-
-            {/* Step: Done */}
-            {step === 'done' && (
-              <div className="space-y-4 text-center py-4">
-                <div className="w-16 h-16 mx-auto rounded-full bg-accent/20 flex items-center justify-center">
-                  <span className="text-3xl">✅</span>
-                </div>
-                <div>
-                  <p className="font-semibold text-foreground">Import Complete!</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Successfully imported {importedCount} cards across {parsedDecks.length} deck
-                    {parsedDecks.length > 1 ? 's' : ''}.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  className="w-full px-4 py-3 bg-primary text-primary-foreground rounded-xl font-medium shadow-md hover:shadow-lg transition-all"
-                >
-                  Done
-                </button>
               </div>
             )}
 

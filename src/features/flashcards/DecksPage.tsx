@@ -1,14 +1,34 @@
 import { ModeToggle } from '@/components/mode-toggle';
+import { useToast } from '@/components/toast-provider';
+import { parseApkgFile } from '@/lib/apkg-parser';
 import { db } from '@/lib/db';
+import { importApkgToDb } from '@/lib/import-utils';
 import type { Deck } from '@/types/flashcard';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BarChart3, Clock, FileUp, Layers, Library, Plus, Sparkles, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  BarChart3,
+  Clock,
+  Download,
+  FileUp,
+  Layers,
+  Library,
+  Pencil,
+  Plus,
+  Sparkles,
+  Trash2,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AddCardDialog } from './AddCardDialog';
 import { CreateDeckDialog } from './CreateDeckDialog';
 import { ImportDialog } from './ImportDialog';
+import { RenameDeckDialog } from './RenameDeckDialog';
+
+// Import sample decks
+import thai1000Url from '@/assets/Thai_1000_Common_Words_incl_Audio_Phonetics_Examples.apkg?url';
+import thaiReadUrl from '@/assets/Thai_Read_Hear_Translate.apkg?url';
 
 export function DecksPage() {
   const decks = useLiveQuery<Deck[]>(() => db.decks.orderBy('createdAt').reverse().toArray());
@@ -37,15 +57,69 @@ export function DecksPage() {
   const [showImport, setShowImport] = useState(false);
   const [addCardDeckId, setAddCardDeckId] = useState<number | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+  const [renameDeck, setRenameDeck] = useState<{ id: number; name: string } | null>(null);
+  const [isImportingSamples, setIsImportingSamples] = useState(false);
+
+  const navigate = useNavigate();
+  const toast = useToast();
 
   const handleDeleteDeck = async (deckId: number) => {
     await db.cards.where('deckId').equals(deckId).delete();
+    await db.notes.where('deckId').equals(deckId).delete();
     await db.reviewLogs.where('deckId').equals(deckId).delete();
     await db.decks.delete(deckId);
     setConfirmDeleteId(null);
+    toast.show('Deck deleted', { type: 'success' });
   };
 
-  const navigate = useNavigate();
+  const handleLoadSamples = async () => {
+    if (isImportingSamples) return;
+    setIsImportingSamples(true);
+    const toastId = toast.show('Loading sample decks...', { type: 'loading', persistent: true });
+
+    try {
+      const samples = [
+        { name: 'Thai 1000 Words', url: thai1000Url },
+        { name: 'Thai Read & Hear', url: thaiReadUrl },
+      ];
+
+      let importedCount = 0;
+
+      for (const sample of samples) {
+        toast.update(toastId, { detail: `Downloading ${sample.name}...` });
+        const resp = await fetch(sample.url);
+        if (!resp.ok) throw new Error(`Failed to fetch ${sample.name}`);
+        const blob = await resp.blob();
+        const file = new File([blob], sample.name + '.apkg');
+
+        toast.update(toastId, { detail: `Parsing ${sample.name}...` });
+        const parsed = await parseApkgFile(file);
+
+        toast.update(toastId, { detail: `Importing ${sample.name}...` });
+        await importApkgToDb(parsed, _count => {
+          // Optional: update detail with card count
+        });
+        importedCount++;
+      }
+
+      toast.update(toastId, {
+        type: 'success',
+        message: 'Sample decks loaded!',
+        detail: `Successfully imported ${String(importedCount)} decks.`,
+        persistent: false,
+      });
+    } catch (e) {
+      console.error(e);
+      toast.update(toastId, {
+        type: 'error',
+        message: 'Failed to load samples',
+        detail: e instanceof Error ? e.message : 'Unknown error',
+        persistent: false,
+      });
+    } finally {
+      setIsImportingSamples(false);
+    }
+  };
 
   const container = {
     hidden: { opacity: 0 },
@@ -142,6 +216,22 @@ export function DecksPage() {
                 <FileUp className="w-4 h-4" />
                 Import .apkg
               </button>
+              <button
+                onClick={() => void handleLoadSamples()}
+                disabled={isImportingSamples}
+                className="flex items-center justify-center gap-2 px-5 py-3 bg-card text-foreground rounded-xl font-medium border border-border shadow-sm hover:shadow-md transition-all disabled:opacity-50"
+              >
+                {isImportingSamples ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                    className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full"
+                  />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
+                Load Sample Decks
+              </button>
             </div>
           </motion.div>
         )}
@@ -150,12 +240,12 @@ export function DecksPage() {
         {!isLoading && decks.length > 0 && (
           <>
             {/* Action buttons bar */}
-            <div className="flex gap-3">
+            <div className="flex gap-3 overflow-x-auto pb-2">
               <button
                 onClick={() => {
                   setShowCreateDeck(true);
                 }}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium shadow-sm hover:shadow-md transition-all text-sm"
+                className="shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium shadow-sm hover:shadow-md transition-all text-sm"
               >
                 <Plus className="w-4 h-4" />
                 New Deck
@@ -164,14 +254,14 @@ export function DecksPage() {
                 onClick={() => {
                   setShowImport(true);
                 }}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-card text-foreground rounded-xl font-medium border border-border shadow-sm hover:shadow-md transition-all text-sm"
+                className="shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 bg-card text-foreground rounded-xl font-medium border border-border shadow-sm hover:shadow-md transition-all text-sm"
               >
                 <FileUp className="w-4 h-4" />
-                Import .apkg
+                Import
               </button>
             </div>
 
-            <motion.div variants={container} initial="hidden" animate="show" className="space-y-3">
+            <motion.div variants={container} initial="hidden" animate="show" className="space-y-3 pb-20">
               {decks.map(deck => {
                 const deckId = deck.id;
                 const counts = deckId !== undefined ? cardCounts?.[deckId] : undefined;
@@ -217,15 +307,26 @@ export function DecksPage() {
 
                       {/* Action buttons */}
                       {deckId !== undefined && !isConfirmingDelete && (
-                        <div className="relative z-10 flex items-center gap-1">
+                        <div className="relative z-10 flex items-center gap-1 pl-2">
                           <button
                             onClick={() => {
                               setAddCardDeckId(deckId);
                             }}
                             className="p-2 rounded-lg hover:bg-primary/10 transition-colors"
                             aria-label={`Add card to ${deck.name}`}
+                            title="Add Card"
                           >
                             <Plus className="w-5 h-5 text-primary" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setRenameDeck({ id: deckId, name: deck.name });
+                            }}
+                            className="p-2 rounded-lg hover:bg-primary/10 transition-colors"
+                            aria-label={`Rename ${deck.name}`}
+                            title="Rename"
+                          >
+                            <Pencil className="w-4 h-4 text-muted-foreground hover:text-primary" />
                           </button>
                           <button
                             onClick={() => {
@@ -233,6 +334,7 @@ export function DecksPage() {
                             }}
                             className="p-2 rounded-lg hover:bg-destructive/10 transition-colors"
                             aria-label={`Delete ${deck.name}`}
+                            title="Delete"
                           >
                             <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />
                           </button>
@@ -241,8 +343,8 @@ export function DecksPage() {
 
                       {/* Delete confirmation */}
                       {isConfirmingDelete && (
-                        <div className="relative z-10 flex items-center gap-2">
-                          <span className="text-xs text-destructive font-medium">Delete?</span>
+                        <div className="relative z-10 flex items-center gap-2 pl-2">
+                          <span className="text-xs text-destructive font-medium hidden sm:inline">Delete?</span>
                           <button
                             onClick={() => void handleDeleteDeck(deckId)}
                             className="px-3 py-1.5 bg-destructive text-destructive-foreground rounded-lg text-xs font-medium hover:bg-destructive/90 transition-colors"
@@ -279,6 +381,13 @@ export function DecksPage() {
         open={showImport}
         onClose={() => {
           setShowImport(false);
+        }}
+      />
+      <RenameDeckDialog
+        deckId={renameDeck?.id ?? null}
+        currentName={renameDeck?.name ?? ''}
+        onClose={() => {
+          setRenameDeck(null);
         }}
       />
       {addCardDeckId !== null && (

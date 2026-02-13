@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { createNoteAndCard, getOrCreateDefaultNoteType } from '@/lib/db';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useState } from 'react';
@@ -21,18 +21,10 @@ export function AddCardDialog({ open, deckId, onClose }: AddCardDialogProps) {
 
     setSaving(true);
     try {
-      const now = new Date();
-      await db.cards.add({
-        deckId,
-        front: front.trim(),
-        back: back.trim(),
-        status: 'new',
-        nextReview: now,
-        interval: 0,
-        easeFactor: 2.5,
-        repetitions: 0,
-        createdAt: now,
-        updatedAt: now,
+      const noteTypeId = await getOrCreateDefaultNoteType();
+      await createNoteAndCard(noteTypeId, deckId, {
+        Front: front.trim(),
+        Back: back.trim(),
       });
       setFront('');
       setBack('');
