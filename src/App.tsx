@@ -4,11 +4,12 @@ import { StatsPage } from '@/features/flashcards/StatsPage';
 import { StudyPage } from '@/features/flashcards/StudyPage';
 import { LandingPage } from '@/features/landing/LandingPage';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { APP_VERSION, BASE_PATH } from './lib/constants';
 
 function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="nong-liming-ui-theme">
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <BrowserRouter basename={BASE_PATH}>
         <div className="flex flex-col min-h-screen">
           <div className="grow">
             <Routes>
@@ -19,7 +20,7 @@ function App() {
             </Routes>
           </div>
           <footer className="w-full py-4 text-center text-sm text-muted-foreground border-t border-border bg-background/50 backdrop-blur-sm">
-            <p>v{import.meta.env.PACKAGE_VERSION}</p>
+            <p>v{APP_VERSION}</p>
           </footer>
         </div>
       </BrowserRouter>
