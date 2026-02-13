@@ -5,7 +5,10 @@ import {
   formatDuration,
   type SchedulingConfig,
 } from '@/lib/sm2';
+import type { Card } from '@/types/flashcard';
 import { describe, expect, it, vi } from 'vitest';
+
+type CardForReview = Pick<Card, 'status' | 'easeFactor' | 'interval' | 'repetitions' | 'lapses' | 'learningStep'>;
 
 const NO_FUZZ_CONFIG: SchedulingConfig = {
   ...DEFAULT_SCHEDULING_CONFIG,
@@ -172,7 +175,7 @@ describe('calculateNextReview', () => {
 
   describe('progression simulation', () => {
     it('correctly progresses a new card through learning to review', () => {
-      let card = { ...newCard };
+      let card: CardForReview = { ...newCard };
       const statuses: string[] = [];
 
       let result = calculateNextReview(card, 3, NO_FUZZ_CONFIG, now);
@@ -192,7 +195,7 @@ describe('calculateNextReview', () => {
     });
 
     it('handles a lapse and recovery cycle', () => {
-      let card = { ...reviewCard };
+      let card: CardForReview = { ...reviewCard };
 
       let result = calculateNextReview(card, 1, NO_FUZZ_CONFIG, now);
       expect(result.status).toBe('relearning');
