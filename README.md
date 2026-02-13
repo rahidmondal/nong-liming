@@ -2,26 +2,25 @@
 
 <img src="public/pwa-icon.svg" alt="Nong LiMing Logo" width="128" height="128">
 
-> **Your Personal Thai Learning Partner** 🇹🇭
+> **Your friendly Thai learning companion** 🇹🇭
 
-Nong LiMing is a friendly, focused "Indic-Thai Bridge" PWA designed to accelerate Thai language acquisition. It leverages Indic-script phonetics for sound accuracy and English SVO grammar for sentence logic, turning 15-minute study blocks into meaningful progress toward real-world fluency.
+Nong LiMing helps you learn Thai in short, focused sessions. It uses familiar sounds to guide pronunciation and simple sentence structure to build confidence, so even 15 minutes can feel productive.
 
 ## ✨ Features
 
-- **Flashcards**: Spaced repetition system (SRS) for optimized vocabulary retention. `[In Development]`
-- **Offline Ready**: Full PWA support for learning anywhere, anytime. `[Ready]`
-- **Varnamala Grid**: Thai consonants mapped to Hindi/Sanskrit equivalents with class-based styling (Mid, High, Low) for intuitive tone mastery. `[Planned]`
-- **Sentence Builder**: Construct Thai sentences using integrated vocabulary and grammar rules. `[Planned]`
+- **Flashcards**: Review words with smart scheduling. `[In Development]`
+- **Offline Ready**: Learn anywhere, even without a connection. `[Ready]`
+- **Consonant Grid**: Thai consonants mapped to Hindi/Sanskrit equivalents. `[Planned]`
+- **Sentence Builder**: Practice building real sentences. `[Planned]`
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [React](https://react.dev/) (Vite) with [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) & [Framer Motion](https://www.framer.com/motion/)
-- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
-- **Database**: [Dexie.js](https://dexie.org/) (IndexedDB)
-- **Icons**: [Lucide React](https://lucide.dev/)
+- **Framework**: [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) + [Framer Motion](https://www.framer.com/motion/)
+- **Database**: [Dexie.js](https://dexie.org/)
 - **PWA**: [Vite PWA](https://vite-pwa-org.netlify.app/)
-- **Typography**: [Sarabun](https://fonts.google.com/specimen/Sarabun) (Google Fonts)
+- **Icons**: [Lucide](https://lucide.dev/)
+- **Font**: [Sarabun](https://fonts.google.com/specimen/Sarabun)
 
 ## 🚀 Getting Started
 
@@ -46,8 +45,6 @@ pnpm install
 pnpm dev
 ```
 
-````
-
 ### Available Scripts
 
 - `pnpm dev`: Start the development server.
@@ -71,7 +68,5 @@ src/
 
 ## 📄 License
 
-Copyright © 22026 Rahid Mondal. All rights reserved.
+Copyright © 2026 Rahid Mondal. All rights reserved.
 License details will be updated upon official release.
-
-````
