@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@/components/theme-provider';
 import { ToastProvider } from '@/components/toast-provider';
+import { BuilderPage } from '@/features/builder/BuilderPage';
 import { DecksPage } from '@/features/flashcards/DecksPage';
 import { StatsPage } from '@/features/flashcards/StatsPage';
 import { StudyPage } from '@/features/flashcards/StudyPage';
@@ -21,6 +22,7 @@ function App() {
                 <Route path="/decks" element={<DecksPage />} />
                 <Route path="/decks/:id/study" element={<StudyPage />} />
                 <Route path="/stats" element={<StatsPage />} />
+                <Route path="/builder" element={<BuilderPage />} />
               </Routes>
             </div>
             <footer className="w-full py-4 text-center text-sm text-muted-foreground border-t border-border bg-background/50 backdrop-blur-sm">
