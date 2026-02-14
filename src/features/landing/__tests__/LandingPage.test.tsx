@@ -39,12 +39,9 @@ describe('LandingPage', () => {
     expect(screen.getByText('Review your Flashcards')).toBeInTheDocument();
   });
 
-  it('renders disabled options with Coming Soon badge', () => {
+  it('renders the Builder option', () => {
     renderwithProviders(<LandingPage />);
-
     expect(screen.getByText('Builder')).toBeInTheDocument();
-
-    const comingSoonBadges = screen.getAllByText('Soon');
-    expect(comingSoonBadges).toHaveLength(1);
+    expect(screen.getByText('Word & Writing Pad')).toBeInTheDocument();
   });
 });

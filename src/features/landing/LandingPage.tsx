@@ -82,20 +82,21 @@ export function LandingPage() {
             </Link>
           </motion.div>
 
-          {/* Disabled Option: Builder */}
-          <motion.div variants={item} className="opacity-60 grayscale filter">
-            <div className="flex items-center p-4 bg-card rounded-xl border border-border shadow-sm">
-              <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 mr-4">
+          {/* Active Option: Builder */}
+          <motion.div variants={item}>
+            <Link
+              to="/builder"
+              className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400 mr-4">
                 <PenTool className="w-6 h-6" />
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">Builder</h3>
-                <p className="text-sm text-muted-foreground">Word & Sentence</p>
+                <p className="text-sm text-muted-foreground">Word & Writing Pad</p>
               </div>
-              <span className="text-xs font-medium bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded text-slate-500">
-                Soon
-              </span>
-            </div>
+            </Link>
           </motion.div>
         </motion.div>
       </main>
