@@ -42,10 +42,9 @@ describe('LandingPage', () => {
   it('renders disabled options with Coming Soon badge', () => {
     renderwithProviders(<LandingPage />);
 
-    expect(screen.getByText('Full View')).toBeInTheDocument();
     expect(screen.getByText('Builder')).toBeInTheDocument();
 
     const comingSoonBadges = screen.getAllByText('Soon');
-    expect(comingSoonBadges).toHaveLength(2);
+    expect(comingSoonBadges).toHaveLength(1);
   });
 });
