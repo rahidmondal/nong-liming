@@ -1,6 +1,7 @@
 # Nong LiMing
 
 <img src="public/pwa-icon.svg" alt="Nong LiMing Logo" width="128" height="128">
+[![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)](https://github.com/rahidmondal/nong-liming)
 
 > **Your friendly Thai learning companion** 🇹🇭
 
@@ -8,10 +9,20 @@ Nong LiMing helps you learn Thai in short, focused sessions. It uses familiar so
 
 ## ✨ Features
 
-- **Flashcards**: Review words with smart scheduling. `[In Development]`
-- **Offline Ready**: Learn anywhere, even without a connection. `[Ready]`
-- **Consonant Grid**: Thai consonants mapped to Hindi/Sanskrit equivalents. `[Planned]`
+- **Full View**: Interactive reference for Consonants, Vowels, Numbers, and Tones with TTS audio. `[New - Since v0.4.0]`
+- **Flashcards**: Review words with smart scheduling. `[Available - Since v0.3.0]`
+- **Offline Ready**: Learn anywhere, even without a connection. `[Ready - Since v0.3.0]`
 - **Sentence Builder**: Practice building real sentences. `[Planned]`
+
+### 📚 Full View Reference
+
+A comprehensive interactive guide to the Thai language system:
+
+- **Consonants**: All 44 consonants grouped by class (Mid, High, Low) with color-coded cards and Indic equivalents.
+- **Vowels**: Complete set of 32 vowels (Monophthongs, Diphthongs) and special vowels.
+- **Numbers**: From 0 to Billion, including pronunciation guides.
+- **Tones**: Visual SVG diagrams for all 5 tones (Mid, Low, Falling, High, Rising) with audio samples.
+- **Text-to-Speech**: Native browser TTS integration for instant pronunciation checking.
 
 ## 🛠️ Tech Stack
 
@@ -52,19 +63,6 @@ pnpm dev
 - `pnpm preview`: Locally preview the production build.
 - `pnpm lint`: Run ESLint to check code quality.
 - `pnpm format`: Format code using Prettier.
-
-## 📂 Architecture
-
-```text
-src/
-├── components/   # Shared UI components
-├── data/         # Static data (consonants, vocabulary)
-├── features/     # Feature-based modules (landing, decks, etc.)
-├── hooks/        # Custom React hooks
-├── lib/          # Utility libraries and configurations
-├── store/        # Zustand state stores
-└── types/        # TypeScript type definitions
-```
 
 ## 📄 License
 
