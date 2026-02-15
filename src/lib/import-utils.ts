@@ -22,6 +22,8 @@ export async function importApkgToDb(parsedResult: ParsedApkg, onProgress: (coun
 
   const defaultNoteTypeId = await getOrCreateDefaultNoteType();
 
+  const mediaToDeckId = new Map<string, number>();
+
   for (const parsedDeck of parsedResult.decks) {
     const now = new Date();
     const deckId = await db.decks.add({
@@ -31,6 +33,10 @@ export async function importApkgToDb(parsedResult: ParsedApkg, onProgress: (coun
       ...DEFAULT_DECK_CONFIG,
     });
     if (deckId === undefined) throw new Error('Failed to add Deck');
+
+    for (const ref of parsedDeck.mediaRefs) {
+      mediaToDeckId.set(ref, deckId);
+    }
 
     const batchSize = 50;
     const notes = parsedDeck.notes;
@@ -76,11 +82,10 @@ export async function importApkgToDb(parsedResult: ParsedApkg, onProgress: (coun
     }
   }
 
-  const firstDeckId = await db.decks
+  const fallbackDeckId = await db.decks
     .toCollection()
     .last()
-    .then(d => d?.id);
-  const targetDeckId = firstDeckId ?? 0;
+    .then(d => d?.id ?? 0);
 
   if (parsedResult.availableMedia.length > 0) {
     const mediaFiles = parsedResult.availableMedia;
@@ -93,6 +98,7 @@ export async function importApkgToDb(parsedResult: ParsedApkg, onProgress: (coun
           try {
             const blob = await parsedResult.getMediaBlob(filename);
             if (blob) {
+              const targetDeckId = mediaToDeckId.get(filename) ?? fallbackDeckId;
               await storeMediaFile(filename, blob, blob.type, targetDeckId);
             }
           } catch (e) {

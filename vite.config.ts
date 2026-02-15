@@ -14,7 +14,7 @@ export default defineConfig({
     tailwindcss(),
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       injectRegister: null,
       includeAssets: [
         'favicon.svg',
@@ -26,7 +26,7 @@ export default defineConfig({
       ],
       manifest: {
         name: 'NongLiMing',
-        short_name: 'nong-liming',
+        short_name: 'NongLiMing',
         description: 'Learn Thai using Indic phonetics with English SVO grammar in focused, mobile-first sessions.',
         id: '/nong-liming/?source=pwa',
         start_url: '/nong-liming/?source=pwa',
@@ -117,18 +117,16 @@ export default defineConfig({
           {
             urlPattern: ({ request }) =>
               request.destination === 'script' || request.destination === 'style' || request.destination === 'font',
-            handler: 'NetworkFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'static-cache',
-              networkTimeoutSeconds: 3,
             },
           },
           {
             urlPattern: ({ request }) => request.destination === 'image',
-            handler: 'NetworkFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'image-cache',
-              networkTimeoutSeconds: 3,
             },
           },
           {

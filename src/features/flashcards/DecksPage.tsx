@@ -1,8 +1,8 @@
-import { ModeToggle } from '@/components/mode-toggle';
 import { useToast } from '@/components/toast-provider';
 import { parseApkgFile } from '@/lib/apkg-parser';
 import { db } from '@/lib/db';
 import { importApkgToDb } from '@/lib/import-utils';
+import { getTodaysCounts } from '@/lib/study-session';
 import type { Deck } from '@/types/flashcard';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion } from 'framer-motion';
@@ -26,27 +26,49 @@ import { CreateDeckDialog } from './CreateDeckDialog';
 import { ImportDialog } from './ImportDialog';
 import { RenameDeckDialog } from './RenameDeckDialog';
 
-// Import sample decks
 import thai1000Url from '@/assets/Thai_1000_Common_Words_incl_Audio_Phonetics_Examples.apkg?url';
 import thaiReadUrl from '@/assets/Thai_Read_Hear_Translate.apkg?url';
 
 export function DecksPage() {
   const decks = useLiveQuery<Deck[]>(() => db.decks.orderBy('createdAt').reverse().toArray());
 
-  const cardCounts = useLiveQuery<Record<number, { total: number; due: number }>>(async () => {
+  const cardCounts = useLiveQuery<
+    Record<number, { total: number; newCount: number; learningCount: number; reviewCount: number }>
+  >(async () => {
     if (!decks) return {};
-    const counts: Record<number, { total: number; due: number }> = {};
+    const counts: Record<number, { total: number; newCount: number; learningCount: number; reviewCount: number }> = {};
     const now = new Date();
     for (const deck of decks) {
       const deckId = deck.id;
       if (deckId === undefined) continue;
-      const total = await db.cards.where('deckId').equals(deckId).count();
-      const due = await db.cards
-        .where('deckId')
-        .equals(deckId)
-        .filter(card => card.nextReview <= now || card.status === 'new')
-        .count();
-      counts[deckId] = { total, due };
+      const allCards = await db.cards.where('deckId').equals(deckId).toArray();
+      const { newToday, reviewToday } = await getTodaysCounts(deckId);
+
+      let newCount = 0;
+      let learningCount = 0;
+      let reviewCount = 0;
+
+      const remainingNew = Math.max(0, deck.newCardsPerDay - newToday);
+      const remainingReview = Math.max(0, deck.reviewCardsPerDay - reviewToday);
+
+      let newSoFar = 0;
+      let reviewSoFar = 0;
+
+      for (const card of allCards) {
+        if (card.status === 'learning' || card.status === 'relearning') {
+          if (card.nextReview <= now) learningCount++;
+        } else if (card.status === 'review') {
+          if (card.nextReview <= now && reviewSoFar < remainingReview) {
+            reviewCount++;
+            reviewSoFar++;
+          }
+        } else if (newSoFar < remainingNew) {
+          newCount++;
+          newSoFar++;
+        }
+      }
+
+      counts[deckId] = { total: allCards.length, newCount, learningCount, reviewCount };
     }
     return counts;
   }, [decks]);
@@ -147,16 +169,13 @@ export function DecksPage() {
             My Decks
           </h1>
         </div>
-        <div className="flex items-center gap-2">
-          <Link
-            to="/stats"
-            className="p-2 rounded-lg hover:bg-card transition-colors text-muted-foreground hover:text-primary"
-            aria-label="View statistics"
-          >
-            <BarChart3 className="w-5 h-5" />
-          </Link>
-          <ModeToggle />
-        </div>
+        <Link
+          to="/stats"
+          className="p-2 rounded-lg hover:bg-card transition-colors text-muted-foreground hover:text-primary"
+          aria-label="View statistics"
+        >
+          <BarChart3 className="w-5 h-5" />
+        </Link>
       </header>
 
       <main className="flex-1 w-full flex flex-col gap-6 mt-2">
@@ -295,10 +314,14 @@ export function DecksPage() {
                               <Layers className="w-3 h-3" />
                               {counts?.total ?? '...'} cards
                             </span>
-                            {(counts?.due ?? 0) > 0 && (
-                              <span className="flex items-center gap-1 text-accent font-medium">
+                            {counts && counts.newCount + counts.learningCount + counts.reviewCount > 0 && (
+                              <span className="flex items-center gap-1 font-medium">
                                 <Clock className="w-3 h-3" />
-                                {counts?.due} due
+                                <span className="text-blue-500">{counts.newCount}</span>
+                                <span className="text-muted-foreground">/</span>
+                                <span className="text-orange-500">{counts.learningCount}</span>
+                                <span className="text-muted-foreground">/</span>
+                                <span className="text-emerald-500">{counts.reviewCount}</span>
                               </span>
                             )}
                           </div>

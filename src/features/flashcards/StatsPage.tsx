@@ -1,4 +1,3 @@
-import { ModeToggle } from '@/components/mode-toggle';
 import type { DailyReviewCount, DeckStats, OverallStats } from '@/lib/stats';
 import { getDailyReviews, getDeckStats, getOverallStats } from '@/lib/stats';
 import { motion } from 'framer-motion';
@@ -51,17 +50,14 @@ export function StatsPage() {
   return (
     <div className="min-h-full flex flex-col items-center p-6 max-w-md mx-auto">
       {/* Header */}
-      <header className="w-full flex justify-between items-center py-6">
-        <div className="flex items-center gap-3">
-          <Link to="/decks" className="p-2 -ml-2 rounded-lg hover:bg-card transition-colors" aria-label="Back to decks">
-            <ArrowLeft className="w-5 h-5 text-muted-foreground" />
-          </Link>
-          <h1 className="text-2xl font-bold text-primary font-sarabun flex items-center gap-2">
-            <BarChart3 className="w-6 h-6" />
-            Statistics
-          </h1>
-        </div>
-        <ModeToggle />
+      <header className="w-full flex items-center gap-3 py-6">
+        <Link to="/decks" className="p-2 -ml-2 rounded-lg hover:bg-card transition-colors" aria-label="Back to decks">
+          <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+        </Link>
+        <h1 className="text-2xl font-bold text-primary font-sarabun flex items-center gap-2">
+          <BarChart3 className="w-6 h-6" />
+          Statistics
+        </h1>
       </header>
 
       <main className="flex-1 w-full flex flex-col gap-6 mt-2">

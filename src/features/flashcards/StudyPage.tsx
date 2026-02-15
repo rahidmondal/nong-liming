@@ -1,3 +1,4 @@
+import { fireConfetti } from '@/lib/confetti';
 import { db } from '@/lib/db';
 import {
   calculateNextReview,
@@ -53,6 +54,12 @@ export function StudyPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const cardStartTime = useRef(Date.now());
   const sessionInitialized = useRef(false);
+
+  useEffect(() => {
+    if (phase === 'done' && sessionStats.reviewed > 0) {
+      fireConfetti();
+    }
+  }, [phase, sessionStats.reviewed]);
 
   const schedulingConfig: SchedulingConfig = useMemo(() => {
     if (!deck) return DEFAULT_SCHEDULING_CONFIG;
@@ -412,7 +419,7 @@ export function StudyPage() {
                       {phase === 'front' ? 'Question' : 'Answer'}
                     </p>
                     <div
-                      className="text-xl font-medium text-foreground whitespace-pre-wrap leading-relaxed card-content"
+                      className="text-lg font-medium text-foreground leading-relaxed card-content overflow-auto max-h-96 w-full wrap-break-word"
                       dangerouslySetInnerHTML={{
                         __html: phase === 'front' ? renderedContent.question : renderedContent.answer,
                       }}

@@ -1,9 +1,33 @@
-import { ModeToggle } from '@/components/mode-toggle';
+import { getOverallStats, type OverallStats } from '@/lib/stats';
+import { useTutorial } from '@/lib/useTutorial';
 import { motion } from 'framer-motion';
-import { BookOpen, Layers, PenTool } from 'lucide-react';
+import { BookOpen, Flame, Layers, PenTool, Settings, Zap } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+function getStreakMessage(streak: number): string {
+  if (streak === 0) return "Start today's session!";
+  if (streak === 1) return 'Great start! 🌱';
+  if (streak <= 3) return 'Keep it up! 💪';
+  if (streak <= 7) return 'On a roll! 🔥';
+  if (streak <= 14) return 'Unstoppable! ⚡';
+  if (streak <= 30) return "You're on fire! 🔥🔥";
+  return 'Legendary! 🏆';
+}
+
 export function LandingPage() {
+  useTutorial();
+  const [stats, setStats] = useState<OverallStats | null>(null);
+
+  const loadStats = useCallback(async () => {
+    const data = await getOverallStats();
+    setStats(data);
+  }, []);
+
+  useEffect(() => {
+    void loadStats();
+  }, [loadStats]);
+
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -23,7 +47,14 @@ export function LandingPage() {
     <div className="min-h-full flex flex-col items-center p-6 max-w-md mx-auto relative">
       <header className="w-full flex justify-between items-center py-6">
         <div className="text-2xl font-bold text-primary font-sarabun">น้องลีมิง</div>
-        <ModeToggle />
+        <Link
+          to="/settings"
+          className="p-2 rounded-xl hover:bg-muted transition-colors"
+          aria-label="Settings"
+          id="settings-link"
+        >
+          <Settings className="w-5 h-5 text-muted-foreground" />
+        </Link>
       </header>
 
       <main className="flex-1 w-full flex flex-col items-center gap-8 mt-8">
@@ -47,11 +78,51 @@ export function LandingPage() {
           <p className="text-muted-foreground">Your personal Thai learning partner.</p>
         </motion.div>
 
+        {/* ── Global Insights ── */}
+        {stats && (stats.totalCards > 0 || stats.totalReviews > 0) && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="w-full"
+          >
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-card border border-border rounded-xl p-3 text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Flame
+                    className={`w-4 h-4 ${stats.currentStreak > 0 ? 'text-orange-500' : 'text-muted-foreground'}`}
+                  />
+                </div>
+                <p className={`text-xl font-bold ${stats.currentStreak > 0 ? 'text-orange-500' : 'text-foreground'}`}>
+                  {stats.currentStreak}
+                </p>
+                <p className="text-[10px] text-muted-foreground">day streak</p>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-3 text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Zap className="w-4 h-4 text-yellow-500" />
+                </div>
+                <p className="text-xl font-bold text-foreground">{stats.reviewsToday}</p>
+                <p className="text-[10px] text-muted-foreground">today</p>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-3 text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Layers className="w-4 h-4 text-primary" />
+                </div>
+                <p className="text-xl font-bold text-foreground">{stats.totalCards}</p>
+                <p className="text-[10px] text-muted-foreground">cards</p>
+              </div>
+            </div>
+            <p className="text-xs text-center text-muted-foreground mt-2">{getStreakMessage(stats.currentStreak)}</p>
+          </motion.div>
+        )}
+
         <motion.div variants={container} initial="hidden" animate="show" className="w-full space-y-4">
-          {/* Active Option: Flashcards */}
+          {/* Flashcards */}
           <motion.div variants={item}>
             <Link
               to="/decks"
+              id="nav-flashcards"
               className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer overflow-hidden"
             >
               <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -65,10 +136,11 @@ export function LandingPage() {
             </Link>
           </motion.div>
 
-          {/* Active Option: Full View */}
+          {/* Full View */}
           <motion.div variants={item}>
             <Link
               to="/full-view"
+              id="nav-fullview"
               className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer overflow-hidden"
             >
               <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -82,10 +154,11 @@ export function LandingPage() {
             </Link>
           </motion.div>
 
-          {/* Active Option: Builder */}
+          {/* Builder */}
           <motion.div variants={item}>
             <Link
               to="/builder"
+              id="nav-builder"
               className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer overflow-hidden"
             >
               <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />

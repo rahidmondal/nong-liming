@@ -1,8 +1,21 @@
 import { ThemeProvider } from '@/components/theme-provider';
 import { LandingPage } from '@/features/landing/LandingPage';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/lib/stats', () => ({
+  getOverallStats: vi.fn().mockResolvedValue({
+    totalDecks: 0,
+    totalCards: 0,
+    totalNotes: 0,
+    totalReviews: 0,
+    currentStreak: 0,
+    longestStreak: 0,
+    reviewsToday: 0,
+    cardBreakdown: { new: 0, learning: 0, review: 0, relearning: 0 },
+  }),
+}));
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -19,28 +32,30 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 describe('LandingPage', () => {
-  const renderwithProviders = (component: React.ReactNode) => {
-    return render(
+  const renderWithProviders = async (component: React.ReactNode) => {
+    render(
       <ThemeProvider>
         <BrowserRouter>{component}</BrowserRouter>
       </ThemeProvider>,
     );
+    // Wait for async state updates (getOverallStats) to flush
+    await waitFor(() => undefined);
   };
 
-  it('renders the greeting correctly', () => {
-    renderwithProviders(<LandingPage />);
+  it('renders the greeting correctly', async () => {
+    await renderWithProviders(<LandingPage />);
     expect(screen.getByText(/Hi, I am/i)).toBeInTheDocument();
     expect(screen.getByText(/Nong Li Ming/i)).toBeInTheDocument();
   });
 
-  it('renders the Flashcards option', () => {
-    renderwithProviders(<LandingPage />);
+  it('renders the Flashcards option', async () => {
+    await renderWithProviders(<LandingPage />);
     expect(screen.getByText('Flashcards')).toBeInTheDocument();
     expect(screen.getByText('Review your Flashcards')).toBeInTheDocument();
   });
 
-  it('renders the Builder option', () => {
-    renderwithProviders(<LandingPage />);
+  it('renders the Builder option', async () => {
+    await renderWithProviders(<LandingPage />);
     expect(screen.getByText('Builder')).toBeInTheDocument();
     expect(screen.getByText('Word & Writing Pad')).toBeInTheDocument();
   });
