@@ -3,21 +3,27 @@ import { useToast } from '@/components/toast-provider';
 import { APP_VERSION } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { usePWAInstall, usePWAUpdate } from '@/lib/usePWA';
+import type { Card, Deck, Note, NoteType, ReviewLog, StudySession } from '@/types/flashcard';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
   Check,
   ChevronRight,
+  Clock,
+  Database,
   Download,
+  ExternalLink,
   HelpCircle,
+  Info,
   Monitor,
   Moon,
   RefreshCw,
   Smartphone,
   Sun,
   Trash2,
+  Upload,
 } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 type Theme = 'light' | 'dark' | 'system';
@@ -28,6 +34,23 @@ const THEME_OPTIONS: { value: Theme; label: string; icon: React.ReactNode }[] = 
   { value: 'system', label: 'System', icon: <Monitor className="w-4 h-4" /> },
 ];
 
+interface BackupData {
+  version?: string;
+  exportedAt?: string;
+  decks?: Deck[];
+  noteTypes?: NoteType[];
+  notes?: Note[];
+  cards?: Card[];
+  studySessions?: StudySession[];
+  reviewLogs?: ReviewLog[];
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${String(bytes)} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const toast = useToast();
@@ -35,6 +58,17 @@ export function SettingsPage() {
   const { checkForUpdates } = usePWAUpdate();
   const [isResetting, setIsResetting] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showClearHistoryConfirm, setShowClearHistoryConfirm] = useState(false);
+  const [storageUsage, setStorageUsage] = useState<{ usage: number; quota: number } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if ('storage' in navigator && 'estimate' in navigator.storage) {
+      void navigator.storage.estimate().then(est => {
+        setStorageUsage({ usage: est.usage ?? 0, quota: est.quota ?? 0 });
+      });
+    }
+  }, []);
 
   const handleExportData = useCallback(async () => {
     const id = toast.show('Exporting data…', { type: 'loading', persistent: true });
@@ -61,6 +95,78 @@ export function SettingsPage() {
       toast.update(id, { type: 'success', message: 'Data exported!', persistent: false });
     } catch {
       toast.update(id, { type: 'error', message: 'Export failed', persistent: false });
+    }
+  }, [toast]);
+
+  const handleImportData = useCallback(
+    async (file: File) => {
+      const id = toast.show('Importing data…', { type: 'loading', persistent: true });
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text) as BackupData;
+
+        if (!data.decks || !data.cards) {
+          toast.update(id, {
+            type: 'error',
+            message: 'Invalid backup file: missing decks or cards',
+            persistent: false,
+          });
+          return;
+        }
+
+        await db.transaction(
+          'rw',
+          [db.decks, db.noteTypes, db.notes, db.cards, db.studySessions, db.reviewLogs],
+          async () => {
+            await db.reviewLogs.clear();
+            await db.studySessions.clear();
+            await db.cards.clear();
+            await db.notes.clear();
+            await db.noteTypes.clear();
+            await db.decks.clear();
+
+            if (data.decks) await db.decks.bulkAdd(data.decks);
+            if (data.noteTypes) await db.noteTypes.bulkAdd(data.noteTypes);
+            if (data.notes) await db.notes.bulkAdd(data.notes);
+            if (data.cards) await db.cards.bulkAdd(data.cards);
+            if (data.studySessions) await db.studySessions.bulkAdd(data.studySessions);
+            if (data.reviewLogs) await db.reviewLogs.bulkAdd(data.reviewLogs);
+          },
+        );
+
+        toast.update(id, { type: 'success', message: 'Data imported! Reloading…', persistent: false });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } catch {
+        toast.update(id, { type: 'error', message: 'Import failed — invalid file', persistent: false });
+      }
+    },
+    [toast],
+  );
+
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        void handleImportData(file);
+      }
+      e.target.value = '';
+    },
+    [handleImportData],
+  );
+
+  const handleClearHistory = useCallback(async () => {
+    const id = toast.show('Clearing study history…', { type: 'loading', persistent: true });
+    try {
+      await db.transaction('rw', db.studySessions, db.reviewLogs, async () => {
+        await db.studySessions.clear();
+        await db.reviewLogs.clear();
+      });
+      setShowClearHistoryConfirm(false);
+      toast.update(id, { type: 'success', message: 'Study history cleared', persistent: false });
+    } catch {
+      toast.update(id, { type: 'error', message: 'Failed to clear history', persistent: false });
     }
   }, [toast]);
 
@@ -105,6 +211,9 @@ export function SettingsPage() {
 
   return (
     <div className="min-h-full flex flex-col p-6 max-w-lg mx-auto">
+      {/* Hidden file input for import */}
+      <input ref={fileInputRef} type="file" accept=".json" onChange={handleFileChange} className="hidden" />
+
       {/* Header */}
       <header className="flex items-center gap-3 py-4 mb-6">
         <Link to="/" className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors" aria-label="Go back">
@@ -225,6 +334,60 @@ export function SettingsPage() {
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
 
+            {/* Import */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors text-left"
+            >
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <Upload className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-foreground">Import Data</p>
+                <p className="text-xs text-muted-foreground">Restore from a JSON backup</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </button>
+
+            {/* Clear Study History */}
+            {!showClearHistoryConfirm ? (
+              <button
+                onClick={() => {
+                  setShowClearHistoryConfirm(true);
+                }}
+                className="w-full flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors text-left"
+              >
+                <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+                  <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">Clear Study History</p>
+                  <p className="text-xs text-muted-foreground">Reset progress, keep decks & cards</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              </button>
+            ) : (
+              <div className="p-4 bg-amber-500/5">
+                <p className="text-sm font-medium text-foreground mb-3">Clear all sessions and review logs?</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => void handleClearHistory()}
+                    className="flex-1 px-4 py-2 text-sm font-semibold bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
+                  >
+                    Yes, clear history
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowClearHistoryConfirm(false);
+                    }}
+                    className="px-4 py-2 text-sm font-medium bg-muted rounded-lg hover:bg-muted/80 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Reset */}
             {!showResetConfirm ? (
               <button
@@ -264,6 +427,58 @@ export function SettingsPage() {
                 </div>
               </div>
             )}
+
+            {/* Storage Usage */}
+            {storageUsage && (
+              <div className="flex items-center gap-3 p-4">
+                <div className="p-2 bg-muted rounded-lg">
+                  <Database className="w-5 h-5 text-muted-foreground" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">Storage</p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatBytes(storageUsage.usage)} of {formatBytes(storageUsage.quota)} used
+                  </p>
+                </div>
+                <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full"
+                    style={{ width: `${String(Math.min((storageUsage.usage / storageUsage.quota) * 100, 100))}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.section>
+
+        {/* ── About ── */}
+        <motion.section variants={item}>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-1">About</h2>
+          <div className="bg-card border border-border rounded-xl overflow-hidden divide-y divide-border">
+            <div className="flex items-center gap-3 p-4">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Info className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-foreground">NongLiMing</p>
+                <p className="text-xs text-muted-foreground">Version {APP_VERSION}</p>
+              </div>
+            </div>
+            <a
+              href="https://github.com/rahidmondal/nong-liming"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors"
+            >
+              <div className="p-2 bg-muted rounded-lg">
+                <ExternalLink className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-foreground">Source Code</p>
+                <p className="text-xs text-muted-foreground">View on GitHub</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </a>
           </div>
         </motion.section>
       </motion.div>

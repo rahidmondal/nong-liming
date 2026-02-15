@@ -1,10 +1,33 @@
+import { getOverallStats, type OverallStats } from '@/lib/stats';
 import { useTutorial } from '@/lib/useTutorial';
 import { motion } from 'framer-motion';
-import { BookOpen, Layers, PenTool, Settings } from 'lucide-react';
+import { BookOpen, Flame, Layers, PenTool, Settings, Zap } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+
+function getStreakMessage(streak: number): string {
+  if (streak === 0) return "Start today's session!";
+  if (streak === 1) return 'Great start! 🌱';
+  if (streak <= 3) return 'Keep it up! 💪';
+  if (streak <= 7) return 'On a roll! 🔥';
+  if (streak <= 14) return 'Unstoppable! ⚡';
+  if (streak <= 30) return "You're on fire! 🔥🔥";
+  return 'Legendary! 🏆';
+}
 
 export function LandingPage() {
   useTutorial();
+  const [stats, setStats] = useState<OverallStats | null>(null);
+
+  const loadStats = useCallback(async () => {
+    const data = await getOverallStats();
+    setStats(data);
+  }, []);
+
+  useEffect(() => {
+    void loadStats();
+  }, [loadStats]);
+
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -54,6 +77,45 @@ export function LandingPage() {
           </h1>
           <p className="text-muted-foreground">Your personal Thai learning partner.</p>
         </motion.div>
+
+        {/* ── Global Insights ── */}
+        {stats && (stats.totalCards > 0 || stats.totalReviews > 0) && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="w-full"
+          >
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-card border border-border rounded-xl p-3 text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Flame
+                    className={`w-4 h-4 ${stats.currentStreak > 0 ? 'text-orange-500' : 'text-muted-foreground'}`}
+                  />
+                </div>
+                <p className={`text-xl font-bold ${stats.currentStreak > 0 ? 'text-orange-500' : 'text-foreground'}`}>
+                  {stats.currentStreak}
+                </p>
+                <p className="text-[10px] text-muted-foreground">day streak</p>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-3 text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Zap className="w-4 h-4 text-yellow-500" />
+                </div>
+                <p className="text-xl font-bold text-foreground">{stats.reviewsToday}</p>
+                <p className="text-[10px] text-muted-foreground">today</p>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-3 text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Layers className="w-4 h-4 text-primary" />
+                </div>
+                <p className="text-xl font-bold text-foreground">{stats.totalCards}</p>
+                <p className="text-[10px] text-muted-foreground">cards</p>
+              </div>
+            </div>
+            <p className="text-xs text-center text-muted-foreground mt-2">{getStreakMessage(stats.currentStreak)}</p>
+          </motion.div>
+        )}
 
         <motion.div variants={container} initial="hidden" animate="show" className="w-full space-y-4">
           {/* Flashcards */}
