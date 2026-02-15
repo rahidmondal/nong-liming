@@ -419,7 +419,7 @@ export function StudyPage() {
                       {phase === 'front' ? 'Question' : 'Answer'}
                     </p>
                     <div
-                      className="text-xl font-medium text-foreground whitespace-pre-wrap leading-relaxed card-content"
+                      className="text-lg font-medium text-foreground leading-relaxed card-content overflow-auto max-h-96 w-full wrap-break-word"
                       dangerouslySetInnerHTML={{
                         __html: phase === 'front' ? renderedContent.question : renderedContent.answer,
                       }}

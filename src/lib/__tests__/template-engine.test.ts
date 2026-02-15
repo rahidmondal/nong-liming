@@ -56,7 +56,7 @@ describe('parseMedia', () => {
     expect(result).toContain('<audio');
     expect(result).toContain('blob:mock/hello.mp3');
     expect(result).toContain('controls');
-    expect(result).toContain('autoplay');
+    expect(result).not.toContain('autoplay');
   });
 
   it('converts multiple sound tags', async () => {
@@ -86,6 +86,14 @@ describe('parseMedia', () => {
   it('escapes special characters in filenames', async () => {
     const result = await parseMedia('[sound:file "name".mp3]');
     expect(result).toContain('&quot;');
+  });
+
+  it('shows placeholder for missing sound media', async () => {
+    const { getMediaUrl } = await import('@/lib/db');
+    vi.mocked(getMediaUrl).mockResolvedValueOnce('');
+    const result = await parseMedia('[sound:missing.mp3]');
+    expect(result).toContain('card-media-missing');
+    expect(result).toContain('missing.mp3');
   });
 });
 
