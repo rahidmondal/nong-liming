@@ -1,9 +1,10 @@
-import { ModeToggle } from '@/components/mode-toggle';
+import { useTutorial } from '@/lib/useTutorial';
 import { motion } from 'framer-motion';
-import { BookOpen, Layers, PenTool } from 'lucide-react';
+import { BookOpen, Layers, PenTool, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function LandingPage() {
+  useTutorial();
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -23,7 +24,14 @@ export function LandingPage() {
     <div className="min-h-full flex flex-col items-center p-6 max-w-md mx-auto relative">
       <header className="w-full flex justify-between items-center py-6">
         <div className="text-2xl font-bold text-primary font-sarabun">น้องลีมิง</div>
-        <ModeToggle />
+        <Link
+          to="/settings"
+          className="p-2 rounded-xl hover:bg-muted transition-colors"
+          aria-label="Settings"
+          id="settings-link"
+        >
+          <Settings className="w-5 h-5 text-muted-foreground" />
+        </Link>
       </header>
 
       <main className="flex-1 w-full flex flex-col items-center gap-8 mt-8">
@@ -48,10 +56,11 @@ export function LandingPage() {
         </motion.div>
 
         <motion.div variants={container} initial="hidden" animate="show" className="w-full space-y-4">
-          {/* Active Option: Flashcards */}
+          {/* Flashcards */}
           <motion.div variants={item}>
             <Link
               to="/decks"
+              id="nav-flashcards"
               className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer overflow-hidden"
             >
               <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -65,10 +74,11 @@ export function LandingPage() {
             </Link>
           </motion.div>
 
-          {/* Active Option: Full View */}
+          {/* Full View */}
           <motion.div variants={item}>
             <Link
               to="/full-view"
+              id="nav-fullview"
               className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer overflow-hidden"
             >
               <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -82,10 +92,11 @@ export function LandingPage() {
             </Link>
           </motion.div>
 
-          {/* Active Option: Builder */}
+          {/* Builder */}
           <motion.div variants={item}>
             <Link
               to="/builder"
+              id="nav-builder"
               className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer overflow-hidden"
             >
               <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />

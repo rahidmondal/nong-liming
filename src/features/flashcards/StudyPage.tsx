@@ -1,3 +1,4 @@
+import { fireConfetti } from '@/lib/confetti';
 import { db } from '@/lib/db';
 import {
   calculateNextReview,
@@ -53,6 +54,12 @@ export function StudyPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const cardStartTime = useRef(Date.now());
   const sessionInitialized = useRef(false);
+
+  useEffect(() => {
+    if (phase === 'done' && sessionStats.reviewed > 0) {
+      fireConfetti();
+    }
+  }, [phase, sessionStats.reviewed]);
 
   const schedulingConfig: SchedulingConfig = useMemo(() => {
     if (!deck) return DEFAULT_SCHEDULING_CONFIG;
