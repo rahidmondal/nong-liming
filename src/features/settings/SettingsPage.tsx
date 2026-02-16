@@ -1,9 +1,9 @@
 import { useTheme } from '@/components/theme-provider';
 import { useToast } from '@/components/toast-provider';
+import { exportAndDownload, importBackup } from '@/lib/backup-utils';
 import { APP_VERSION } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { usePWAInstall, usePWAUpdate } from '@/lib/usePWA';
-import type { Card, Deck, Note, NoteType, ReviewLog, StudySession } from '@/types/flashcard';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -34,17 +34,6 @@ const THEME_OPTIONS: { value: Theme; label: string; icon: React.ReactNode }[] = 
   { value: 'system', label: 'System', icon: <Monitor className="w-4 h-4" /> },
 ];
 
-interface BackupData {
-  version?: string;
-  exportedAt?: string;
-  decks?: Deck[];
-  noteTypes?: NoteType[];
-  notes?: Note[];
-  cards?: Card[];
-  studySessions?: StudySession[];
-  reviewLogs?: ReviewLog[];
-}
-
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${String(bytes)} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -71,28 +60,10 @@ export function SettingsPage() {
   }, []);
 
   const handleExportData = useCallback(async () => {
-    const id = toast.show('Exporting data…', { type: 'loading', persistent: true });
+    const id = toast.show('Exporting full backup…', { type: 'loading', persistent: true });
     try {
-      const data = {
-        version: APP_VERSION,
-        exportedAt: new Date().toISOString(),
-        decks: await db.decks.toArray(),
-        noteTypes: await db.noteTypes.toArray(),
-        notes: await db.notes.toArray(),
-        cards: await db.cards.toArray(),
-        studySessions: await db.studySessions.toArray(),
-        reviewLogs: await db.reviewLogs.toArray(),
-      };
-
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `nong-liming-backup-${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-
-      toast.update(id, { type: 'success', message: 'Data exported!', persistent: false });
+      await exportAndDownload();
+      toast.update(id, { type: 'success', message: 'Backup exported!', persistent: false });
     } catch {
       toast.update(id, { type: 'error', message: 'Export failed', persistent: false });
     }
@@ -100,46 +71,25 @@ export function SettingsPage() {
 
   const handleImportData = useCallback(
     async (file: File) => {
-      const id = toast.show('Importing data…', { type: 'loading', persistent: true });
+      const id = toast.show('Restoring backup…', { type: 'loading', persistent: true });
       try {
-        const text = await file.text();
-        const data = JSON.parse(text) as BackupData;
-
-        if (!data.decks || !data.cards) {
-          toast.update(id, {
-            type: 'error',
-            message: 'Invalid backup file: missing decks or cards',
-            persistent: false,
-          });
-          return;
-        }
-
-        await db.transaction(
-          'rw',
-          [db.decks, db.noteTypes, db.notes, db.cards, db.studySessions, db.reviewLogs],
-          async () => {
-            await db.reviewLogs.clear();
-            await db.studySessions.clear();
-            await db.cards.clear();
-            await db.notes.clear();
-            await db.noteTypes.clear();
-            await db.decks.clear();
-
-            if (data.decks) await db.decks.bulkAdd(data.decks);
-            if (data.noteTypes) await db.noteTypes.bulkAdd(data.noteTypes);
-            if (data.notes) await db.notes.bulkAdd(data.notes);
-            if (data.cards) await db.cards.bulkAdd(data.cards);
-            if (data.studySessions) await db.studySessions.bulkAdd(data.studySessions);
-            if (data.reviewLogs) await db.reviewLogs.bulkAdd(data.reviewLogs);
-          },
-        );
-
-        toast.update(id, { type: 'success', message: 'Data imported! Reloading…', persistent: false });
+        const result = await importBackup(file);
+        toast.update(id, {
+          type: 'success',
+          message: 'Backup restored! Reloading…',
+          detail: `${String(result.deckCount)} decks, ${String(result.cardCount)} cards, ${String(result.mediaCount)} media files`,
+          persistent: false,
+        });
         setTimeout(() => {
           window.location.reload();
         }, 1500);
-      } catch {
-        toast.update(id, { type: 'error', message: 'Import failed — invalid file', persistent: false });
+      } catch (e) {
+        toast.update(id, {
+          type: 'error',
+          message: 'Import failed',
+          detail: e instanceof Error ? e.message : 'Invalid .nong file',
+          persistent: false,
+        });
       }
     },
     [toast],
@@ -212,7 +162,7 @@ export function SettingsPage() {
   return (
     <div className="min-h-full flex flex-col p-6 max-w-lg mx-auto">
       {/* Hidden file input for import */}
-      <input ref={fileInputRef} type="file" accept=".json" onChange={handleFileChange} className="hidden" />
+      <input ref={fileInputRef} type="file" accept=".nong" onChange={handleFileChange} className="hidden" />
 
       {/* Header */}
       <header className="flex items-center gap-3 py-4 mb-6">
@@ -328,8 +278,8 @@ export function SettingsPage() {
                 <Download className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-foreground">Export Data</p>
-                <p className="text-xs text-muted-foreground">Download a JSON backup</p>
+                <p className="text-sm font-medium text-foreground">Export Full Backup</p>
+                <p className="text-xs text-muted-foreground">Download a .nong backup (data + media)</p>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
@@ -343,8 +293,8 @@ export function SettingsPage() {
                 <Upload className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-foreground">Import Data</p>
-                <p className="text-xs text-muted-foreground">Restore from a JSON backup</p>
+                <p className="text-sm font-medium text-foreground">Import Backup</p>
+                <p className="text-xs text-muted-foreground">Restore from a .nong backup file</p>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
