@@ -1,5 +1,7 @@
 # Nong LiMing
 
+[![Version](https://img.shields.io/static/v1?label=version&message=0.6.0&color=blue)](https://github.com/rahidmondal/nong-liming)
+
 <img src="public/pwa-icon.svg" alt="Nong LiMing Logo" width="128" height="128">
 
 > **Your friendly Thai learning companion** 🇹🇭
@@ -85,7 +87,4 @@ pnpm dev
 
 ## 📄 License
 
-Copyright © 2026 Rahid Mondal. All rights reserved.
-License details will be updated upon official release.
-
-> [![Version](https://img.shields.io/static/v1?label=version&message=0.5.0&color=blue)](https://github.com/rahidmondal/nong-liming)
+Licensed under the MIT License. See [LICENSE](LICENSE).
