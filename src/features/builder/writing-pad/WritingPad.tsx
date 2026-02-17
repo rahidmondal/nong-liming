@@ -12,7 +12,6 @@ type RecognitionState =
 export function WritingPad() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
   const isDrawingRef = useRef(false);
   const [hasStrokes, setHasStrokes] = useState(false);
   const [recognition, setRecognition] = useState<RecognitionState>({
@@ -96,7 +95,6 @@ export function WritingPad() {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     isDrawingRef.current = true;
-    setIsDrawing(true);
     setHasStrokes(true);
   };
 
@@ -110,7 +108,6 @@ export function WritingPad() {
 
   const endStroke = () => {
     isDrawingRef.current = false;
-    setIsDrawing(false);
   };
 
   const onMouseDown = (e: React.MouseEvent) => {
@@ -118,7 +115,7 @@ export function WritingPad() {
     beginStroke(x, y);
   };
   const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDrawing) return;
+    if (!isDrawingRef.current) return;
     const { x, y } = getMouseCoords(e);
     continueStroke(x, y);
   };
