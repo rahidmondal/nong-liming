@@ -141,8 +141,15 @@ export function SettingsPage() {
   }, [checkForUpdates, toast]);
 
   const handleInstall = useCallback(() => {
-    void install();
-  }, [install]);
+    if (canInstall) {
+      void install();
+    } else {
+      toast.show("Tap 'Share' then 'Add to Home Screen'", {
+        type: 'success',
+        detail: 'from your browser menu',
+      });
+    }
+  }, [install, canInstall, toast]);
 
   const handleStartTutorial = useCallback(() => {
     localStorage.removeItem('nong-liming-tutorial-done');
@@ -206,7 +213,7 @@ export function SettingsPage() {
           <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-1">App</h2>
           <div className="bg-card border border-border rounded-xl overflow-hidden divide-y divide-border">
             {/* Install */}
-            {!isInstalled && canInstall && (
+            {!isInstalled && (
               <button
                 onClick={handleInstall}
                 className="w-full flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors text-left"
