@@ -29,6 +29,19 @@ interface BackupData {
 
 const BACKUP_FORMAT_VERSION = '1';
 
+function rehydrateDates(rows: unknown[], dateFields: string[]): Record<string, unknown>[] {
+  return (rows as Record<string, unknown>[]).map(row => {
+    const copy = { ...row };
+    for (const field of dateFields) {
+      const val = copy[field];
+      if (typeof val === 'string') {
+        copy[field] = new Date(val);
+      }
+    }
+    return copy;
+  });
+}
+
 export async function exportBackup(): Promise<Blob> {
   const zip = new JSZip();
 
@@ -77,9 +90,6 @@ export async function exportBackup(): Promise<Blob> {
   return zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
 }
 
-/**
- * Trigger a browser download of the backup file.
- */
 export async function exportAndDownload(): Promise<void> {
   const blob = await exportBackup();
   const url = URL.createObjectURL(blob);
@@ -101,9 +111,6 @@ function isBackupData(obj: unknown): obj is BackupData {
   );
 }
 
-/**
- * Import a .nong ZIP backup file and restore the full database including media.
- */
 export async function importBackup(file: File): Promise<{ deckCount: number; cardCount: number; mediaCount: number }> {
   const zip = await JSZip.loadAsync(file);
 
@@ -119,7 +126,6 @@ export async function importBackup(file: File): Promise<{ deckCount: number; car
     throw new Error('Invalid backup: data.json has an unexpected structure');
   }
 
-  // Collect media blobs before starting the transaction
   const mediaEntries: { filename: string; blob: Blob; mimeType: string; deckId: number }[] = [];
   const mediaFolder = zip.folder('media');
 
@@ -158,8 +164,6 @@ export async function importBackup(file: File): Promise<{ deckCount: number; car
     await Promise.all(mediaPromises);
   }
 
-  // Build a map of media filename → deckId from the notes data
-  // If a note references media, associate that media with the note's deckId
   const mediaDeckMap = new Map<string, number>();
   if (Array.isArray(data.notes)) {
     for (const note of data.notes as { deckId?: number; fields?: Record<string, string> }[]) {
@@ -177,7 +181,6 @@ export async function importBackup(file: File): Promise<{ deckCount: number; car
     }
   }
 
-  // Assign deckIds to media entries
   for (const entry of mediaEntries) {
     entry.deckId = mediaDeckMap.get(entry.filename) ?? 0;
   }
@@ -194,12 +197,20 @@ export async function importBackup(file: File): Promise<{ deckCount: number; car
       await db.noteTypes.clear();
       await db.decks.clear();
 
-      if (data.decks.length > 0) await db.decks.bulkAdd(data.decks as never[]);
-      if (data.noteTypes.length > 0) await db.noteTypes.bulkAdd(data.noteTypes as never[]);
-      if (data.notes.length > 0) await db.notes.bulkAdd(data.notes as never[]);
-      if (data.cards.length > 0) await db.cards.bulkAdd(data.cards as never[]);
-      if (data.studySessions.length > 0) await db.studySessions.bulkAdd(data.studySessions as never[]);
-      if (data.reviewLogs.length > 0) await db.reviewLogs.bulkAdd(data.reviewLogs as never[]);
+      if (data.decks.length > 0)
+        await db.decks.bulkAdd(rehydrateDates(data.decks, ['createdAt', 'updatedAt']) as never[]);
+      if (data.noteTypes.length > 0)
+        await db.noteTypes.bulkAdd(rehydrateDates(data.noteTypes, ['createdAt']) as never[]);
+      if (data.notes.length > 0)
+        await db.notes.bulkAdd(rehydrateDates(data.notes, ['createdAt', 'updatedAt']) as never[]);
+      if (data.cards.length > 0)
+        await db.cards.bulkAdd(rehydrateDates(data.cards, ['nextReview', 'createdAt', 'updatedAt']) as never[]);
+      if (data.studySessions.length > 0)
+        await db.studySessions.bulkAdd(
+          rehydrateDates(data.studySessions, ['startedAt', 'lastActiveAt', 'completedAt']) as never[],
+        );
+      if (data.reviewLogs.length > 0)
+        await db.reviewLogs.bulkAdd(rehydrateDates(data.reviewLogs, ['reviewedAt']) as never[]);
 
       for (const entry of mediaEntries) {
         await db.mediaFiles.put({

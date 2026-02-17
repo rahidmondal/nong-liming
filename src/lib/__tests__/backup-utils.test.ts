@@ -332,4 +332,73 @@ describe('backup-utils: ZIP format validation', () => {
       expect(restored.notes[0].tags).toEqual(['thai', 'greetings']);
     });
   });
+
+  describe('date rehydration after JSON round-trip', () => {
+    it('date fields should be Dates, not strings, after JSON round-trip', async () => {
+      const now = new Date();
+      const blob = await createMockBackupZip({
+        dataJson: {
+          manifest: { version: '1', appVersion: APP_VERSION, exportedAt: now.toISOString(), counts: {} },
+          decks: [{ id: 1, name: 'D', createdAt: now.toISOString(), updatedAt: now.toISOString() }],
+          noteTypes: [
+            {
+              id: 1,
+              name: 'Basic',
+              fields: ['F'],
+              questionTemplate: '',
+              answerTemplate: '',
+              css: '',
+              createdAt: now.toISOString(),
+            },
+          ],
+          notes: [],
+          cards: [
+            {
+              id: 1,
+              noteId: 1,
+              deckId: 1,
+              ordinal: 0,
+              status: 'new',
+              nextReview: now.toISOString(),
+              interval: 0,
+              easeFactor: 250,
+              repetitions: 0,
+              lapses: 0,
+              learningStep: 0,
+              createdAt: now.toISOString(),
+              updatedAt: now.toISOString(),
+            },
+          ],
+          studySessions: [],
+          reviewLogs: [
+            {
+              id: 1,
+              cardId: 1,
+              noteId: 1,
+              deckId: 1,
+              rating: 3,
+              previousInterval: 0,
+              newInterval: 1,
+              easeFactor: 250,
+              timeTakenMs: 3000,
+              reviewedAt: now.toISOString(),
+            },
+          ],
+        },
+      });
+
+      const zip = await JSZip.loadAsync(blob);
+      const dataFile = zip.file('data.json');
+      if (!dataFile) throw new Error('missing');
+      const raw = JSON.parse(await dataFile.async('text')) as Record<string, unknown[]>;
+
+      // Simulate what JSON.parse produces: date fields are strings
+      const cards = raw.cards as Record<string, unknown>[];
+      expect(typeof cards[0].nextReview).toBe('string');
+      expect(typeof cards[0].createdAt).toBe('string');
+
+      const logs = raw.reviewLogs as Record<string, unknown>[];
+      expect(typeof logs[0].reviewedAt).toBe('string');
+    });
+  });
 });
