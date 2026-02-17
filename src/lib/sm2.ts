@@ -90,11 +90,16 @@ function handleLearning(card: CardForReview, rating: Rating, config: SchedulingC
   }
 
   if (rating === 2) {
+    const nextStepIndex = learningStep + 1;
+    const currentStepInterval = steps[learningStep] ?? 1;
+    const nextStepInterval = nextStepIndex < steps.length ? steps[nextStepIndex] : config.graduatingInterval * 24 * 60; // graduatingInterval is in days
+
+    const averageInterval = (currentStepInterval + nextStepInterval) / 2;
     return {
       easeFactor,
       interval: 0,
       repetitions,
-      nextReview: addMinutes(now, steps[learningStep] ?? 1),
+      nextReview: addMinutes(now, averageInterval),
       status: 'learning',
       lapses,
       learningStep,
