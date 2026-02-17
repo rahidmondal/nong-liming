@@ -3,11 +3,11 @@ import { ToastProvider } from '@/components/toast-provider';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { BuilderPage } from '@/features/builder/BuilderPage';
 import { DecksPage } from '@/features/flashcards/DecksPage';
-import { StatsPage } from '@/features/flashcards/StatsPage';
 import { StudyPage } from '@/features/flashcards/StudyPage';
 import { FullViewPage } from '@/features/full-view/FullViewPage';
 import { LandingPage } from '@/features/landing/LandingPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
+import { StatsPage } from '@/features/stats/StatsPage';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { BASE_PATH } from './lib/constants';
 

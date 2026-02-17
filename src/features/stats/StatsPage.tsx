@@ -1,5 +1,5 @@
-import type { DailyReviewCount, DeckStats, OverallStats } from '@/lib/stats';
-import { getDailyReviews, getDeckStats, getOverallStats } from '@/lib/stats';
+import type { DailyReviewCount, DeckStats, OverallStats } from '@/features/stats/lib/stats';
+import { getDailyReviews, getDeckStats, getOverallStats } from '@/features/stats/lib/stats';
 import { motion } from 'framer-motion';
 import { ArrowLeft, BarChart3, BookOpen, Flame, Layers, Star, TrendingUp, Zap } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';

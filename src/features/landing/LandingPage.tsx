@@ -1,4 +1,4 @@
-import { getOverallStats, type OverallStats } from '@/lib/stats';
+import { getOverallStats, type OverallStats } from '@/features/stats/lib/stats';
 import { useTutorial } from '@/lib/useTutorial';
 import { motion } from 'framer-motion';
 import { BookOpen, Flame, Layers, PenTool, Settings, Zap } from 'lucide-react';

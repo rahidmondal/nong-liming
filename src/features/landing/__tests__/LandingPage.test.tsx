@@ -4,7 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/lib/stats', () => ({
+vi.mock('@/features/stats/lib/stats', () => ({
   getOverallStats: vi.fn().mockResolvedValue({
     totalDecks: 0,
     totalCards: 0,

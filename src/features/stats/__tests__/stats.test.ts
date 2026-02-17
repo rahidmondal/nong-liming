@@ -1,4 +1,4 @@
-import { getStreaks } from '@/lib/stats';
+import { getStreaks } from '@/features/stats/lib/stats';
 import { describe, expect, it } from 'vitest';
 
 describe('getStreaks', () => {
