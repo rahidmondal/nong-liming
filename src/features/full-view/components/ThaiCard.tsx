@@ -1,4 +1,4 @@
-import { useTTS } from '@/features/full-view/hooks/useTTS';
+import { useTTS } from '@/hooks/useTTS';
 import { motion } from 'framer-motion';
 import { Volume2, VolumeX } from 'lucide-react';
 

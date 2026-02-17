@@ -1,6 +1,7 @@
 import { consonants } from '@/data/consonants';
 import { tones } from '@/data/tones';
 import { vowels } from '@/data/vowels';
+import { useTTS } from '@/hooks/useTTS';
 import type { ThaiConsonant, ThaiTone, ThaiVowel } from '@/types/alphabet';
 import { motion } from 'framer-motion';
 import { Check, ChevronDown, ChevronUp, RotateCcw, Volume2, X } from 'lucide-react';
@@ -107,6 +108,7 @@ export function WordBuilder() {
   const [selectedVowel, setSelectedVowel] = useState<string | null>(null);
   const [selectedTone, setSelectedTone] = useState<string | null>(null);
   const [finalConsonant, setFinalConsonant] = useState<string | null>(null);
+  const { speak } = useTTS();
 
   const consonantItems = useMemo(
     () =>
@@ -201,11 +203,8 @@ export function WordBuilder() {
 
   const handleSpeak = useCallback(() => {
     if (!composed) return;
-    const utterance = new SpeechSynthesisUtterance(composed);
-    utterance.lang = 'th-TH';
-    utterance.rate = 0.8;
-    speechSynthesis.speak(utterance);
-  }, [composed]);
+    speak(composed);
+  }, [composed, speak]);
 
   return (
     <div className="space-y-6">

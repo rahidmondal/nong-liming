@@ -1,3 +1,4 @@
+import { useTTS } from '@/hooks/useTTS';
 import { motion } from 'framer-motion';
 import { AlertCircle, Eraser, Loader2, ScanSearch, Undo2, Volume2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -19,6 +20,7 @@ export function WritingPad() {
   });
   const workerRef = useRef<Worker | null>(null);
   const strokeHistory = useRef<ImageData[]>([]);
+  const { speak } = useTTS();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -404,10 +406,7 @@ export function WritingPad() {
 
               <button
                 onClick={() => {
-                  const utterance = new SpeechSynthesisUtterance(recognition.text);
-                  utterance.lang = 'th-TH';
-                  utterance.rate = 0.8;
-                  speechSynthesis.speak(utterance);
+                  speak(recognition.text);
                 }}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors"
               >
