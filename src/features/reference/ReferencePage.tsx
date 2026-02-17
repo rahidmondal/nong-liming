@@ -3,10 +3,10 @@ import { consonants } from '@/data/consonants';
 import { numbers } from '@/data/numbers';
 import { tones } from '@/data/tones';
 import { vowels } from '@/data/vowels';
-import { ConsonantChart } from '@/features/full-view/components/ConsonantChart';
-import { ThaiCard } from '@/features/full-view/components/ThaiCard';
-import { ToneDiagram } from '@/features/full-view/components/ToneDiagram';
-import { VowelChart } from '@/features/full-view/components/VowelChart';
+import { ConsonantChart } from '@/features/reference/components/ConsonantChart';
+import { ThaiCard } from '@/features/reference/components/ThaiCard';
+import { ToneDiagram } from '@/features/reference/components/ToneDiagram';
+import { VowelChart } from '@/features/reference/components/VowelChart';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, Hash, Languages, Music, Type } from 'lucide-react';
 import { useState } from 'react';
@@ -21,7 +21,7 @@ const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: 'tones', label: 'Tones', icon: <Music className="w-4 h-4" /> },
 ];
 
-export function FullViewPage() {
+export function ReferencePage() {
   const [activeTab, setActiveTab] = useState<Tab>('consonants');
 
   return (
@@ -32,7 +32,7 @@ export function FullViewPage() {
           <ArrowLeft className="w-5 h-5" />
           <span className="text-sm font-medium">Back</span>
         </Link>
-        <h1 className="text-xl font-bold text-foreground">Full View</h1>
+        <h1 className="text-xl font-bold text-foreground">Reference</h1>
         <ModeToggle />
       </header>
 

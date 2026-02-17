@@ -9,15 +9,25 @@ const mockReviewLogs: { deckId: number; reviewedAt: Date; previousInterval: numb
 vi.mock('@/lib/db', () => ({
   db: {
     cards: {
-      where: (field: string) => ({
-        equals: (val: number) => ({
-          toArray: () => Promise.resolve(mockCards.filter(c => (field === 'deckId' ? c.deckId === val : false))),
-          filter: (fn: (c: Card) => boolean) => ({
-            toArray: () =>
-              Promise.resolve(mockCards.filter(c => (field === 'deckId' ? c.deckId === val : false)).filter(fn)),
-          }),
-        }),
-      }),
+      where: (query: string | Record<string, unknown>) => {
+        if (typeof query === 'string') {
+          return {
+            equals: (val: number) => ({
+              toArray: () => Promise.resolve(mockCards.filter(c => (query === 'deckId' ? c.deckId === val : false))),
+              filter: (fn: (c: Card) => boolean) => ({
+                toArray: () =>
+                  Promise.resolve(mockCards.filter(c => (query === 'deckId' ? c.deckId === val : false)).filter(fn)),
+              }),
+            }),
+          };
+        }
+        return {
+          toArray: () =>
+            Promise.resolve(
+              mockCards.filter(c => Object.entries(query).every(([key, val]) => c[key as keyof Card] === val)),
+            ),
+        };
+      },
     },
     reviewLogs: {
       where: (field: string) => ({

@@ -1,3 +1,4 @@
+import { useTTS } from '@/hooks/useTTS';
 import { motion } from 'framer-motion';
 import { AlertCircle, Eraser, Loader2, ScanSearch, Undo2, Volume2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -12,7 +13,6 @@ type RecognitionState =
 export function WritingPad() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
   const isDrawingRef = useRef(false);
   const [hasStrokes, setHasStrokes] = useState(false);
   const [recognition, setRecognition] = useState<RecognitionState>({
@@ -20,6 +20,7 @@ export function WritingPad() {
   });
   const workerRef = useRef<Worker | null>(null);
   const strokeHistory = useRef<ImageData[]>([]);
+  const { speak } = useTTS();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -96,7 +97,6 @@ export function WritingPad() {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     isDrawingRef.current = true;
-    setIsDrawing(true);
     setHasStrokes(true);
   };
 
@@ -110,7 +110,6 @@ export function WritingPad() {
 
   const endStroke = () => {
     isDrawingRef.current = false;
-    setIsDrawing(false);
   };
 
   const onMouseDown = (e: React.MouseEvent) => {
@@ -118,7 +117,7 @@ export function WritingPad() {
     beginStroke(x, y);
   };
   const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDrawing) return;
+    if (!isDrawingRef.current) return;
     const { x, y } = getMouseCoords(e);
     continueStroke(x, y);
   };
@@ -258,20 +257,29 @@ export function WritingPad() {
 
       await workerRef.current.setParameters({
         tessedit_pageseg_mode: PSM.SINGLE_CHAR,
+        tessedit_char_whitelist: 'กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮะาิีึืุูเแโใไัำํ็่้๊๋ฯๆ๏๚๛๐๑๒๓๔๕๖๗๘๙',
       });
 
       const result = await workerRef.current.recognize(processedImage);
 
       const rawText = result.data.text.trim();
-      const thaiOnly = rawText.replace(/[^\u0E00-\u0E7F\s]/g, '').trim();
+      const thaiOnly = rawText
+        .replace(/[^\u0E00-\u0E7F\s]/g, '')
+        .normalize('NFC')
+        .trim();
       const confidence = result.data.confidence;
 
       if (thaiOnly) {
         setRecognition({ status: 'success', text: thaiOnly, confidence });
       } else {
+        const errorMessage =
+          rawText.length > 0
+            ? 'Please enter only Thai characters.'
+            : 'Could not recognize Thai text. Try writing larger, clearer strokes.';
+
         setRecognition({
           status: 'error',
-          message: 'Could not recognize Thai text. Try writing larger, clearer strokes in the center of the pad.',
+          message: errorMessage,
         });
       }
     } catch (error) {
@@ -398,10 +406,7 @@ export function WritingPad() {
 
               <button
                 onClick={() => {
-                  const utterance = new SpeechSynthesisUtterance(recognition.text);
-                  utterance.lang = 'th-TH';
-                  utterance.rate = 0.8;
-                  speechSynthesis.speak(utterance);
+                  speak(recognition.text);
                 }}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors"
               >

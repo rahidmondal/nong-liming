@@ -4,6 +4,15 @@ import { db, getOrCreateDefaultNoteType, storeMediaFile } from './db';
 
 export async function importApkgToDb(parsedResult: ParsedApkg, onProgress: (count: number) => void): Promise<number> {
   let totalCards = 0;
+  const suffix = `_${Date.now().toString(36)}`;
+
+  const renameMap = new Map<string, string>();
+  for (const filename of parsedResult.availableMedia) {
+    const ext = filename.split('.').pop() ?? '';
+    const name = filename.replace(`.${ext}`, '');
+    const newName = `${name}${suffix}.${ext}`;
+    renameMap.set(filename, newName);
+  }
 
   const modelIdMap = new Map<string, number>();
 
@@ -34,8 +43,9 @@ export async function importApkgToDb(parsedResult: ParsedApkg, onProgress: (coun
     });
     if (deckId === undefined) throw new Error('Failed to add Deck');
 
+    // Map original filenames to this deck, but we'll store them as new filenames later
     for (const ref of parsedDeck.mediaRefs) {
-      mediaToDeckId.set(ref, deckId);
+      mediaToDeckId.set(renameMap.get(ref) ?? ref, deckId);
     }
 
     const batchSize = 50;
@@ -47,10 +57,33 @@ export async function importApkgToDb(parsedResult: ParsedApkg, onProgress: (coun
       for (const parsedNote of batch) {
         const noteTypeId = modelIdMap.get(parsedNote.modelId) ?? defaultNoteTypeId;
 
+        // 2. Replace media references in fields
+        const processedFields: Record<string, string> = {};
+        for (const [key, value] of Object.entries(parsedNote.fields)) {
+          let newValue = value;
+          // Replace images: src="fname" -> src="fname_suffix"
+          newValue = newValue.replace(
+            /(<img[^>]+src=["'])([^"']+)["']/gi,
+            (match: string, prefix: string, fname: string) => {
+              const newName = renameMap.get(fname);
+              return newName ? `${prefix}${newName}"` : match;
+            },
+          );
+          // Replace sounds: [sound:fname] -> [sound:fname_suffix]
+          newValue = newValue.replace(
+            /(\[sound:)([^\]]+)(\])/gi,
+            (match: string, prefix: string, fname: string, suffix: string) => {
+              const newName = renameMap.get(fname);
+              return newName ? `${prefix}${newName}${suffix}` : match;
+            },
+          );
+          processedFields[key] = newValue;
+        }
+
         const noteId = await db.notes.add({
           noteTypeId,
           deckId,
-          fields: parsedNote.fields,
+          fields: processedFields,
           tags: [],
           createdAt: now,
           updatedAt: now,
@@ -94,15 +127,17 @@ export async function importApkgToDb(parsedResult: ParsedApkg, onProgress: (coun
     for (let i = 0; i < mediaFiles.length; i += mediaBatchSize) {
       const batch = mediaFiles.slice(i, i + mediaBatchSize);
       await Promise.all(
-        batch.map(async filename => {
+        batch.map(async originalFilename => {
           try {
-            const blob = await parsedResult.getMediaBlob(filename);
+            const blob = await parsedResult.getMediaBlob(originalFilename);
             if (blob) {
-              const targetDeckId = mediaToDeckId.get(filename) ?? fallbackDeckId;
-              await storeMediaFile(filename, blob, blob.type, targetDeckId);
+              const newFilename = renameMap.get(originalFilename) ?? originalFilename;
+              const targetDeckId = mediaToDeckId.get(newFilename) ?? fallbackDeckId;
+              // 3. Store with new filename
+              await storeMediaFile(newFilename, blob, blob.type, targetDeckId);
             }
           } catch (e) {
-            console.warn(`Failed to import media: ${filename}`, e);
+            console.warn(`Failed to import media: ${originalFilename}`, e);
           }
         }),
       );

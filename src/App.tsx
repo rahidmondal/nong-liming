@@ -3,11 +3,11 @@ import { ToastProvider } from '@/components/toast-provider';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { BuilderPage } from '@/features/builder/BuilderPage';
 import { DecksPage } from '@/features/flashcards/DecksPage';
-import { StatsPage } from '@/features/flashcards/StatsPage';
 import { StudyPage } from '@/features/flashcards/StudyPage';
-import { FullViewPage } from '@/features/full-view/FullViewPage';
 import { LandingPage } from '@/features/landing/LandingPage';
+import { ReferencePage } from '@/features/reference/ReferencePage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
+import { StatsPage } from '@/features/stats/StatsPage';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { BASE_PATH } from './lib/constants';
 
@@ -20,7 +20,7 @@ function App() {
             <div className="grow">
               <Routes>
                 <Route path="/" element={<LandingPage />} />
-                <Route path="/full-view" element={<FullViewPage />} />
+                <Route path="/reference" element={<ReferencePage />} />
                 <Route path="/decks" element={<DecksPage />} />
                 <Route path="/decks/:id/study" element={<StudyPage />} />
                 <Route path="/stats" element={<StatsPage />} />

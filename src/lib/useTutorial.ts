@@ -24,9 +24,9 @@ const TUTORIAL_STEPS: DriveStep[] = [
     },
   },
   {
-    element: '#nav-fullview',
+    element: '#nav-reference',
     popover: {
-      title: '📖 Full View',
+      title: '📖 Reference',
       description: 'Browse the Thai alphabet, numbers, and tone marks with Indic phonetic mappings.',
       side: 'bottom',
       align: 'center',

@@ -62,12 +62,12 @@ describe('calculateNextReview', () => {
       expect(result.nextReview.getTime() - now.getTime()).toBe(1 * 60 * 1000);
     });
 
-    it('Hard: stays on current step', () => {
+    it('Hard: calculates average of current and next step (or graduating)', () => {
       const card = { ...learningCard, learningStep: 1 };
       const result = calculateNextReview(card, 2, NO_FUZZ_CONFIG, now);
       expect(result.status).toBe('learning');
       expect(result.learningStep).toBe(1);
-      expect(result.nextReview.getTime() - now.getTime()).toBe(10 * 60 * 1000);
+      expect(result.nextReview.getTime() - now.getTime()).toBe(725 * 60 * 1000);
     });
 
     it('Good: advances to next step', () => {

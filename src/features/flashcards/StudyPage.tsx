@@ -272,8 +272,20 @@ export function StudyPage() {
     const sess = await getOrCreateSession(deck.id ?? 0, cardIds);
     setSession(sess);
 
+    const idsToUse = sess.totalReviewed > 0 && sess.queue.length > 0 ? sess.queue : cardIds;
+
+    if (sess.totalReviewed > 0) {
+      setSessionStats({
+        reviewed: sess.totalReviewed,
+        correct: sess.correctCount,
+        newSeen: sess.newCardsSeen,
+        reviewSeen: sess.reviewCardsSeen,
+        startTime: sess.startedAt.getTime(),
+      });
+    }
+
     const cardDataResult: CardWithNote[] = [];
-    for (const cardId of cardIds) {
+    for (const cardId of idsToUse) {
       const card = await db.cards.get(cardId);
       if (!card) continue;
       const note = await db.notes.get(card.noteId);

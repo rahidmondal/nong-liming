@@ -183,7 +183,16 @@ export async function parseApkgFile(file: File): Promise<ParsedApkg> {
   }
   const dbBytes = new Uint8Array(await dbFile.async('arraybuffer'));
 
-  const SQL = await initSqlJs(SQL_CONFIG);
+  let SQL;
+  try {
+    SQL = await initSqlJs(SQL_CONFIG);
+  } catch (e) {
+    throw new Error(
+      `Failed to load SQL engine (WASM). Check your internet connection or try refreshing. Details: ${
+        e instanceof Error ? e.message : String(e)
+      }`,
+    );
+  }
   const sqlDb = new SQL.Database(dbBytes);
 
   const mediaMap = new Map<string, string>();
@@ -305,7 +314,17 @@ export async function parseApkgFile(file: File): Promise<ParsedApkg> {
 
 export async function getApkgModels(file: File): Promise<AnkiModel[]> {
   const dbBytes = await extractDbFromApkg(file);
-  const SQL = await initSqlJs(SQL_CONFIG);
+
+  let SQL;
+  try {
+    SQL = await initSqlJs(SQL_CONFIG);
+  } catch (e) {
+    throw new Error(
+      `Failed to load SQL engine (WASM). Check your internet connection or try refreshing. Details: ${
+        e instanceof Error ? e.message : String(e)
+      }`,
+    );
+  }
   const sqlDb = new SQL.Database(dbBytes);
 
   try {

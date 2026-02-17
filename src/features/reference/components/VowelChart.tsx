@@ -1,4 +1,4 @@
-import { ThaiCard } from '@/features/full-view/components/ThaiCard';
+import { ThaiCard } from '@/features/reference/components/ThaiCard';
 import type { ThaiVowel, VowelType } from '@/types/alphabet';
 
 const TYPE_CONFIG: Record<VowelType, { label: string; color: string }> = {

@@ -1,4 +1,4 @@
-import { ThaiCard } from '@/features/full-view/components/ThaiCard';
+import { ThaiCard } from '@/features/reference/components/ThaiCard';
 import type { ThaiConsonant } from '@/types/alphabet';
 
 const CLASS_CONFIG: Record<string, { label: string; color: string }> = {
