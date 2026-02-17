@@ -258,20 +258,29 @@ export function WritingPad() {
 
       await workerRef.current.setParameters({
         tessedit_pageseg_mode: PSM.SINGLE_CHAR,
+        tessedit_char_whitelist: 'กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮะาิีึืุูเแโใไัำํ็่้๊๋ฯๆ๏๚๛๐๑๒๓๔๕๖๗๘๙',
       });
 
       const result = await workerRef.current.recognize(processedImage);
 
       const rawText = result.data.text.trim();
-      const thaiOnly = rawText.replace(/[^\u0E00-\u0E7F\s]/g, '').trim();
+      const thaiOnly = rawText
+        .replace(/[^\u0E00-\u0E7F\s]/g, '')
+        .normalize('NFC')
+        .trim();
       const confidence = result.data.confidence;
 
       if (thaiOnly) {
         setRecognition({ status: 'success', text: thaiOnly, confidence });
       } else {
+        const errorMessage =
+          rawText.length > 0
+            ? 'Please enter only Thai characters.'
+            : 'Could not recognize Thai text. Try writing larger, clearer strokes.';
+
         setRecognition({
           status: 'error',
-          message: 'Could not recognize Thai text. Try writing larger, clearer strokes in the center of the pad.',
+          message: errorMessage,
         });
       }
     } catch (error) {
