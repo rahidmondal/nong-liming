@@ -136,11 +136,11 @@ export function LandingPage() {
             </Link>
           </motion.div>
 
-          {/* Full View */}
+          {/* Reference */}
           <motion.div variants={item}>
             <Link
-              to="/full-view"
-              id="nav-fullview"
+              to="/reference"
+              id="nav-reference"
               className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer overflow-hidden"
             >
               <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -148,7 +148,7 @@ export function LandingPage() {
                 <BookOpen className="w-6 h-6" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-lg">Full View</h3>
+                <h3 className="font-semibold text-lg">Reference</h3>
                 <p className="text-sm text-muted-foreground">Alphabet/Number/Tone Reference</p>
               </div>
             </Link>

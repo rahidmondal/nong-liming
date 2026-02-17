@@ -45,31 +45,42 @@ export async function buildStudyQueue(deck: Deck): Promise<StudyQueueResult> {
   const remainingNew = Math.max(0, deck.newCardsPerDay - newToday);
   const remainingReview = Math.max(0, deck.reviewCardsPerDay - reviewToday);
 
-  const allCards = await db.cards.where('deckId').equals(deckId).toArray();
+  const [learningCards, relearningCards, reviewCards, newCardsRaw] = await Promise.all([
+    db.cards.where({ deckId, status: 'learning' }).toArray(),
+    db.cards.where({ deckId, status: 'relearning' }).toArray(),
+    db.cards.where({ deckId, status: 'review' }).toArray(),
+    db.cards.where({ deckId, status: 'new' }).toArray(),
+  ]);
 
   const learning: Card[] = [];
   const review: Card[] = [];
-  const newCards: Card[] = [];
 
-  for (const card of allCards) {
-    if (card.status === 'learning' || card.status === 'relearning') {
-      if (card.nextReview <= now) {
-        learning.push(card);
-      }
-    } else if (card.status === 'review') {
-      if (card.nextReview <= now) {
-        review.push(card);
-      }
-    } else {
-      newCards.push(card);
+  // Filter learning/relearning due now
+  for (const card of [...learningCards, ...relearningCards]) {
+    if (card.nextReview <= now) {
+      learning.push(card);
     }
+  }
+
+  // Filter reviews due now
+  for (const card of reviewCards) {
+    if (card.nextReview <= now) {
+      review.push(card);
+    }
+  }
+
+  // Shuffle new cards (Fisher-Yates) to vary the order
+  const newCards = [...newCardsRaw];
+  for (let i = newCards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = newCards[i];
+    newCards[i] = newCards[j];
+    newCards[j] = temp;
   }
 
   learning.sort((a, b) => a.nextReview.getTime() - b.nextReview.getTime());
 
   review.sort((a, b) => a.nextReview.getTime() - b.nextReview.getTime());
-
-  newCards.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
   const limitedReview = review.slice(0, remainingReview);
   const limitedNew = newCards.slice(0, remainingNew);

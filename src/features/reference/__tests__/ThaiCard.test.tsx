@@ -1,5 +1,5 @@
 import { ThemeProvider } from '@/components/theme-provider';
-import { ThaiCard } from '@/features/full-view/components/ThaiCard';
+import { ThaiCard } from '@/features/reference/components/ThaiCard';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';

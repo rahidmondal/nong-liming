@@ -148,6 +148,10 @@ db.version(3).stores({
   mediaFiles: 'filename, deckId',
 });
 
+db.version(4).stores({
+  cards: '++id, noteId, deckId, status, nextReview, [deckId+status], createdAt',
+});
+
 export { db };
 
 const blobUrlCache = new Map<string, string>();
