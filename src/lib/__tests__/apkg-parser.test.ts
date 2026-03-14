@@ -36,6 +36,17 @@ describe('stripHtml', () => {
     const ankiHtml = '<div style="font-family: Arial;">สวัสดี</div><br><i>hello</i>';
     expect(stripHtml(ankiHtml)).toBe('สวัสดี\nhello');
   });
+
+  it('handles unclosed malicious tags', () => {
+    expect(stripHtml('hello <script src="x.js"')).toBe('hello');
+    expect(stripHtml('hello <img src="x" onerror="alert(1)"')).toBe('hello');
+  });
+
+  it('handles nested malicious tags (multi-character sanitization)', () => {
+    expect(stripHtml('<<script>script>')).toBe('');
+    expect(stripHtml('<s<script>cript>')).toBe('cript>'); 
+    expect(stripHtml('<<img src=x onerror=alert(1)>>')).toBe('<>');
+  });
 });
 
 describe('parseModels', () => {

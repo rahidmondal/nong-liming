@@ -1,5 +1,5 @@
 import { fireConfetti } from '@/lib/confetti';
-import { db } from '@/lib/db';
+import { db, getOrCreateUserStats } from '@/lib/db';
 import {
   calculateNextReview,
   DEFAULT_SCHEDULING_CONFIG,
@@ -201,6 +201,40 @@ export function StudyPage() {
         timeTakenMs,
         reviewedAt: new Date(),
       });
+
+      // Update daily goal stats
+      const stats = await getOrCreateUserStats();
+      const today = new Date().toISOString().slice(0, 10);
+      let newCount = stats.cardsReviewedToday + 1;
+
+      if (stats.lastStudyDate !== today) {
+        newCount = 1; // Reset if rollover hasn't been caught yet
+      }
+
+      await db.userStats.update(1, {
+        cardsReviewedToday: newCount,
+        lastStudyDate: today,
+      });
+
+      // Feature 4: Detect Graduation
+      if (card.status !== 'review' && result.status === 'review') {
+        const fieldNames = Object.keys(note.fields);
+        const frontHtml = note.fields.Front || (fieldNames.length > 0 ? note.fields[fieldNames[0]] : 'Unknown');
+        const backHtml = note.fields.Back || (fieldNames.length > 1 ? note.fields[fieldNames[1]] : '');
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = frontHtml;
+        const plainWord = tempDiv.textContent || tempDiv.innerText || 'Unknown';
+        
+        tempDiv.innerHTML = backHtml;
+        const plainMeaning = tempDiv.textContent || tempDiv.innerText || '';
+
+        await db.graduatedWords.add({
+          word: plainWord.trim() || 'Unknown',
+          meaning: plainMeaning.trim(),
+          graduatedAt: new Date(),
+        });
+      }
 
       const wasNew = card.status === 'new';
       const wasReview = card.status === 'review';

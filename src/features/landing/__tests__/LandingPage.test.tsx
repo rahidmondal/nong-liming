@@ -56,7 +56,7 @@ describe('LandingPage', () => {
 
   it('renders the Builder option', async () => {
     await renderWithProviders(<LandingPage />);
-    expect(screen.getByText('Builder')).toBeInTheDocument();
+    expect(screen.getByText('Writing Builder')).toBeInTheDocument();
     expect(screen.getByText('Word & Writing Pad')).toBeInTheDocument();
   });
 });

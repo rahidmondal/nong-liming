@@ -109,3 +109,18 @@ export interface MediaFile {
   deckId: number;
   createdAt: Date;
 }
+
+export interface UserStats {
+  id: number; // Expected to always be 1
+  dailyGoal: number;
+  freezeTokens: number;
+  cardsReviewedToday: number;
+  lastStudyDate: string; // e.g. YYYY-MM-DD
+}
+
+export interface GraduatedWord {
+  id?: number;
+  word: string;
+  meaning: string;
+  graduatedAt: Date;
+}

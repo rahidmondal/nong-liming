@@ -8,6 +8,9 @@ import { LandingPage } from '@/features/landing/LandingPage';
 import { ReferencePage } from '@/features/reference/ReferencePage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { StatsPage } from '@/features/stats/StatsPage';
+import { DictionaryPage } from '@/features/dictionary/DictionaryPage';
+import { ToneTrainerPage } from '@/features/toneTrainer/ToneTrainerPage';
+import { SentencePracticePage } from '@/features/sentenceBuilder/SentencePracticePage';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { BASE_PATH } from './lib/constants';
 
@@ -21,6 +24,9 @@ function App() {
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/reference" element={<ReferencePage />} />
+                <Route path="/dictionary" element={<DictionaryPage />} />
+                <Route path="/tone-trainer" element={<ToneTrainerPage />} />
+                <Route path="/sentence-practice" element={<SentencePracticePage />} />
                 <Route path="/decks" element={<DecksPage />} />
                 <Route path="/decks/:id/study" element={<StudyPage />} />
                 <Route path="/stats" element={<StatsPage />} />

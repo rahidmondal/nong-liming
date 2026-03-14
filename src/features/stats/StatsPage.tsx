@@ -1,7 +1,10 @@
 import type { DailyReviewCount, DeckStats, OverallStats } from '@/features/stats/lib/stats';
 import { getDailyReviews, getDeckStats, getOverallStats } from '@/features/stats/lib/stats';
+import { db } from '@/lib/db';
+import type { UserStats } from '@/types/flashcard';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BarChart3, BookOpen, Flame, Layers, Star, TrendingUp, Zap } from 'lucide-react';
+import { ArrowLeft, BarChart3, BookOpen, Flame, Layers, Snowflake, Star, Target, TrendingUp, Zap } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -10,6 +13,8 @@ export function StatsPage() {
   const [daily, setDaily] = useState<DailyReviewCount[]>([]);
   const [deckStats, setDeckStats] = useState<DeckStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const userStats = useLiveQuery<UserStats | undefined>(() => db.userStats.get(1));
 
   const loadStats = useCallback(async () => {
     const [o, d, ds] = await Promise.all([getOverallStats(), getDailyReviews(30), getDeckStats()]);
@@ -98,6 +103,56 @@ export function StatsPage() {
               </div>
               <p className="text-2xl font-bold text-foreground">{overall.reviewsToday}</p>
             </motion.div>
+          </motion.div>
+        )}
+
+        {/* Gamification Stats */}
+        {userStats && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="grid grid-cols-2 gap-3"
+          >
+            <div className="bg-card rounded-xl border border-border p-4">
+              <div className="flex items-center gap-2 text-primary mb-2">
+                <Target className="w-5 h-5" />
+                <span className="font-semibold">Daily Goal</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Progress</span>
+                  <span className="font-medium">
+                    {userStats.cardsReviewedToday} / {userStats.dailyGoal}
+                  </span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full bg-primary rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{
+                      width: `${String(Math.min(100, (userStats.cardsReviewedToday / userStats.dailyGoal) * 100))}%`,
+                    }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                  />
+                </div>
+                {userStats.cardsReviewedToday >= userStats.dailyGoal && (
+                  <p className="text-[10px] text-emerald-500 font-medium">Goal Met! Streak secured.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-card rounded-xl border border-border p-4">
+              <div className="flex items-center gap-2 text-blue-500 mb-2">
+                <Snowflake className="w-5 h-5" />
+                <span className="font-semibold">Freeze Tokens</span>
+              </div>
+              <div className="flex items-end gap-1 mb-1">
+                <span className="text-2xl font-bold text-foreground">{userStats.freezeTokens}</span>
+                <span className="text-sm text-muted-foreground pb-0.5">/ 3 max</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground leading-tight">Protects your streak if you miss a day.</p>
+            </div>
           </motion.div>
         )}
 

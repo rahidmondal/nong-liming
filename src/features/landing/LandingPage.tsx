@@ -1,7 +1,7 @@
 import { getOverallStats, type OverallStats } from '@/features/stats/lib/stats';
 import { useTutorial } from '@/lib/useTutorial';
 import { motion } from 'framer-motion';
-import { BookOpen, Flame, Layers, PenTool, Settings, Zap } from 'lucide-react';
+import { BookA, BookOpen, Flame, Layers, MessageSquareText, Music, PenTool, Settings, Zap } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -136,6 +136,42 @@ export function LandingPage() {
             </Link>
           </motion.div>
 
+          {/* Dictionary */}
+          <motion.div variants={item}>
+            <Link
+              to="/dictionary"
+              id="nav-dictionary"
+              className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400 mr-4">
+                <BookA className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg">Dictionary</h3>
+                <p className="text-sm text-muted-foreground">Search and Quick Add</p>
+              </div>
+            </Link>
+          </motion.div>
+
+          {/* Tone Trainer */}
+          <motion.div variants={item}>
+            <Link
+              to="/tone-trainer"
+              id="nav-tone-trainer"
+              className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400 mr-4">
+                <Music className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg">Tone Trainer</h3>
+                <p className="text-sm text-muted-foreground">Practice Thai Tones</p>
+              </div>
+            </Link>
+          </motion.div>
+
           {/* Reference */}
           <motion.div variants={item}>
             <Link
@@ -166,8 +202,26 @@ export function LandingPage() {
                 <PenTool className="w-6 h-6" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-lg">Builder</h3>
+                <h3 className="font-semibold text-lg">Writing Builder</h3>
                 <p className="text-sm text-muted-foreground">Word & Writing Pad</p>
+              </div>
+            </Link>
+          </motion.div>
+
+          {/* Sentence Practice */}
+          <motion.div variants={item}>
+            <Link
+              to="/sentence-practice"
+              id="nav-sentence-practice"
+              className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400 mr-4">
+                <MessageSquareText className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg">Sentence Practice</h3>
+                <p className="text-sm text-muted-foreground">Combine Words Intelligently</p>
               </div>
             </Link>
           </motion.div>
