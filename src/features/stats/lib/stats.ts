@@ -1,4 +1,5 @@
 import { db } from '@/lib/db';
+import { checkAndApplyStreakRollover } from './streakLogic';
 
 export interface DailyReviewCount {
   date: string; // YYYY-MM-DD
@@ -109,6 +110,8 @@ export async function getDailyReviews(days = 30): Promise<DailyReviewCount[]> {
 }
 
 export async function getOverallStats(): Promise<OverallStats> {
+  await checkAndApplyStreakRollover();
+
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
 

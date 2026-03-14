@@ -1,4 +1,14 @@
-import type { Card, Deck, MediaFile, Note, NoteType, ReviewLog, StudySession } from '@/types/flashcard';
+import type {
+  Card,
+  Deck,
+  GraduatedWord,
+  MediaFile,
+  Note,
+  NoteType,
+  ReviewLog,
+  StudySession,
+  UserStats,
+} from '@/types/flashcard';
 import { DEFAULT_DECK_CONFIG, DEFAULT_EASE_FACTOR } from '@/types/flashcard';
 import Dexie, { type EntityTable } from 'dexie';
 
@@ -15,6 +25,8 @@ const db = new Dexie('NongLimingDB') as Dexie & {
   studySessions: EntityTable<StudySession, 'id'>;
   reviewLogs: EntityTable<ReviewLog, 'id'>;
   mediaFiles: EntityTable<MediaFile, 'filename'>;
+  userStats: EntityTable<UserStats, 'id'>;
+  graduatedWords: EntityTable<GraduatedWord, 'id'>;
 };
 
 db.version(1).stores({
@@ -152,6 +164,11 @@ db.version(4).stores({
   cards: '++id, noteId, deckId, status, nextReview, [deckId+status], createdAt',
 });
 
+db.version(5).stores({
+  userStats: 'id',
+  graduatedWords: '++id, word, graduatedAt',
+});
+
 export { db };
 
 const blobUrlCache = new Map<string, string>();
@@ -226,4 +243,19 @@ export async function createNoteAndCard(
   });
 
   return { noteId: toId(noteId), cardId: toId(cardId) };
+}
+
+export async function getOrCreateUserStats(): Promise<UserStats> {
+  let stats = await db.userStats.get(1);
+  if (!stats) {
+    stats = {
+      id: 1,
+      dailyGoal: 20,
+      freezeTokens: 0,
+      cardsReviewedToday: 0,
+      lastStudyDate: '',
+    };
+    await db.userStats.put(stats);
+  }
+  return stats;
 }
