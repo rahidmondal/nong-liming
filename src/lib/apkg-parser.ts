@@ -115,10 +115,14 @@ export function stripHtml(html: string): string {
   // 1. Replace block-level tags with newlines to preserve spacing
   let processed = html
     .replace(/<(?:div|p|br|li|h[1-6]|blockquote|pre)[^>]*>/gi, '\n')
-    .replace(/<\/ (?:div|p|li|h[1-6]|blockquote|pre)>/gi, '\n');
+    .replace(/<\/\s*(?:div|p|li|h[1-6]|blockquote|pre)>/gi, '\n');
 
-  // 2. Remove all remaining tags
-  processed = processed.replace(/<[^>]*>/g, '');
+  // 2. Remove all remaining tags, accounting for nested and unclosed tags
+  let previous = '';
+  while (processed !== previous) {
+    previous = processed;
+    processed = processed.replace(/<[a-z\/!][^>]*>?/gi, '');
+  }
 
   // 3. Unescape entities in a single pass to avoid double-unescaping issues
   // Use a map for common entities
