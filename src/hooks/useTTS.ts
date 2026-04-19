@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export function useTTS(lang = 'th-TH') {
+export function useTTS(lang = 'th-TH', rate = 0.8) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
 
@@ -34,7 +34,7 @@ export function useTTS(lang = 'th-TH') {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
 
-      utterance.rate = 0.8;
+      utterance.rate = rate;
       utterance.pitch = 1.0;
 
       if (voice) {
@@ -58,7 +58,7 @@ export function useTTS(lang = 'th-TH') {
         setIsSpeaking(false);
       }, timeoutMs);
     },
-    [lang, voice],
+    [lang, voice, rate],
   );
 
   const stop = useCallback(() => {

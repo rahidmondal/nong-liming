@@ -1,25 +1,26 @@
-import type { DailyReviewCount, DeckStats, OverallStats } from '@/features/stats/lib/stats';
-import { getDailyReviews, getDeckStats, getOverallStats } from '@/features/stats/lib/stats';
+import type { DeckStats, OverallStats } from '@/features/stats/lib/stats';
+import { getDeckStats, getOverallStats } from '@/features/stats/lib/stats';
 import { db } from '@/lib/db';
 import type { UserStats } from '@/types/flashcard';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BarChart3, BookOpen, Flame, Layers, Snowflake, Star, Target, TrendingUp, Zap } from 'lucide-react';
+import { ArrowLeft, BarChart3, BookOpen, Flame, Layers, Snowflake, Star, Target, Zap } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ConsistencyHeatmap } from './components/ConsistencyHeatmap';
+import { LearningCurve } from './components/LearningCurve';
+import { WeaknessDiagnostic } from './components/WeaknessDiagnostic';
 
 export function StatsPage() {
   const [overall, setOverall] = useState<OverallStats | null>(null);
-  const [daily, setDaily] = useState<DailyReviewCount[]>([]);
   const [deckStats, setDeckStats] = useState<DeckStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const userStats = useLiveQuery<UserStats | undefined>(() => db.userStats.get(1));
 
   const loadStats = useCallback(async () => {
-    const [o, d, ds] = await Promise.all([getOverallStats(), getDailyReviews(30), getDeckStats()]);
+    const [o, ds] = await Promise.all([getOverallStats(), getDeckStats()]);
     setOverall(o);
-    setDaily(d);
     setDeckStats(ds);
     setIsLoading(false);
   }, []);
@@ -27,8 +28,6 @@ export function StatsPage() {
   useEffect(() => {
     void loadStats();
   }, [loadStats]);
-
-  const maxDailyCount = Math.max(...daily.map(d => d.count), 1);
 
   const container = {
     hidden: { opacity: 0 },
@@ -162,7 +161,7 @@ export function StatsPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-card rounded-xl border border-border p-5"
+            className="bg-card rounded-xl border border-border p-5 mb-6"
           >
             <h2 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
@@ -201,43 +200,11 @@ export function StatsPage() {
           </motion.div>
         )}
 
-        {/* Activity Chart (last 30 days) */}
-        {daily.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-card rounded-xl border border-border p-5"
-          >
-            <h2 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Last 30 Days
-            </h2>
-            <div className="flex items-end gap-0.75 h-24">
-              {daily.map(d => {
-                const height = d.count > 0 ? Math.max(8, (d.count / maxDailyCount) * 100) : 4;
-                const dayLabel = new Date(d.date).toLocaleDateString('en', { weekday: 'narrow' });
-                return (
-                  <div key={d.date} className="flex-1 flex flex-col items-center justify-end group relative">
-                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-foreground text-background text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                      {d.count} reviews
-                    </div>
-                    <motion.div
-                      className={`w-full rounded-sm ${d.count > 0 ? 'bg-primary' : 'bg-muted'}`}
-                      initial={{ height: 0 }}
-                      animate={{ height: `${String(height)}%` }}
-                      transition={{ duration: 0.4, delay: 0.02 }}
-                    />
-                    {/* Show day letter every 7 days */}
-                    {daily.indexOf(d) % 7 === 0 && (
-                      <span className="text-[9px] text-muted-foreground mt-1">{dayLabel}</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <ConsistencyHeatmap />
+          <LearningCurve />
+          <WeaknessDiagnostic />
+        </motion.div>
 
         {/* Per-Deck Stats */}
         {deckStats.length > 0 && (

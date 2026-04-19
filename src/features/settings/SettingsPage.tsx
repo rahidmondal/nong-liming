@@ -1,12 +1,15 @@
+import { PlaybackSpeedSelector } from '@/components/PlaybackSpeedSelector';
 import { useTheme } from '@/components/theme-provider';
 import { useToast } from '@/components/toast-provider';
 import { exportAndDownload, importBackup } from '@/lib/backup-utils';
 import { APP_VERSION } from '@/lib/constants';
 import { db } from '@/lib/db';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { usePWAInstall, usePWAUpdate } from '@/lib/usePWA';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
+  BrainCircuit,
   Check,
   ChevronRight,
   Clock,
@@ -50,6 +53,8 @@ export function SettingsPage() {
   const [showClearHistoryConfirm, setShowClearHistoryConfirm] = useState(false);
   const [storageUsage, setStorageUsage] = useState<{ usage: number; quota: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const userStats = useLiveQuery(() => db.userStats.get(1));
 
   useEffect(() => {
     if ('storage' in navigator && 'estimate' in navigator.storage) {
@@ -205,6 +210,22 @@ export function SettingsPage() {
                 ))}
               </div>
             </div>
+            {/* Playback Speed */}
+            <div className="p-4 border-t border-border">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Playback Speed</p>
+                  <p className="text-xs text-muted-foreground">Default speed for text-to-speech</p>
+                </div>
+                {userStats && (
+                  <PlaybackSpeedSelector
+                    currentSpeed={userStats.playbackSpeed}
+                    onSpeedChange={speed => void db.userStats.update(1, { playbackSpeed: speed })}
+                    size="medium"
+                  />
+                )}
+              </div>
+            </div>
           </div>
         </motion.section>
 
@@ -269,6 +290,21 @@ export function SettingsPage() {
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
+
+            {/* Spaced Repetition Guide */}
+            <Link
+              to="/settings/algorithm"
+              className="w-full flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors text-left"
+            >
+              <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
+                <BrainCircuit className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-foreground">How the Algorithm Works</p>
+                <p className="text-xs text-muted-foreground">Understand Spaced Repetition (SM-2)</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </Link>
           </div>
         </motion.section>
 

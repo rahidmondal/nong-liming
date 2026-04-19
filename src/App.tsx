@@ -10,7 +10,10 @@ import { SettingsPage } from '@/features/settings/SettingsPage';
 import { StatsPage } from '@/features/stats/StatsPage';
 import { DictionaryPage } from '@/features/dictionary/DictionaryPage';
 import { ToneTrainerPage } from '@/features/toneTrainer/ToneTrainerPage';
+import { LessonViewer } from '@/features/lessons/LessonViewer';
+import { LessonsOverview } from '@/features/lessons/LessonsOverview';
 import { SentencePracticePage } from '@/features/sentenceBuilder/SentencePracticePage';
+import { SpacedRepetitionGuide } from '@/features/settings/SpacedRepetitionGuide';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { BASE_PATH } from './lib/constants';
 
@@ -27,11 +30,14 @@ function App() {
                 <Route path="/dictionary" element={<DictionaryPage />} />
                 <Route path="/tone-trainer" element={<ToneTrainerPage />} />
                 <Route path="/sentence-practice" element={<SentencePracticePage />} />
+                <Route path="/lessons" element={<LessonsOverview />} />
+                <Route path="/lessons/:id" element={<LessonViewer />} />
                 <Route path="/decks" element={<DecksPage />} />
                 <Route path="/decks/:id/study" element={<StudyPage />} />
                 <Route path="/stats" element={<StatsPage />} />
                 <Route path="/builder" element={<BuilderPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/settings/algorithm" element={<SpacedRepetitionGuide />} />
               </Routes>
             </div>
           </div>

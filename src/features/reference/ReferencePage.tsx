@@ -1,3 +1,4 @@
+import { SpeedPill } from '@/components/PlaybackSpeedSelector';
 import { ModeToggle } from '@/components/mode-toggle';
 import { consonants } from '@/data/consonants';
 import { numbers } from '@/data/numbers';
@@ -7,6 +8,8 @@ import { ConsonantChart } from '@/features/reference/components/ConsonantChart';
 import { ThaiCard } from '@/features/reference/components/ThaiCard';
 import { ToneDiagram } from '@/features/reference/components/ToneDiagram';
 import { VowelChart } from '@/features/reference/components/VowelChart';
+import { db } from '@/lib/db';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, Hash, Languages, Music, Type } from 'lucide-react';
 import { useState } from 'react';
@@ -23,17 +26,26 @@ const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
 
 export function ReferencePage() {
   const [activeTab, setActiveTab] = useState<Tab>('consonants');
+  const userStats = useLiveQuery(() => db.userStats.get(1));
 
   return (
     <div className="min-h-full flex flex-col p-4 sm:p-6 max-w-5xl mx-auto">
       {/* Header */}
-      <header className="w-full flex justify-between items-center py-4">
+      <header className="w-full flex justify-between items-center py-4 mb-2">
         <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-5 h-5" />
           <span className="text-sm font-medium">Back</span>
         </Link>
-        <h1 className="text-xl font-bold text-foreground">Reference</h1>
-        <ModeToggle />
+        <h1 className="text-xl font-bold text-foreground absolute left-1/2 -translate-x-1/2">Reference</h1>
+        <div className="flex items-center gap-3">
+          {userStats && (
+            <SpeedPill
+              currentSpeed={userStats.playbackSpeed}
+              onSpeedChange={speed => void db.userStats.update(1, { playbackSpeed: speed })}
+            />
+          )}
+          <ModeToggle />
+        </div>
       </header>
 
       {/* Tab Navigation */}

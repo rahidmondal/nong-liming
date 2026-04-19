@@ -17,6 +17,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, Clock, Pause, RotateCcw } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { CardDetailsPanel } from './CardDetailsPanel';
+import { ReviewPreview } from './ReviewPreview';
 
 type StudyPhase = 'loading' | 'front' | 'back' | 'done';
 
@@ -221,11 +223,11 @@ export function StudyPage() {
         const fieldNames = Object.keys(note.fields);
         const frontHtml = note.fields.Front || (fieldNames.length > 0 ? note.fields[fieldNames[0]] : 'Unknown');
         const backHtml = note.fields.Back || (fieldNames.length > 1 ? note.fields[fieldNames[1]] : '');
-        
+
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = frontHtml;
         const plainWord = tempDiv.textContent || tempDiv.innerText || 'Unknown';
-        
+
         tempDiv.innerHTML = backHtml;
         const plainMeaning = tempDiv.textContent || tempDiv.innerText || '';
 
@@ -475,6 +477,18 @@ export function StudyPage() {
                 </motion.div>
               </AnimatePresence>
             </div>
+
+            {/* SM-2 Transparency Panels */}
+            {phase === 'back' && (
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full flex flex-col gap-2 relative z-10"
+              >
+                <ReviewPreview card={current.card} config={schedulingConfig} />
+                <CardDetailsPanel card={current.card} />
+              </motion.div>
+            )}
 
             {/* Rating buttons with interval previews */}
             {phase === 'back' && (

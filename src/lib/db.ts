@@ -9,6 +9,9 @@ import type {
   StudySession,
   UserStats,
 } from '@/types/flashcard';
+import type { DailyChallenge } from '@/types/dailyChallenge';
+import type { WritingPadStat } from '@/types/writingPad';
+import type { LessonProgress } from '@/types/lesson';
 import { DEFAULT_DECK_CONFIG, DEFAULT_EASE_FACTOR } from '@/types/flashcard';
 import Dexie, { type EntityTable } from 'dexie';
 
@@ -27,6 +30,9 @@ const db = new Dexie('NongLimingDB') as Dexie & {
   mediaFiles: EntityTable<MediaFile, 'filename'>;
   userStats: EntityTable<UserStats, 'id'>;
   graduatedWords: EntityTable<GraduatedWord, 'id'>;
+  dailyChallenges: EntityTable<DailyChallenge, 'id'>;
+  writingPadStats: EntityTable<WritingPadStat, 'id'>;
+  lessonProgress: EntityTable<LessonProgress, 'lessonId'>;
 };
 
 db.version(1).stores({
@@ -169,6 +175,12 @@ db.version(5).stores({
   graduatedWords: '++id, word, graduatedAt',
 });
 
+db.version(6).stores({
+  dailyChallenges: '++id, date',
+  writingPadStats: '++id, character',
+  lessonProgress: 'lessonId',
+});
+
 export { db };
 
 const blobUrlCache = new Map<string, string>();
@@ -254,6 +266,7 @@ export async function getOrCreateUserStats(): Promise<UserStats> {
       freezeTokens: 0,
       cardsReviewedToday: 0,
       lastStudyDate: '',
+      playbackSpeed: 1.0,
     };
     await db.userStats.put(stats);
   }

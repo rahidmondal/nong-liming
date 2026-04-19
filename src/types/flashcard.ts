@@ -116,6 +116,7 @@ export interface UserStats {
   freezeTokens: number;
   cardsReviewedToday: number;
   lastStudyDate: string; // e.g. YYYY-MM-DD
+  playbackSpeed: number; // 0.5-2.0, default 1.0
 }
 
 export interface GraduatedWord {

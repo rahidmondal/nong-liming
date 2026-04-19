@@ -3,11 +3,16 @@ import { motion } from 'framer-motion';
 import { AlertCircle, Eraser, Loader2, ScanSearch, Undo2, Volume2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createWorker, PSM, type Worker } from 'tesseract.js';
+import { db } from '@/lib/db';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { DifficultySelector, type DifficultyLevel } from './DifficultySelector';
+import { CharacterFeedback } from './CharacterFeedback';
+import { splitThaiString } from '@/lib/thai-utils';
 
 type RecognitionState =
   | { status: 'idle' }
-  | { status: 'loading'; message: string }
-  | { status: 'success'; text: string; confidence: number }
+  | { status: 'loading'; message: string; subMessage?: string }
+  | { status: 'success'; fullText: string; characters: string[]; confidence: number }
   | { status: 'error'; message: string };
 
 export function WritingPad() {
@@ -15,55 +20,99 @@ export function WritingPad() {
   const containerRef = useRef<HTMLDivElement>(null);
   const isDrawingRef = useRef(false);
   const [hasStrokes, setHasStrokes] = useState(false);
-  const [recognition, setRecognition] = useState<RecognitionState>({
-    status: 'idle',
-  });
+  const [level, setLevel] = useState<DifficultyLevel>(1);
+  const [recognition, setRecognition] = useState<RecognitionState>({ status: 'idle' });
   const workerRef = useRef<Worker | null>(null);
   const strokeHistory = useRef<ImageData[]>([]);
-  const { speak } = useTTS();
+  const userStats = useLiveQuery(() => db.userStats.get(1));
+  const { speak } = useTTS('th-TH', userStats?.playbackSpeed ?? 0.8);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d', { willReadFrequently: true });
-    if (!canvas || !ctx) return undefined;
-
-    const resizeCanvas = () => {
-      const container = containerRef.current;
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
-      const size = Math.min(rect.width - 32, 400);
-      canvas.width = size;
-      canvas.height = size;
-
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      drawGrid(ctx, canvas.width, canvas.height);
-    };
-
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-    };
-  }, []);
-
-  function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  const drawGrid = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number, currentLevel: number) => {
     ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 1;
     ctx.setLineDash([5, 5]);
 
     ctx.beginPath();
-    ctx.moveTo(width / 2, 0);
-    ctx.lineTo(width / 2, height);
-    ctx.stroke();
-    ctx.beginPath();
+    // Horizontal center line
     ctx.moveTo(0, height / 2);
     ctx.lineTo(width, height / 2);
     ctx.stroke();
 
+    // Vertical lines based on level columns
+    const columns = currentLevel;
+    const colWidth = width / columns;
+
+    for (let i = 1; i < columns; i++) {
+      // Solid boundaries between characters
+      ctx.beginPath();
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.setLineDash([]);
+      ctx.moveTo(i * colWidth, 0);
+      ctx.lineTo(i * colWidth, height);
+      ctx.stroke();
+    }
+
+    // Faint dashed centers for each column
+    ctx.strokeStyle = '#f1f5f9';
+    ctx.setLineDash([5, 5]);
+    for (let i = 0; i < columns; i++) {
+      const center = i * colWidth + colWidth / 2;
+      ctx.beginPath();
+      ctx.moveTo(center, 0);
+      ctx.lineTo(center, height);
+      ctx.stroke();
+    }
+
     ctx.setLineDash([]);
-  }
+  }, []);
+
+  const resizeCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d', { willReadFrequently: true });
+    const container = containerRef.current;
+    if (!canvas || !ctx || !container) return;
+
+    const rect = container.getBoundingClientRect();
+    // Width is full wrapper width, height is capped to maintain somewhat wide aspect for lines.
+    const width = Math.min(rect.width - 32, 600);
+    const height = level === 1 ? width : Math.min(width * 0.4, 250);
+
+    canvas.width = width;
+    canvas.height = height;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawGrid(ctx, canvas.width, canvas.height, level);
+  }, [level, drawGrid]);
+
+  useEffect(() => {
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, [resizeCanvas]);
+
+  // When level changes, clear and resize
+  useEffect(() => {
+    strokeHistory.current = [];
+    setHasStrokes(false);
+    setRecognition({ status: 'idle' });
+    resizeCanvas();
+  }, [level, resizeCanvas]);
+
+  const clearCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d', { willReadFrequently: true });
+    if (!canvas || !ctx) return;
+
+    strokeHistory.current = [];
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawGrid(ctx, canvas.width, canvas.height, level);
+    setHasStrokes(false);
+    setRecognition({ status: 'idle' });
+  }, [level, drawGrid]);
 
   const getMouseCoords = (e: React.MouseEvent): { x: number; y: number } => {
     const canvas = canvasRef.current;
@@ -86,14 +135,14 @@ export function WritingPad() {
     if (!canvas || !ctx) return;
 
     strokeHistory.current.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-    if (strokeHistory.current.length > 20) {
+    if (strokeHistory.current.length > 30) {
       strokeHistory.current.shift();
     }
 
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 10;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     isDrawingRef.current = true;
@@ -113,35 +162,24 @@ export function WritingPad() {
   };
 
   const onMouseDown = (e: React.MouseEvent) => {
-    const { x, y } = getMouseCoords(e);
-    beginStroke(x, y);
+    beginStroke(getMouseCoords(e).x, getMouseCoords(e).y);
   };
   const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDrawingRef.current) return;
-    const { x, y } = getMouseCoords(e);
-    continueStroke(x, y);
+    continueStroke(getMouseCoords(e).x, getMouseCoords(e).y);
   };
-  const onMouseUp = () => {
-    endStroke();
-  };
-  const onMouseLeave = () => {
-    endStroke();
-  };
+  const onMouseUp = () => { endStroke(); };
+  const onMouseLeave = () => { endStroke(); };
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
-
     const handleTouchStart = (e: TouchEvent) => {
       e.preventDefault();
-      const { x, y } = getTouchCoords(e);
-      beginStroke(x, y);
+      beginStroke(getTouchCoords(e).x, getTouchCoords(e).y);
     };
     const handleTouchMove = (e: TouchEvent) => {
       e.preventDefault();
-      if (!isDrawingRef.current) return;
-      const { x, y } = getTouchCoords(e);
-      continueStroke(x, y);
+      continueStroke(getTouchCoords(e).x, getTouchCoords(e).y);
     };
     const handleTouchEnd = (e: TouchEvent) => {
       e.preventDefault();
@@ -157,19 +195,6 @@ export function WritingPad() {
       canvas.removeEventListener('touchmove', handleTouchMove);
       canvas.removeEventListener('touchend', handleTouchEnd);
     };
-  }, []);
-
-  const clearCanvas = useCallback(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d', { willReadFrequently: true });
-    if (!canvas || !ctx) return;
-
-    strokeHistory.current = [];
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    drawGrid(ctx, canvas.width, canvas.height);
-    setHasStrokes(false);
-    setRecognition({ status: 'idle' });
   }, []);
 
   const undoStroke = useCallback(() => {
@@ -195,36 +220,35 @@ export function WritingPad() {
     const src = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = src.data;
 
+    // Aggressive binarization for higher contrast
     for (let i = 0; i < data.length; i += 4) {
       const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-      const val = avg < 180 ? 0 : 255;
+      const val = avg < 200 ? 0 : 255;
       data[i] = val;
       data[i + 1] = val;
       data[i + 2] = val;
       data[i + 3] = 255;
     }
 
-    const ocrSize = 600;
-    const padding = 60;
     const ocrCanvas = document.createElement('canvas');
-    ocrCanvas.width = ocrSize;
-    ocrCanvas.height = ocrSize;
+    // Scale up for better line OCR
+    const scale = 2;
+    const padding = 60;
+    ocrCanvas.width = canvas.width * scale + padding * 2;
+    ocrCanvas.height = canvas.height * scale + padding * 2;
+
     const ocrCtx = ocrCanvas.getContext('2d');
     if (!ocrCtx) return null;
 
     ocrCtx.fillStyle = '#ffffff';
-    ocrCtx.fillRect(0, 0, ocrSize, ocrSize);
+    ocrCtx.fillRect(0, 0, ocrCanvas.width, ocrCanvas.height);
 
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
-    const tempCtx = tempCanvas.getContext('2d');
-    if (!tempCtx) return null;
-    tempCtx.putImageData(src, 0, 0);
+    tempCanvas.getContext('2d')?.putImageData(src, 0, 0);
 
-    const drawSize = ocrSize - padding * 2;
-    ocrCtx.drawImage(tempCanvas, padding, padding, drawSize, drawSize);
-
+    ocrCtx.drawImage(tempCanvas, padding, padding, canvas.width * scale, canvas.height * scale);
     return ocrCanvas.toDataURL('image/png');
   }, []);
 
@@ -239,57 +263,82 @@ export function WritingPad() {
         setRecognition({
           status: 'loading',
           message: 'Loading Thai language data…',
+          subMessage: 'First time download is ~10MB. Please wait.',
         });
         const worker = await createWorker('tha');
         workerRef.current = worker;
       }
 
-      setRecognition({
-        status: 'loading',
-        message: 'Recognizing handwriting…',
-      });
+      setRecognition({ status: 'loading', message: 'Recognizing handwriting…' });
 
       const processedImage = preprocessCanvasForOCR();
       if (!processedImage) {
-        setRecognition({ status: 'error', message: 'Failed to process the drawing.' });
+        setRecognition({ status: 'error', message: 'Failed to process drawing.' });
         return;
       }
 
+      const psmMode = level === 1 ? PSM.SINGLE_CHAR : PSM.SINGLE_LINE;
+
       await workerRef.current.setParameters({
-        tessedit_pageseg_mode: PSM.SINGLE_CHAR,
+        tessedit_pageseg_mode: psmMode,
         tessedit_char_whitelist: 'กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮะาิีึืุูเแโใไัำํ็่้๊๋ฯๆ๏๚๛๐๑๒๓๔๕๖๗๘๙',
       });
 
       const result = await workerRef.current.recognize(processedImage);
-
       const rawText = result.data.text.trim();
       const thaiOnly = rawText
-        .replace(/[^\u0E00-\u0E7F\s]/g, '')
+        .replace(/[^\u0E00-\u0E7F]/g, '') // remove spaces and punctuation
         .normalize('NFC')
         .trim();
       const confidence = result.data.confidence;
 
       if (thaiOnly) {
-        setRecognition({ status: 'success', text: thaiOnly, confidence });
+        const characters = splitThaiString(thaiOnly);
+        setRecognition({ status: 'success', fullText: thaiOnly, characters, confidence });
+
+        // Update Stats
+        const todayMs = Date.now();
+        for (const char of characters) {
+          let stat = await db.writingPadStats.where('character').equals(char).first();
+          stat ??= { character: char, attempts: 0, successes: 0, avgConfidence: 0, lastAttempt: 0 };
+          const isSuccess = confidence > 60;
+
+          const newAttempts = stat.attempts + 1;
+          const newSuccesses = stat.successes + (isSuccess ? 1 : 0);
+          const newAvg = (stat.avgConfidence * stat.attempts + confidence) / newAttempts;
+
+          if (stat.id === undefined) {
+            await db.writingPadStats.add({
+              ...stat,
+              attempts: newAttempts,
+              successes: newSuccesses,
+              avgConfidence: newAvg,
+              lastAttempt: todayMs,
+            });
+          } else {
+            await db.writingPadStats.update(stat.id, {
+              attempts: newAttempts,
+              successes: newSuccesses,
+              avgConfidence: newAvg,
+              lastAttempt: todayMs,
+            });
+          }
+        }
       } else {
-        const errorMessage =
+        const msg =
           rawText.length > 0
             ? 'Please enter only Thai characters.'
-            : 'Could not recognize Thai text. Try writing larger, clearer strokes.';
-
-        setRecognition({
-          status: 'error',
-          message: errorMessage,
-        });
+            : 'Could not recognize Thai text. Try writing larger in the guides.';
+        setRecognition({ status: 'error', message: msg });
       }
     } catch (error) {
       console.error('OCR Error:', error);
       setRecognition({
         status: 'error',
-        message: 'OCR failed. Please check your internet connection for the first-time language data download.',
+        message: 'OCR failed. Check your connection for the language package download.',
       });
     }
-  }, [preprocessCanvasForOCR]);
+  }, [preprocessCanvasForOCR, level]);
 
   useEffect(() => {
     return () => {
@@ -299,50 +348,42 @@ export function WritingPad() {
 
   return (
     <div className="space-y-6">
-      {/* Canvas Area */}
-      <div ref={containerRef} className="flex flex-col items-center gap-4">
-        <div className="text-center">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1 font-semibold">Drawing Area</p>
-          <p className="text-sm text-muted-foreground">Write a Thai character or word below</p>
-        </div>
+      <DifficultySelector level={level} setLevel={setLevel} disabled={recognition.status === 'loading'} />
 
-        {/* Canvas Container */}
-        <div className="relative p-4 bg-card rounded-2xl border border-border shadow-lg">
+      <div ref={containerRef} className="flex flex-col items-center gap-4">
+        <div className="relative p-2 bg-card rounded-2xl border border-border shadow-lg">
           <canvas
             ref={canvasRef}
-            className="rounded-xl cursor-crosshair touch-none"
+            className="rounded-xl cursor-crosshair touch-none bg-white"
             style={{ display: 'block' }}
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
             onMouseLeave={onMouseLeave}
           />
-
-          {/* Hint overlay when empty */}
           {!hasStrokes && (
-            <div className="absolute inset-4 flex items-center justify-center pointer-events-none rounded-xl">
-              <p className="text-4xl text-slate-300 dark:text-slate-600 font-sarabun select-none">เขียนที่นี่</p>
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <p className="text-4xl text-slate-300 dark:text-slate-600 font-sarabun select-none opacity-50">
+                {level === 1 ? 'ก' : 'เขียนที่นี่'}
+              </p>
             </div>
           )}
         </div>
 
-        {/* Tool Buttons */}
         <div className="flex gap-2">
           <button
             onClick={undoStroke}
             disabled={!hasStrokes}
             className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-secondary/80 transition-colors"
           >
-            <Undo2 className="w-4 h-4" />
-            Undo
+            <Undo2 className="w-4 h-4" /> Undo
           </button>
           <button
             onClick={clearCanvas}
             disabled={!hasStrokes}
             className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-secondary/80 transition-colors"
           >
-            <Eraser className="w-4 h-4" />
-            Clear
+            <Eraser className="w-4 h-4" /> Clear
           </button>
           <button
             onClick={recognizeText}
@@ -359,7 +400,6 @@ export function WritingPad() {
         </div>
       </div>
 
-      {/* Recognition Result */}
       {recognition.status !== 'idle' && (
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -371,47 +411,43 @@ export function WritingPad() {
               <Loader2 className="w-5 h-5 animate-spin text-primary" />
               <div>
                 <p className="text-sm font-medium">{recognition.message}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  First time may take a moment to download Thai language data
-                </p>
+                {recognition.subMessage && <p className="text-[10px] opacity-80 mt-1">{recognition.subMessage}</p>}
               </div>
             </div>
           )}
 
           {recognition.status === 'success' && (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                   Recognition Result
                 </h3>
                 <span
                   className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                     recognition.confidence > 70
-                      ? 'bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
+                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300'
                       : recognition.confidence > 40
-                        ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300'
-                        : 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300'
+                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300'
+                        : 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-300'
                   }`}
                 >
                   {Math.round(recognition.confidence)}% confidence
                 </span>
               </div>
 
-              <div className="p-4 bg-secondary/30 rounded-xl">
-                <p className="text-4xl sm:text-5xl font-bold text-foreground text-center font-sarabun leading-relaxed">
-                  {recognition.text}
+              <div className="py-2">
+                <p className="text-4xl sm:text-5xl font-bold text-center font-sarabun text-foreground">
+                  {recognition.fullText}
                 </p>
+                <CharacterFeedback characters={recognition.characters} confidenceScore={recognition.confidence} />
               </div>
 
               <button
-                onClick={() => {
-                  speak(recognition.text);
-                }}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors"
+                onClick={() => { speak(recognition.fullText); }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20"
               >
-                <Volume2 className="w-4 h-4" />
-                Listen to Recognized Text
+                <Volume2 className="w-4 h-4" /> Listen to Text
               </button>
             </div>
           )}
@@ -428,14 +464,12 @@ export function WritingPad() {
         </motion.div>
       )}
 
-      {/* Tips */}
       <div className="p-4 bg-secondary/30 rounded-xl border border-border">
-        <h3 className="text-sm font-semibold text-foreground mb-2">✍️ Tips for better recognition</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-2">✍️ Guide</h3>
         <ul className="space-y-1 text-xs text-muted-foreground">
-          <li>• Write large, clear characters in the center</li>
-          <li>• Draw each stroke deliberately — avoid quick scribbles</li>
-          <li>• Use the center crosshair as a guide for positioning</li>
-          <li>• The first recognition attempt may take longer as it loads Thai language data</li>
+          <li>• Change difficulty to practice words vs individual characters.</li>
+          <li>• Use the vertical lines to space out each letter evenly.</li>
+          <li>• Write clearly and attach vowels closely to their consonants.</li>
         </ul>
       </div>
     </div>
