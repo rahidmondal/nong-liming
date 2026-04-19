@@ -12,6 +12,9 @@ export interface ThaiCardProps {
   accentColor?: string;
 }
 
+import { db } from '@/lib/db';
+import { useLiveQuery } from 'dexie-react-hooks';
+
 export function ThaiCard({
   thaiChar,
   english,
@@ -21,7 +24,8 @@ export function ThaiCard({
   audioText,
   accentColor,
 }: ThaiCardProps) {
-  const { speak, isSpeaking } = useTTS();
+  const userStats = useLiveQuery(() => db.userStats.get(1));
+  const { speak, isSpeaking } = useTTS('th-TH', userStats?.playbackSpeed ?? 0.8);
 
   const handleSpeak = (e: React.MouseEvent) => {
     e.stopPropagation();

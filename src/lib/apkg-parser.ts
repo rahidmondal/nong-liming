@@ -111,7 +111,7 @@ const FIELD_SEPARATOR = '\x1f';
 
 export function stripHtml(html: string): string {
   if (!html) return '';
-  
+
   // 1. Replace block-level tags with newlines to preserve spacing
   let processed = html
     .replace(/<(?:div|p|br|li|h[1-6]|blockquote|pre)[^>]*>/gi, '\n')

@@ -1,3 +1,4 @@
+import { DailyChallengesPanel } from '@/features/dailyChallenges/DailyChallengesPanel';
 import { getOverallStats, type OverallStats } from '@/features/stats/lib/stats';
 import { useTutorial } from '@/lib/useTutorial';
 import { motion } from 'framer-motion';
@@ -117,6 +118,9 @@ export function LandingPage() {
           </motion.div>
         )}
 
+        {/* Daily Challenges */}
+        <DailyChallengesPanel />
+
         <motion.div variants={container} initial="hidden" animate="show" className="w-full space-y-4">
           {/* Flashcards */}
           <motion.div variants={item}>
@@ -204,6 +208,24 @@ export function LandingPage() {
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">Writing Builder</h3>
                 <p className="text-sm text-muted-foreground">Word & Writing Pad</p>
+              </div>
+            </Link>
+          </motion.div>
+
+          {/* Dialogues */}
+          <motion.div variants={item}>
+            <Link
+              to="/lessons"
+              id="nav-lessons"
+              className="group relative flex items-center p-4 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400 mr-4">
+                <MessageSquareText className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg">Conversations</h3>
+                <p className="text-sm text-muted-foreground">Interactive Dialogues</p>
               </div>
             </Link>
           </motion.div>

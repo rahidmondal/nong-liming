@@ -44,7 +44,7 @@ describe('stripHtml', () => {
 
   it('handles nested malicious tags (multi-character sanitization)', () => {
     expect(stripHtml('<<script>script>')).toBe('');
-    expect(stripHtml('<s<script>cript>')).toBe('cript>'); 
+    expect(stripHtml('<s<script>cript>')).toBe('cript>');
     expect(stripHtml('<<img src=x onerror=alert(1)>>')).toBe('<>');
   });
 });
