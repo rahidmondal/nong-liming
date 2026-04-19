@@ -6,16 +6,32 @@ import { Link } from 'react-router-dom';
 
 export function WeaknessDiagnostic() {
   const weakCards = useLiveQuery(async () => {
-    const allCards = await db.flashcards.toArray();
+    const allCards = await db.cards.toArray();
     // Filter out unseen cards, we only drop cards with low ease or high lapses
-    const active = allCards.filter(c => c.state !== 'new');
+    const active = allCards.filter(c => c.status !== 'new');
 
     // Sort by a rudimentary "weakness score": (300 - easeFactor) + (lapses * 20)
-    return active
+    const topCards = active
       .map(c => ({ card: c, score: 300 - c.easeFactor + c.lapses * 20 }))
       .sort((a, b) => b.score - a.score)
       .slice(0, 5) // top 5 weakest
       .map(entry => entry.card);
+      
+    if (topCards.length === 0) return [];
+    
+    // Fetch associated notes to get front/back text
+    const noteIds = topCards.map(c => c.noteId);
+    const notes = await db.notes.where('id').anyOf(noteIds).toArray();
+    const noteMap = new Map(notes.map(n => [n.id, n]));
+    
+    return topCards.map(c => {
+      const note = noteMap.get(c.noteId);
+      return {
+        ...c,
+        front: note?.fields['Front'] ?? 'Unknown',
+        back: note?.fields['Back'] ?? 'Unknown'
+      };
+    });
   }, []);
 
   if (!weakCards || weakCards.length === 0) {

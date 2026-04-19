@@ -24,7 +24,7 @@ export function LessonsOverview() {
   const isLessonUnlocked = (index: number) => {
     if (index === 0) return true;
     const prevLessonId = lessons[index - 1].id;
-    return progressMap.get(prevLessonId)?.isCompleted ?? false;
+    return progressMap.get(prevLessonId)?.completed ?? false;
   };
 
   return (
@@ -45,7 +45,7 @@ export function LessonsOverview() {
           {lessons.map((lesson, idx) => {
             const unlocked = isLessonUnlocked(idx);
             const progress = progressMap.get(lesson.id);
-            const isCompleted = progress?.isCompleted ?? false;
+            const isCompleted = progress?.completed ?? false;
 
             return (
               <motion.div variants={item} key={lesson.id}>

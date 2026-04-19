@@ -99,8 +99,10 @@ export function LessonViewer() {
       try {
         await db.lessonProgress.put({
           lessonId: lesson.id,
-          isCompleted: true,
-          lastAttempted: Date.now(),
+          completed: true,
+          completedAt: Date.now(),
+          exchangesCompleted: 0,
+          selectedOptions: [],
         });
       } catch (err) {
         console.error('Failed to save lesson progress', err);

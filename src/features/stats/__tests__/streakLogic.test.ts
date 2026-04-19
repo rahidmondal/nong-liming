@@ -43,6 +43,7 @@ describe('streakLogic', () => {
       cardsReviewedToday: 5, // Missed goal (default likely 20)
       dailyGoal: 20,
       freezeTokens: 2,
+      playbackSpeed: 1.0,
     });
 
     await checkAndApplyStreakRollover();
@@ -69,6 +70,7 @@ describe('streakLogic', () => {
       cardsReviewedToday: 20, // Met goal
       dailyGoal: 20,
       freezeTokens: 2,
+      playbackSpeed: 1.0,
     });
 
     await checkAndApplyStreakRollover();
@@ -79,6 +81,7 @@ describe('streakLogic', () => {
       1,
       expect.objectContaining({
         freezeTokens: 2,
+      playbackSpeed: 1.0,
         cardsReviewedToday: 0,
         lastStudyDate: today,
       }),
@@ -95,6 +98,7 @@ describe('streakLogic', () => {
       cardsReviewedToday: 0, // Missed goal 3 days ago
       dailyGoal: 20,
       freezeTokens: 5,
+      playbackSpeed: 1.0,
     });
 
     await checkAndApplyStreakRollover();
@@ -106,6 +110,7 @@ describe('streakLogic', () => {
       1,
       expect.objectContaining({
         freezeTokens: 2,
+      playbackSpeed: 1.0,
         cardsReviewedToday: 0,
         lastStudyDate: today,
       }),
@@ -122,6 +127,7 @@ describe('streakLogic', () => {
       cardsReviewedToday: 0,
       dailyGoal: 20,
       freezeTokens: 2,
+      playbackSpeed: 1.0,
     });
 
     await checkAndApplyStreakRollover();

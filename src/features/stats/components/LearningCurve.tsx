@@ -77,7 +77,7 @@ export function LearningCurve() {
               contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px' }}
               itemStyle={{ color: 'var(--foreground)' }}
               labelStyle={{ color: 'var(--muted-foreground)', fontSize: '12px', marginBottom: '4px' }}
-              formatter={(value: number) => [`${value}%`, 'Retention']}
+              formatter={(value) => [`${String(value)}%`, 'Retention']}
             />
             <Area
               type="monotone"

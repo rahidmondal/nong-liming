@@ -26,10 +26,10 @@ export function ConsistencyHeatmap() {
     // Create a map of "YYYY-MM-DD" -> count of reviews
     const sessionMap = new Map<string, number>();
     sessions?.forEach(session => {
-      const d = new Date(session.startTime);
+      const d = new Date(session.startedAt);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       const existing = sessionMap.get(key) || 0;
-      sessionMap.set(key, existing + session.cardsReviewed);
+      sessionMap.set(key, existing + session.totalReviewed);
     });
 
     return dates.map(date => {
@@ -48,7 +48,7 @@ export function ConsistencyHeatmap() {
     <div className="bg-card border border-border shadow-sm rounded-xl p-5 mb-6">
       <h3 className="text-sm font-semibold text-foreground mb-4">30-Day Consistency</h3>
       <div className="flex gap-1 overflow-x-auto pb-2">
-        {heatmapData.map((day, i) => {
+        {heatmapData.map((day) => {
           let colorClass = 'bg-muted'; // 0
           if (day.count > 0 && day.count <= 10) colorClass = 'bg-emerald-200 dark:bg-emerald-900/60';
           else if (day.count > 10 && day.count <= 30) colorClass = 'bg-emerald-400 dark:bg-emerald-600/80';
