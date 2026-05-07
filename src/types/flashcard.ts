@@ -117,6 +117,10 @@ export interface UserStats {
   cardsReviewedToday: number;
   lastStudyDate: string; // e.g. YYYY-MM-DD
   playbackSpeed: number; // 0.5-2.0, default 1.0
+  dokKemCount: number; // Ixora flower (flashcards)
+  yaPraekCount: number; // Bermuda grass (streaks)
+  khaoTokCount: number; // Popped rice (lessons)
+  dokMaKhueCount: number; // Eggplant flower (writing)
 }
 
 export interface GraduatedWord {
