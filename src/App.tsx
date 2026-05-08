@@ -12,6 +12,7 @@ import { DictionaryPage } from '@/features/dictionary/DictionaryPage';
 import { ToneTrainerPage } from '@/features/toneTrainer/ToneTrainerPage';
 import { LessonViewer } from '@/features/lessons/LessonViewer';
 import { LessonsOverview } from '@/features/lessons/LessonsOverview';
+import { ReadingPage } from '@/features/reading/ReadingPage';
 import { SentencePracticePage } from '@/features/sentenceBuilder/SentencePracticePage';
 import { SpacedRepetitionGuide } from '@/features/settings/SpacedRepetitionGuide';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -32,6 +33,7 @@ function App() {
                 <Route path="/sentence-practice" element={<SentencePracticePage />} />
                 <Route path="/lessons" element={<LessonsOverview />} />
                 <Route path="/lessons/:id" element={<LessonViewer />} />
+                <Route path="/reading" element={<ReadingPage />} />
                 <Route path="/decks" element={<DecksPage />} />
                 <Route path="/decks/:id/study" element={<StudyPage />} />
                 <Route path="/stats" element={<StatsPage />} />
