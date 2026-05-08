@@ -44,6 +44,10 @@ describe('streakLogic', () => {
       dailyGoal: 20,
       freezeTokens: 2,
       playbackSpeed: 1.0,
+      dokKemCount: 0,
+      yaPraekCount: 0,
+      khaoTokCount: 0,
+      dokMaKhueCount: 0,
     });
 
     await checkAndApplyStreakRollover();
@@ -71,6 +75,10 @@ describe('streakLogic', () => {
       dailyGoal: 20,
       freezeTokens: 2,
       playbackSpeed: 1.0,
+      dokKemCount: 0,
+      yaPraekCount: 0,
+      khaoTokCount: 0,
+      dokMaKhueCount: 0,
     });
 
     await checkAndApplyStreakRollover();
@@ -99,6 +107,10 @@ describe('streakLogic', () => {
       dailyGoal: 20,
       freezeTokens: 5,
       playbackSpeed: 1.0,
+      dokKemCount: 0,
+      yaPraekCount: 0,
+      khaoTokCount: 0,
+      dokMaKhueCount: 0,
     });
 
     await checkAndApplyStreakRollover();
@@ -128,6 +140,10 @@ describe('streakLogic', () => {
       dailyGoal: 20,
       freezeTokens: 2,
       playbackSpeed: 1.0,
+      dokKemCount: 0,
+      yaPraekCount: 0,
+      khaoTokCount: 0,
+      dokMaKhueCount: 0,
     });
 
     await checkAndApplyStreakRollover();
