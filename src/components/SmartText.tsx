@@ -2,22 +2,23 @@ import { useState, useMemo } from 'react';
 import { DICTIONARY_DATA, type DictionaryEntryData } from '@/features/dictionary/dictionaryData';
 import { AddFromDictionaryDialog } from '@/features/dictionary/AddFromDictionaryDialog';
 
-declare namespace Intl {
-  class Segmenter {
-    constructor(locales?: string | string[], options?: { granularity?: 'grapheme' | 'word' | 'sentence' });
-    segment(input: string): Segments;
-  }
-  interface Segments {
-    containing(codeUnitIndex?: number): SegmentData;
-    [Symbol.iterator](): IterableIterator<SegmentData>;
-  }
-  interface SegmentData {
-    segment: string;
-    index: number;
-    input: string;
-    isWordLike?: boolean;
-  }
+interface SegmentData {
+  segment: string;
+  index: number;
+  input: string;
+  isWordLike?: boolean;
 }
+
+interface Segments {
+  containing(codeUnitIndex?: number): SegmentData;
+  [Symbol.iterator](): IterableIterator<SegmentData>;
+}
+
+interface Segmenter {
+  segment(input: string): Segments;
+}
+
+type SegmenterConstructor = new (locales?: string | string[], options?: { granularity?: 'grapheme' | 'word' | 'sentence' }) => Segmenter;
 
 interface SmartTextProps {
   text: string;
@@ -29,14 +30,15 @@ export function SmartText({ text, className = '' }: SmartTextProps) {
 
   const segments = useMemo(() => {
     try {
-      const segmenter = new Intl.Segmenter('th-TH', { granularity: 'word' });
+      const SegmenterCtor = (Intl as unknown as { Segmenter: SegmenterConstructor }).Segmenter;
+      const segmenter = new SegmenterCtor('th-TH', { granularity: 'word' });
        
       const segmentsArray = Array.from(segmenter.segment(text));
       return segmentsArray.map(s => ({
         text: s.segment,
         isWordLike: Boolean(s.isWordLike),
       }));
-    } catch (_e) {
+    } catch {
       // Fallback if Intl.Segmenter is not available
       return [{ text, isWordLike: false }];
     }

@@ -189,11 +189,12 @@ db.version(7).stores({
   const statsTable = tx.table<UserStats, number>('userStats');
   const stats = await statsTable.get(1);
   if (stats) {
+    const s = stats as Partial<UserStats>;
     await statsTable.update(1, {
-      dokKemCount: stats.dokKemCount ?? 0,
-      yaPraekCount: stats.yaPraekCount ?? 0,
-      khaoTokCount: stats.khaoTokCount ?? 0,
-      dokMaKhueCount: stats.dokMaKhueCount ?? 0,
+      dokKemCount: s.dokKemCount ?? 0,
+      yaPraekCount: s.yaPraekCount ?? 0,
+      khaoTokCount: s.khaoTokCount ?? 0,
+      dokMaKhueCount: s.dokMaKhueCount ?? 0,
     } as unknown as Partial<UserStats>);
   }
 });

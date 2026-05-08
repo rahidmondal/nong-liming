@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return */
+ 
 import { lessons } from '@/data/lessons';
 import { db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';

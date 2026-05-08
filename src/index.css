@@ -75,67 +75,67 @@
 }
 
 :root {
-  /* Light Mode - Soft Sage/Mint & Deep Green */
-  --background: #f0fdf4; /* green-50 */
-  --foreground: #064e3b; /* teal-900 */
+  /* Light Mode - Thaitone: Nuan (Warm White), Daeng Chaad (Crimson), Thong (Gold) */
+  --background: #fdfbf7;
+  --foreground: #2c2825;
 
   --card: #ffffff;
-  --card-foreground: #064e3b;
+  --card-foreground: #2c2825;
 
   --popover: #ffffff;
-  --popover-foreground: #064e3b;
+  --popover-foreground: #2c2825;
 
-  --primary: #059669; /* emerald-600 */
+  --primary: #c83232; /* Daeng Chaad */
   --primary-foreground: #ffffff;
 
-  --secondary: #d1fae5; /* emerald-100 */
-  --secondary-foreground: #065f46; /* emerald-800 */
+  --secondary: #dfb15b; /* Thong */
+  --secondary-foreground: #2c2825;
 
-  --muted: #e2e8f0;
-  --muted-foreground: #64748b;
+  --muted: #f2ece4;
+  --muted-foreground: #78716c;
 
-  --accent: #10b981; /* emerald-500 */
+  --accent: #1b3a55; /* Kram (Indigo) */
   --accent-foreground: #ffffff;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
-  --border: #d1fae5; /* emerald-100 */
-  --input: #d1fae5;
-  --ring: #059669;
+  --border: #e8e0d5;
+  --input: #e8e0d5;
+  --ring: #c83232;
 
-  --radius: 0.75rem;
+  --radius: 1rem; /* More organic and rounded */
 }
 
 .dark {
-  /* Dark Mode - Deep Slate/Green & Neon Emerald Accents */
-  --background: #020617; /* slate-950 */
-  --foreground: #ecfdf5; /* emerald-50 */
+  /* Dark Mode - Thaitone */
+  --background: #1c1917; /* Din (Dark Stone) */
+  --foreground: #fdfbf7;
 
-  --card: #0f172a; /* slate-900 */
-  --card-foreground: #ecfdf5;
+  --card: #292524;
+  --card-foreground: #fdfbf7;
 
-  --popover: #0f172a;
-  --popover-foreground: #ecfdf5;
+  --popover: #292524;
+  --popover-foreground: #fdfbf7;
 
-  --primary: #10b981; /* emerald-500 */
-  --primary-foreground: #020617;
+  --primary: #e63946; /* Brighter Daeng Chaad */
+  --primary-foreground: #ffffff;
 
-  --secondary: #1e293b; /* slate-800 */
-  --secondary-foreground: #f0fdf4;
+  --secondary: #fbbf24; /* Brighter Thong */
+  --secondary-foreground: #1c1917;
 
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
+  --muted: #44403c;
+  --muted-foreground: #a8a29e;
 
-  --accent: #34d399; /* emerald-400 */
-  --accent-foreground: #020617;
+  --accent: #60a5fa; /* Lighter Kram */
+  --accent-foreground: #1c1917;
 
-  --destructive: #7f1d1d;
-  --destructive-foreground: #fef2f2;
+  --destructive: #f87171;
+  --destructive-foreground: #1c1917;
 
-  --border: #1e293b;
-  --input: #1e293b;
-  --ring: #34d399;
+  --border: #44403c;
+  --input: #44403c;
+  --ring: #e63946;
 }
 
 @layer base {
@@ -146,16 +146,16 @@
     @apply bg-background text-foreground;
     font-family: 'Sarabun', 'Noto Sans Thai', 'Segoe UI', sans-serif;
     background-image:
-      radial-gradient(circle at top, var(--accent), transparent 55%),
-      radial-gradient(circle at 20% 20%, var(--primary), transparent 45%);
+      radial-gradient(circle at top right, rgba(223, 177, 91, 0.15), transparent 50%),
+      radial-gradient(circle at bottom left, rgba(200, 50, 50, 0.08), transparent 50%);
     background-attachment: fixed;
-    background-blend-mode: soft-light;
+    background-blend-mode: multiply;
   }
 
   .dark body {
     background-image:
-      radial-gradient(circle at top, rgba(16, 185, 129, 0.15), transparent 55%),
-      radial-gradient(circle at 20% 20%, rgba(52, 211, 153, 0.15), transparent 45%);
-    background-blend-mode: normal;
+      radial-gradient(circle at top right, rgba(251, 191, 36, 0.1), transparent 50%),
+      radial-gradient(circle at bottom left, rgba(230, 57, 70, 0.1), transparent 50%);
+    background-blend-mode: screen;
   }
 }

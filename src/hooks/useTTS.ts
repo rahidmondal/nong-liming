@@ -1,27 +1,45 @@
 import { useCallback, useEffect, useState } from 'react';
 
+// Global cache for voices to avoid multiple components overwriting onvoiceschanged
+let cachedVoices: SpeechSynthesisVoice[] = [];
+let voicesLoaded = false;
+const voiceListeners = new Set<() => void>();
+
+const loadGlobalVoices = () => {
+  cachedVoices = window.speechSynthesis.getVoices();
+  if (cachedVoices.length > 0) {
+    voicesLoaded = true;
+    voiceListeners.forEach(listener => { listener(); });
+  }
+};
+
+if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+  loadGlobalVoices();
+  window.speechSynthesis.addEventListener('voiceschanged', loadGlobalVoices);
+}
+
 export function useTTS(lang = 'th-TH', rate = 0.8) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
 
   useEffect(() => {
-    const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-
+    const updateVoice = () => {
       const bestVoice =
-        voices.find(v => v.lang === lang && (v.name.includes('Google') || v.name.includes('Microsoft'))) ??
-        voices.find(v => v.lang === lang);
+        cachedVoices.find(v => v.lang === lang && (v.name.includes('Google') || v.name.includes('Microsoft'))) ??
+        cachedVoices.find(v => v.lang === lang);
 
       if (bestVoice) {
         setVoice(bestVoice);
       }
     };
 
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
+    if (voicesLoaded) {
+      updateVoice();
+    }
 
+    voiceListeners.add(updateVoice);
     return () => {
-      window.speechSynthesis.onvoiceschanged = null;
+      voiceListeners.delete(updateVoice);
     };
   }, [lang]);
 

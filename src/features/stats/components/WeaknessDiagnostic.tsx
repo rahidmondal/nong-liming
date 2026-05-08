@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return */
+ 
 import { db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { AlertCircle, ArrowRight } from 'lucide-react';
@@ -28,8 +28,8 @@ export function WeaknessDiagnostic() {
       const note = noteMap.get(c.noteId);
       return {
         ...c,
-        front: note?.fields['Front'] ?? 'Unknown',
-        back: note?.fields['Back'] ?? 'Unknown'
+        front: note?.fields.Front ?? 'Unknown',
+        back: note?.fields.Back ?? 'Unknown'
       };
     });
   }, []);
