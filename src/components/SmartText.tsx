@@ -2,6 +2,23 @@ import { useState, useMemo } from 'react';
 import { DICTIONARY_DATA, type DictionaryEntryData } from '@/features/dictionary/dictionaryData';
 import { AddFromDictionaryDialog } from '@/features/dictionary/AddFromDictionaryDialog';
 
+declare namespace Intl {
+  class Segmenter {
+    constructor(locales?: string | string[], options?: { granularity?: 'grapheme' | 'word' | 'sentence' });
+    segment(input: string): Segments;
+  }
+  interface Segments {
+    containing(codeUnitIndex?: number): SegmentData;
+    [Symbol.iterator](): IterableIterator<SegmentData>;
+  }
+  interface SegmentData {
+    segment: string;
+    index: number;
+    input: string;
+    isWordLike?: boolean;
+  }
+}
+
 interface SmartTextProps {
   text: string;
   className?: string;
@@ -12,17 +29,13 @@ export function SmartText({ text, className = '' }: SmartTextProps) {
 
   const segments = useMemo(() => {
     try {
-      // @ts-expect-error Intl.Segmenter is not typed in all environments
       const segmenter = new Intl.Segmenter('th-TH', { granularity: 'word' });
        
       const segmentsArray = Array.from(segmenter.segment(text));
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return segmentsArray.map((s: any) => ({
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+      return segmentsArray.map(s => ({
         text: s.segment,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-        isWordLike: s.isWordLike,
-      })) as { text: string; isWordLike: boolean }[];
+        isWordLike: Boolean(s.isWordLike),
+      }));
     } catch (_e) {
       // Fallback if Intl.Segmenter is not available
       return [{ text, isWordLike: false }];

@@ -2,9 +2,10 @@ import { useTTS } from '@/hooks/useTTS';
 import { motion } from 'framer-motion';
 import { AlertCircle, Eraser, Loader2, ScanSearch, Undo2, Volume2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createWorker, PSM, type Worker } from 'tesseract.js';
+import { isOCRReady, recognizeThaiText } from '@/lib/ocr';
 import { db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { addOffering } from '@/features/waikru/useWaiKru';
 import { DifficultySelector, type DifficultyLevel } from './DifficultySelector';
 import { CharacterFeedback } from './CharacterFeedback';
 import { splitThaiString } from '@/lib/thai-utils';
@@ -22,7 +23,6 @@ export function WritingPad() {
   const [hasStrokes, setHasStrokes] = useState(false);
   const [level, setLevel] = useState<DifficultyLevel>(1);
   const [recognition, setRecognition] = useState<RecognitionState>({ status: 'idle' });
-  const workerRef = useRef<Worker | null>(null);
   const strokeHistory = useRef<ImageData[]>([]);
   const userStats = useLiveQuery(() => db.userStats.get(1));
   const { speak } = useTTS('th-TH', userStats?.playbackSpeed ?? 0.8);
@@ -256,41 +256,29 @@ export function WritingPad() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    setRecognition({ status: 'loading', message: 'Initializing OCR engine…' });
+    if (!isOCRReady()) {
+      setRecognition({
+        status: 'loading',
+        message: 'Loading Thai language data…',
+        subMessage: 'First time download is ~10MB. Please wait.',
+      });
+    } else {
+      setRecognition({ status: 'loading', message: 'Recognizing handwriting…' });
+    }
 
     try {
-      if (!workerRef.current) {
-        setRecognition({
-          status: 'loading',
-          message: 'Loading Thai language data…',
-          subMessage: 'First time download is ~10MB. Please wait.',
-        });
-        const worker = await createWorker('tha');
-        workerRef.current = worker;
-      }
-
-      setRecognition({ status: 'loading', message: 'Recognizing handwriting…' });
-
       const processedImage = preprocessCanvasForOCR();
       if (!processedImage) {
         setRecognition({ status: 'error', message: 'Failed to process drawing.' });
         return;
       }
 
-      const psmMode = level === 1 ? PSM.SINGLE_CHAR : PSM.SINGLE_LINE;
-
-      await workerRef.current.setParameters({
-        tessedit_pageseg_mode: psmMode,
-        tessedit_char_whitelist: 'กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮะาิีึืุูเแโใไัำํ็่้๊๋ฯๆ๏๚๛๐๑๒๓๔๕๖๗๘๙',
-      });
-
-      const result = await workerRef.current.recognize(processedImage);
-      const rawText = result.data.text.trim();
+      const { text: rawText, confidence } = await recognizeThaiText(processedImage, level);
+      
       const thaiOnly = rawText
         .replace(/[^\u0E00-\u0E7F]/g, '') // remove spaces and punctuation
         .normalize('NFC')
         .trim();
-      const confidence = result.data.confidence;
 
       if (thaiOnly) {
         const characters = splitThaiString(thaiOnly);
@@ -302,6 +290,10 @@ export function WritingPad() {
           let stat = await db.writingPadStats.where('character').equals(char).first();
           stat ??= { character: char, attempts: 0, successes: 0, avgConfidence: 0, lastAttempt: 0 };
           const isSuccess = confidence > 60;
+          
+          if (isSuccess) {
+            void addOffering('dokMaKhue', 1);
+          }
 
           const newAttempts = stat.attempts + 1;
           const newSuccesses = stat.successes + (isSuccess ? 1 : 0);
@@ -339,12 +331,6 @@ export function WritingPad() {
       });
     }
   }, [preprocessCanvasForOCR, level]);
-
-  useEffect(() => {
-    return () => {
-      void workerRef.current?.terminate();
-    };
-  }, []);
 
   return (
     <div className="space-y-6">

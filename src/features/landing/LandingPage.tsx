@@ -2,9 +2,10 @@ import { DailyChallengesPanel } from '@/features/dailyChallenges/DailyChallenges
 import { getOverallStats, type OverallStats } from '@/features/stats/lib/stats';
 import { useTutorial } from '@/lib/useTutorial';
 import { motion } from 'framer-motion';
-import { BookA, BookOpen, BookOpenText, Flame, Layers, MessageSquareText, Music, PenTool, Settings, Zap } from 'lucide-react';
+import { BookA, BookOpen, BookOpenText, Flame, Layers, Map, MessageSquareText, Music, PenTool, Settings, Zap } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { PhanKhru } from '@/features/waikru/PhanKhru';
 
 function getStreakMessage(streak: number): string {
   if (streak === 0) return "Start today's session!";
@@ -79,6 +80,28 @@ export function LandingPage() {
           <p className="text-muted-foreground">Your personal Thai learning partner.</p>
         </motion.div>
 
+        {/* The Unalome Path - Main Journey */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="w-full"
+        >
+          <Link
+            to="/unalome"
+            className="group relative flex items-center p-5 bg-gradient-to-br from-primary/10 via-card to-card rounded-2xl border-2 border-primary/20 shadow-lg hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="p-4 bg-primary text-primary-foreground rounded-xl mr-5 shadow-inner">
+              <Map className="w-8 h-8" />
+            </div>
+            <div className="flex-1">
+              <h2 className="font-bold text-2xl text-foreground group-hover:text-primary transition-colors">The Unalome Path</h2>
+              <p className="text-sm text-muted-foreground mt-1">Your guided journey to Thai fluency</p>
+            </div>
+          </Link>
+        </motion.div>
+
         {/* ── Global Insights ── */}
         {stats && (stats.totalCards > 0 || stats.totalReviews > 0) && (
           <motion.div
@@ -117,6 +140,10 @@ export function LandingPage() {
             <p className="text-xs text-center text-muted-foreground mt-2">{getStreakMessage(stats.currentStreak)}</p>
           </motion.div>
         )}
+
+        <div className="w-full">
+          <PhanKhru />
+        </div>
 
         {/* Daily Challenges */}
         <DailyChallengesPanel />
