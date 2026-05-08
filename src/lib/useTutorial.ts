@@ -6,6 +6,24 @@ const STORAGE_KEY = 'nong-liming-tutorial-done';
 
 const TUTORIAL_STEPS: DriveStep[] = [
   {
+    element: 'a[href="/unalome"]',
+    popover: {
+      title: '🗺️ The Unalome Path',
+      description: 'Follow your guided curriculum path to Thai fluency! Unlock lessons and earn traditional Wai Kru offerings.',
+      side: 'bottom',
+      align: 'center',
+    },
+  },
+  {
+    element: '#nav-reading',
+    popover: {
+      title: '🧠 Smart Reading',
+      description: 'Read immersive stories. Tap on any Thai word to translate it and save it to your flashcards.',
+      side: 'bottom',
+      align: 'center',
+    },
+  },
+  {
     element: '#settings-link',
     popover: {
       title: '⚙️ Settings',
