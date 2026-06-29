@@ -20,6 +20,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CardDetailsPanel } from './CardDetailsPanel';
 import { ReviewPreview } from './ReviewPreview';
 import { addOffering } from '@/features/waikru/useWaiKru';
+import { incrementChallengeProgress } from '@/features/dailyChallenges/challengeGenerator';
 
 type StudyPhase = 'loading' | 'front' | 'back' | 'done';
 
@@ -246,6 +247,7 @@ export function StudyPage() {
 
       if (wasCorrect) {
         void addOffering('dokKem', 1);
+        void incrementChallengeProgress('review', 1);
       }
 
       setSessionStats(prev => ({

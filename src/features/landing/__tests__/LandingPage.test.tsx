@@ -44,19 +44,12 @@ describe('LandingPage', () => {
 
   it('renders the greeting correctly', async () => {
     await renderWithProviders(<LandingPage />);
-    expect(screen.getByText(/Hi, I am/i)).toBeInTheDocument();
-    expect(screen.getByText(/Nong Li Ming/i)).toBeInTheDocument();
+    expect(screen.getByText(/Sawasdee krub!/i)).toBeInTheDocument();
+    expect(screen.getByText(/น้องลีมิง/i)).toBeInTheDocument();
   });
 
-  it('renders the Flashcards option', async () => {
+  it('renders the Start Daily Session CTA', async () => {
     await renderWithProviders(<LandingPage />);
-    expect(screen.getByText('Flashcards')).toBeInTheDocument();
-    expect(screen.getByText('Review your Flashcards')).toBeInTheDocument();
-  });
-
-  it('renders the Builder option', async () => {
-    await renderWithProviders(<LandingPage />);
-    expect(screen.getByText('Writing Builder')).toBeInTheDocument();
-    expect(screen.getByText('Word & Writing Pad')).toBeInTheDocument();
+    expect(screen.getByText(/Start Daily Session/i)).toBeInTheDocument();
   });
 });

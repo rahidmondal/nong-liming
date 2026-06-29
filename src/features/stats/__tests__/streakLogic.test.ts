@@ -89,7 +89,6 @@ describe('streakLogic', () => {
       1,
       expect.objectContaining({
         freezeTokens: 2,
-      playbackSpeed: 1.0,
         cardsReviewedToday: 0,
         lastStudyDate: today,
       }),
@@ -122,7 +121,6 @@ describe('streakLogic', () => {
       1,
       expect.objectContaining({
         freezeTokens: 2,
-      playbackSpeed: 1.0,
         cardsReviewedToday: 0,
         lastStudyDate: today,
       }),

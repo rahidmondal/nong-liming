@@ -6,30 +6,12 @@ const STORAGE_KEY = 'nong-liming-tutorial-done';
 
 const TUTORIAL_STEPS: DriveStep[] = [
   {
-    element: 'a[href="/unalome"]',
+    element: '#nav-unalome',
     popover: {
       title: '🗺️ The Unalome Path',
       description: 'Follow your guided curriculum path to Thai fluency! Unlock lessons and earn traditional Wai Kru offerings.',
       side: 'bottom',
       align: 'center',
-    },
-  },
-  {
-    element: '#nav-reading',
-    popover: {
-      title: '🧠 Smart Reading',
-      description: 'Read immersive stories. Tap on any Thai word to translate it and save it to your flashcards.',
-      side: 'bottom',
-      align: 'center',
-    },
-  },
-  {
-    element: '#settings-link',
-    popover: {
-      title: '⚙️ Settings',
-      description: 'Theme, data management, updates — all in one place.',
-      side: 'bottom',
-      align: 'end',
     },
   },
   {
@@ -42,21 +24,21 @@ const TUTORIAL_STEPS: DriveStep[] = [
     },
   },
   {
-    element: '#nav-reference',
+    element: '#nav-tab-practice',
     popover: {
-      title: '📖 Reference',
-      description: 'Browse the Thai alphabet, numbers, and tone marks with Indic phonetic mappings.',
-      side: 'bottom',
+      title: '🛠️ Practice Hub',
+      description: 'Access the dictionary, smart reading, tone trainer, and other tools here.',
+      side: 'top',
       align: 'center',
     },
   },
   {
-    element: '#nav-builder',
+    element: '#nav-tab-profile',
     popover: {
-      title: '✏️ Builder',
-      description: 'Build words and practice writing Thai characters with the drawing pad.',
-      side: 'bottom',
-      align: 'center',
+      title: '👤 Profile & Settings',
+      description: 'Check your stats, manage decks, and adjust settings here.',
+      side: 'top',
+      align: 'end',
     },
   },
 ];

@@ -16,10 +16,31 @@ import { UnalomePage } from '@/features/unalome/UnalomePage';
 import { ReadingPage } from '@/features/reading/ReadingPage';
 import { SentencePracticePage } from '@/features/sentenceBuilder/SentencePracticePage';
 import { SpacedRepetitionGuide } from '@/features/settings/SpacedRepetitionGuide';
+import { ToolsHub } from '@/features/tools/ToolsHub';
+import { Navigation } from '@/components/Navigation';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { BASE_PATH } from './lib/constants';
+import { useState, useEffect } from 'react';
+import { isOnboardingComplete } from '@/lib/onboarding';
+import { OnboardingWizard } from '@/features/onboarding/OnboardingWizard';
 
 function App() {
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(true);
+
+  useEffect(() => {
+    setShowOnboarding(!isOnboardingComplete());
+  }, []);
+
+  if (showOnboarding) {
+    return (
+      <ThemeProvider defaultTheme="system" storageKey="nong-liming-ui-theme">
+        <ToastProvider>
+          <OnboardingWizard onComplete={() => setShowOnboarding(false)} />
+        </ToastProvider>
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider defaultTheme="system" storageKey="nong-liming-ui-theme">
       <ToastProvider>
@@ -46,7 +67,7 @@ function App() {
               </svg>
             </div>
             
-            <div className="grow relative z-10">
+            <div className="grow relative z-10 pb-20">
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/reference" element={<ReferencePage />} />
@@ -63,8 +84,10 @@ function App() {
                 <Route path="/builder" element={<BuilderPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/settings/algorithm" element={<SpacedRepetitionGuide />} />
+                <Route path="/practice" element={<ToolsHub />} />
               </Routes>
             </div>
+            <Navigation />
           </div>
           <UpdatePrompt />
         </BrowserRouter>

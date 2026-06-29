@@ -9,6 +9,7 @@ import { addOffering } from '@/features/waikru/useWaiKru';
 import { DifficultySelector, type DifficultyLevel } from './DifficultySelector';
 import { CharacterFeedback } from './CharacterFeedback';
 import { splitThaiString } from '@/lib/thai-utils';
+import { incrementChallengeProgress } from '@/features/dailyChallenges/challengeGenerator';
 
 type RecognitionState =
   | { status: 'idle' }
@@ -293,6 +294,7 @@ export function WritingPad() {
           
           if (isSuccess) {
             void addOffering('dokMaKhue', 1);
+            void incrementChallengeProgress('write', 1);
           }
 
           const newAttempts = stat.attempts + 1;
