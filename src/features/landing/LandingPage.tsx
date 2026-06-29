@@ -45,18 +45,19 @@ export function LandingPage() {
   };
 
   return (
-    <div className="min-h-full flex flex-col items-center p-6 max-w-md mx-auto relative bg-background">
-      <header className="w-full flex justify-between items-center py-4">
-        <div className="text-2xl font-bold text-primary font-sarabun drop-shadow-sm">น้องลีมิง</div>
-        <Link
-          to="/settings"
-          className="p-2 rounded-xl hover:bg-muted transition-colors shadow-sm bg-card"
-          aria-label="Settings"
-          id="settings-link"
-        >
-          <Settings className="w-5 h-5 text-muted-foreground" />
-        </Link>
-      </header>
+    <div className="min-h-full w-full flex justify-center p-6 relative">
+      <div className="w-full max-w-md flex flex-col items-center">
+        <header className="w-full flex justify-between items-center py-4">
+          <div className="text-2xl font-bold text-primary font-sarabun drop-shadow-sm">น้องลีมิง</div>
+          <Link
+            to="/settings"
+            className="p-2 rounded-xl hover:bg-muted transition-colors shadow-sm bg-card"
+            aria-label="Settings"
+            id="settings-link"
+          >
+            <Settings className="w-5 h-5 text-muted-foreground" />
+          </Link>
+        </header>
 
       <main className="flex-1 w-full flex flex-col items-center gap-8 mt-4 pb-8">
         {/* Mascot Integration */}
@@ -142,6 +143,7 @@ export function LandingPage() {
           </motion.div>
         </motion.div>
       </main>
+      </div>
     </div>
   );
 }

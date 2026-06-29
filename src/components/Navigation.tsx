@@ -3,8 +3,8 @@ import { NavLink } from 'react-router-dom';
 
 export function Navigation() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border pb-safe">
-      <div className="max-w-md mx-auto flex justify-around p-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border pb-safe md:top-0 md:bottom-0 md:right-auto md:w-24 md:border-t-0 md:border-r md:flex md:flex-col md:justify-center">
+      <div className="max-w-md mx-auto flex justify-around p-2 md:flex-col md:space-y-8 md:p-4">
         <NavLink 
           to="/" 
           end

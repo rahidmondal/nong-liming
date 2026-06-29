@@ -85,10 +85,10 @@
   --popover: #ffffff;
   --popover-foreground: #2c2825;
 
-  --primary: #c83232; /* Daeng Chaad */
+  --primary: #10b981; /* Emerald 500 */
   --primary-foreground: #ffffff;
 
-  --secondary: #dfb15b; /* Thong */
+  --secondary: #d1fae5; /* Emerald 100 */
   --secondary-foreground: #2c2825;
 
   --muted: #f2ece4;
@@ -102,7 +102,7 @@
 
   --border: #e8e0d5;
   --input: #e8e0d5;
-  --ring: #c83232;
+  --ring: #10b981;
 
   --radius: 1rem; /* More organic and rounded */
 }
@@ -118,10 +118,10 @@
   --popover: #292524;
   --popover-foreground: #fdfbf7;
 
-  --primary: #e63946; /* Brighter Daeng Chaad */
-  --primary-foreground: #ffffff;
+  --primary: #34d399; /* Emerald 400 */
+  --primary-foreground: #022c22;
 
-  --secondary: #fbbf24; /* Brighter Thong */
+  --secondary: #064e3b; /* Emerald 900 */
   --secondary-foreground: #1c1917;
 
   --muted: #44403c;
@@ -135,7 +135,7 @@
 
   --border: #44403c;
   --input: #44403c;
-  --ring: #e63946;
+  --ring: #34d399;
 }
 
 @layer base {
@@ -146,16 +146,16 @@
     @apply bg-background text-foreground;
     font-family: 'Sarabun', 'Noto Sans Thai', 'Segoe UI', sans-serif;
     background-image:
-      radial-gradient(circle at top right, rgba(223, 177, 91, 0.15), transparent 50%),
-      radial-gradient(circle at bottom left, rgba(200, 50, 50, 0.08), transparent 50%);
+      radial-gradient(circle at top right, rgba(16, 185, 129, 0.15), transparent 50%),
+      radial-gradient(circle at bottom left, rgba(209, 250, 229, 0.2), transparent 50%);
     background-attachment: fixed;
     background-blend-mode: multiply;
   }
 
   .dark body {
     background-image:
-      radial-gradient(circle at top right, rgba(251, 191, 36, 0.1), transparent 50%),
-      radial-gradient(circle at bottom left, rgba(230, 57, 70, 0.1), transparent 50%);
+      radial-gradient(circle at top right, rgba(52, 211, 153, 0.15), transparent 50%),
+      radial-gradient(circle at bottom left, rgba(6, 78, 59, 0.2), transparent 50%);
     background-blend-mode: screen;
   }
 }

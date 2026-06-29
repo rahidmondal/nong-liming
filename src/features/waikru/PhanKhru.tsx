@@ -5,12 +5,14 @@ import { useWaiKru } from './useWaiKru';
 export function PhanKhru() {
   const { inventory } = useWaiKru();
 
+  const basePath = import.meta.env.BASE_URL;
+
   const offerings = [
     {
       id: 'dokKem',
       label: 'Dok Kem (Ixora)',
       desc: 'Sharp wit & intelligence',
-      icon: <Flower className="w-6 h-6 text-red-500" />,
+      icon: <img src={`${basePath}icons/dok_kem.jpg`} alt="Dok Kem" className="w-10 h-10 rounded-full shadow-sm object-cover" />,
       count: inventory.dokKem,
       bg: 'bg-red-500/10',
       border: 'border-red-500/20',
@@ -19,7 +21,7 @@ export function PhanKhru() {
       id: 'yaPraek',
       label: 'Ya Praek (Bermuda Grass)',
       desc: 'Resilience & patience',
-      icon: <Leaf className="w-6 h-6 text-green-500" />,
+      icon: <img src={`${basePath}icons/ya_praek.jpg`} alt="Ya Praek" className="w-10 h-10 rounded-full shadow-sm object-cover" />,
       count: inventory.yaPraek,
       bg: 'bg-green-500/10',
       border: 'border-green-500/20',
@@ -28,7 +30,7 @@ export function PhanKhru() {
       id: 'khaoTok',
       label: 'Khao Tok (Popped Rice)',
       desc: 'Discipline & blooming',
-      icon: <Sparkles className="w-6 h-6 text-amber-500" />,
+      icon: <img src={`${basePath}icons/khao_tok.jpg`} alt="Khao Tok" className="w-10 h-10 rounded-full shadow-sm object-cover" />,
       count: inventory.khaoTok,
       bg: 'bg-amber-500/10',
       border: 'border-amber-500/20',
@@ -37,7 +39,7 @@ export function PhanKhru() {
       id: 'dokMaKhue',
       label: 'Dok Ma Khue (Eggplant Flower)',
       desc: 'Humility & respect',
-      icon: <Star className="w-6 h-6 text-purple-500" />,
+      icon: <img src={`${basePath}icons/dok_ma_khue.jpg`} alt="Dok Ma Khue" className="w-10 h-10 rounded-full shadow-sm object-cover" />,
       count: inventory.dokMaKhue,
       bg: 'bg-purple-500/10',
       border: 'border-purple-500/20',
@@ -63,10 +65,7 @@ export function PhanKhru() {
             whileHover={{ y: -2 }}
             className={`p-4 rounded-xl border ${offering.border} ${offering.bg} flex flex-col items-center text-center gap-2 relative overflow-hidden`}
           >
-            <div className="absolute -right-4 -top-4 opacity-5 pointer-events-none scale-150">
-              {offering.icon}
-            </div>
-            <div className="relative z-10 p-3 bg-background rounded-full shadow-sm">
+            <div className="relative z-10 p-2 bg-background/50 rounded-full shadow-sm border border-border">
               {offering.icon}
             </div>
             <div className="relative z-10 mt-1">

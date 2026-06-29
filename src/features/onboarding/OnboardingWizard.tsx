@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { setOnboardingComplete } from '@/lib/onboarding';
 import { seedDatabaseForBeginner } from '@/lib/seedDatabase';
 import { ArrowRight, CheckCircle2, Sparkles, User, Target } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(1);
@@ -35,14 +36,27 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
-      <div className="max-w-md w-full relative z-10">
-        {/* Mascot */}
-        <div className="flex justify-center mb-8">
-          <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center shadow-lg border-4 border-background text-5xl">
-            🐘
+    <div className="min-h-screen flex flex-col md:flex-row bg-background">
+      {/* Desktop Graphic Side */}
+      <div className="hidden md:flex md:w-1/2 bg-primary/5 items-center justify-center border-r border-border p-12">
+        <div className="text-center space-y-6 max-w-md">
+          <div className="w-48 h-48 mx-auto rounded-full flex items-center justify-center shadow-2xl overflow-hidden mb-8">
+            <Logo className="w-full h-full" />
           </div>
+          <h1 className="text-4xl font-bold font-sarabun text-primary">Nong Li Ming</h1>
+          <p className="text-xl text-muted-foreground">Your guided path to mastering the Thai language.</p>
         </div>
+      </div>
+      
+      {/* Wizard Side */}
+      <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="max-w-md w-full relative z-10">
+          {/* Mobile Mascot (Hidden on desktop) */}
+          <div className="flex justify-center mb-8 md:hidden">
+            <div className="w-24 h-24 rounded-full flex items-center justify-center shadow-lg overflow-hidden">
+              <Logo className="w-full h-full" />
+            </div>
+          </div>
         
         <div className="bg-card shadow-xl rounded-3xl p-6 md:p-8 border border-border">
           <AnimatePresence mode="wait">
@@ -95,25 +109,16 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                   <p className="text-muted-foreground mt-2">What is your goal for learning Thai?</p>
                 </div>
                 
-                <div className="space-y-4">
-                  <div className="relative">
-                    <Target className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                    <input 
-                      type="text" 
-                      value={goal}
-                      onChange={(e) => setGoal(e.target.value)}
-                      placeholder="e.g. Travel, Family, Work..."
-                      className="w-full bg-background border border-input rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none"
-                    />
-                  </div>
-                  
-                  <button 
-                    onClick={handleNext}
-                    disabled={!goal.trim()}
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Continue <ArrowRight className="h-5 w-5" />
-                  </button>
+                <div className="grid gap-3">
+                  {['Travel', 'Family / Partner', 'Work', 'Culture & Media', 'Just for fun'].map(option => (
+                    <button
+                      key={option}
+                      onClick={() => { setGoal(option); setTimeout(handleNext, 150); }}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${goal === option ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}
+                    >
+                      <h3 className="font-semibold text-foreground">{option}</h3>
+                    </button>
+                  ))}
                 </div>
               </motion.div>
             )}
@@ -183,6 +188,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
