@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { setOnboardingComplete } from '@/lib/onboarding';
 import { seedDatabaseForBeginner } from '@/lib/seedDatabase';
-import { ArrowRight, CheckCircle2, Sparkles, User, Target } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Sparkles, User } from 'lucide-react';
 import { Logo } from '@/components/Logo';
+import { useToast } from '@/components/toast-provider';
 
 export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(1);
@@ -11,6 +12,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   const [goal, setGoal] = useState('');
   const [level, setLevel] = useState<'beginner' | 'intermediate' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { show } = useToast();
 
   const handleNext = () => {
     if (step < 3) setStep(step + 1);
@@ -27,7 +29,10 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
       onComplete();
     } catch (e) {
       console.error('Error during onboarding completion:', e);
-      // In a real app we might show a toast, but we'll proceed anyway to unblock the user
+      show('Setup Error', {
+        detail: 'Failed to load your starter deck. You can import one later!',
+        type: 'error'
+      });
       setOnboardingComplete();
       onComplete();
     } finally {
@@ -79,7 +84,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                     <input 
                       type="text" 
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e) => { setName(e.target.value); }}
                       placeholder="Your name"
                       className="w-full bg-background border border-input rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none"
                     />
@@ -138,7 +143,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                 
                 <div className="grid gap-4">
                   <button
-                    onClick={() => setLevel('beginner')}
+                    onClick={() => { setLevel('beginner'); }}
                     className={`p-4 rounded-xl border-2 text-left transition-all flex items-start gap-4 ${level === 'beginner' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}
                   >
                     <div className={`p-2 rounded-lg ${level === 'beginner' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
@@ -152,7 +157,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                   </button>
 
                   <button
-                    onClick={() => setLevel('intermediate')}
+                    onClick={() => { setLevel('intermediate'); }}
                     className={`p-4 rounded-xl border-2 text-left transition-all flex items-start gap-4 ${level === 'intermediate' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}
                   >
                     <div className={`p-2 rounded-lg ${level === 'intermediate' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>

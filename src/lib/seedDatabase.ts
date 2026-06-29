@@ -21,7 +21,7 @@ export async function seedDatabaseForBeginner(): Promise<void> {
 
   // Seed first 10 consonants
   for (const c of consonants.slice(0, 10)) {
-    await createNoteAndCard(noteTypeId, deckId as number, {
+    await createNoteAndCard(noteTypeId, deckId!, {
       Front: c.thaiChar,
       Back: `${c.thaiName} - ${c.startSound} / ${c.finalSound}`,
     });
@@ -29,7 +29,7 @@ export async function seedDatabaseForBeginner(): Promise<void> {
 
   // Seed first 10 vowels
   for (const v of vowels.slice(0, 10)) {
-    await createNoteAndCard(noteTypeId, deckId as number, {
+    await createNoteAndCard(noteTypeId, deckId!, {
       Front: v.thaiChar,
       Back: `${v.thaiName} - ${v.english}`,
     });

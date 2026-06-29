@@ -20,22 +20,18 @@ import { ToolsHub } from '@/features/tools/ToolsHub';
 import { Navigation } from '@/components/Navigation';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { BASE_PATH } from './lib/constants';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { isOnboardingComplete } from '@/lib/onboarding';
 import { OnboardingWizard } from '@/features/onboarding/OnboardingWizard';
 
 function App() {
-  const [showOnboarding, setShowOnboarding] = useState<boolean>(true);
-
-  useEffect(() => {
-    setShowOnboarding(!isOnboardingComplete());
-  }, []);
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(() => !isOnboardingComplete());
 
   if (showOnboarding) {
     return (
       <ThemeProvider defaultTheme="system" storageKey="nong-liming-ui-theme">
         <ToastProvider>
-          <OnboardingWizard onComplete={() => setShowOnboarding(false)} />
+          <OnboardingWizard onComplete={() => { setShowOnboarding(false); }} />
         </ToastProvider>
       </ThemeProvider>
     );

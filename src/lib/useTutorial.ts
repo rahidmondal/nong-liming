@@ -45,6 +45,7 @@ const TUTORIAL_STEPS: DriveStep[] = [
 
 export function useTutorial() {
   const driverRef = useRef<ReturnType<typeof driver> | null>(null);
+  const isUnmounting = useRef(false);
 
   const start = useCallback(() => {
     if (driverRef.current) {
@@ -57,7 +58,9 @@ export function useTutorial() {
       showButtons: ['next', 'previous', 'close'],
       steps: TUTORIAL_STEPS,
       onDestroyed: () => {
-        localStorage.setItem(STORAGE_KEY, 'true');
+        if (!isUnmounting.current) {
+          localStorage.setItem(STORAGE_KEY, 'true');
+        }
       },
       popoverClass: 'nong-liming-tutorial',
     });
@@ -81,6 +84,7 @@ export function useTutorial() {
 
   useEffect(() => {
     return () => {
+      isUnmounting.current = true;
       driverRef.current?.destroy();
     };
   }, []);

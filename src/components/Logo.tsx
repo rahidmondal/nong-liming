@@ -3,17 +3,17 @@ import React from 'react';
 export function Logo({ className = '' }: { className?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title" className={className}>
-      <title>Nong Li Ming Mascot</title>
+      <title id="title">Nong Li Ming Mascot</title>
       
       {/* Outer glow ring */}
-      <circle cx="256" cy="256" r="200" fill="none" className="stroke-primary/40" strokeWidth="4"/>
+      <circle cx="256" cy="256" r="200" fill="none" className="stroke-primary/40 dark:stroke-primary/50" strokeWidth="4"/>
       {/* Inner decorative ring */}
-      <circle cx="256" cy="256" r="160" fill="none" className="stroke-primary/30" strokeWidth="2"/>
+      <circle cx="256" cy="256" r="160" fill="none" className="stroke-primary/30 dark:stroke-primary/40" strokeWidth="2"/>
       {/* Glowing background circle */}
-      <circle cx="256" cy="256" r="130" className="fill-primary/10" />
+      <circle cx="256" cy="256" r="130" className="fill-primary/10 dark:fill-primary/20" />
       
       {/* Main card background */}
-      <rect x="116" y="116" width="280" height="280" rx="48" className="fill-card shadow-xl" />
+      <rect x="116" y="116" width="280" height="280" rx="48" className="fill-card drop-shadow-xl" />
       <rect x="116" y="116" width="280" height="280" rx="48" fill="none" className="stroke-border" strokeWidth="2" />
       
       {/* Decorative corner accents */}

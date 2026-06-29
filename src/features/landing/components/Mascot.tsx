@@ -16,7 +16,7 @@ export function Mascot() {
     const interval = setInterval(() => {
       setMessageIndex((prev) => (prev + 1) % messages.length);
     }, 5000); // Rotate message every 5 seconds
-    return () => clearInterval(interval);
+    return () => { clearInterval(interval); };
   }, []);
 
   return (
