@@ -19,6 +19,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CardDetailsPanel } from './CardDetailsPanel';
 import { ReviewPreview } from './ReviewPreview';
+import { addOffering } from '@/features/waikru/useWaiKru';
+import { incrementChallengeProgress } from '@/features/dailyChallenges/challengeGenerator';
 
 type StudyPhase = 'loading' | 'front' | 'back' | 'done';
 
@@ -211,6 +213,7 @@ export function StudyPage() {
 
       if (stats.lastStudyDate !== today) {
         newCount = 1; // Reset if rollover hasn't been caught yet
+        void addOffering('yaPraek', 1);
       }
 
       await db.userStats.update(1, {
@@ -241,6 +244,11 @@ export function StudyPage() {
       const wasNew = card.status === 'new';
       const wasReview = card.status === 'review';
       const wasCorrect = rating >= 3;
+
+      if (wasCorrect) {
+        void addOffering('dokKem', 1);
+        void incrementChallengeProgress('review', 1);
+      }
 
       setSessionStats(prev => ({
         ...prev,

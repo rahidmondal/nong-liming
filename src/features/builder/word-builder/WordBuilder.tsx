@@ -6,6 +6,7 @@ import type { ThaiConsonant, ThaiTone, ThaiVowel } from '@/types/alphabet';
 import { motion } from 'framer-motion';
 import { Check, ChevronDown, ChevronUp, RotateCcw, Volume2, X } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
+import { incrementChallengeProgress } from '@/features/dailyChallenges/challengeGenerator';
 
 const FINAL_CONSONANT_SOUNDS = new Set(['k', 't', 'p', 'n', 'm', 'ng', 'y', 'w']);
 
@@ -158,15 +159,18 @@ export function WordBuilder() {
 
     if (!ic) return '';
 
-    let result = ic.thaiChar;
-
+    let baseConsonant = ic.thaiChar;
     if (t) {
-      result += t.thaiChar;
+      baseConsonant += t.thaiChar;
     }
 
+    let result = '';
+
     if (v) {
-      const vowelChar = v.thaiChar.replace(/อ/g, '');
-      result += vowelChar;
+      // Replace the FIRST occurrence of 'อ' with the baseConsonant + tone
+      result = v.thaiChar.replace('อ', baseConsonant);
+    } else {
+      result = baseConsonant;
     }
 
     if (fc) {
@@ -204,7 +208,10 @@ export function WordBuilder() {
   const handleSpeak = useCallback(() => {
     if (!composed) return;
     speak(composed);
-  }, [composed, speak]);
+    if (validation.isValid) {
+      void incrementChallengeProgress('build', 1);
+    }
+  }, [composed, speak, validation.isValid]);
 
   return (
     <div className="space-y-6">

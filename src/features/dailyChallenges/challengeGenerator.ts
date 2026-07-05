@@ -291,3 +291,18 @@ export async function resetTodaysChallenges(): Promise<DailyChallenge> {
 
   return getTodaysChallenges();
 }
+
+/**
+ * Increment progress for a specific challenge type if there is an active incomplete challenge today.
+ */
+export async function incrementChallengeProgress(type: 'write' | 'build' | 'review', delta = 1): Promise<void> {
+  const today = toLocalDateKey(new Date());
+  const record = await db.dailyChallenges.where('date').equals(today).first();
+  if (!record) return;
+
+  const challenge = record.challenges.find(c => c.type === type && !c.completed);
+  if (!challenge) return;
+
+  await updateChallengeProgress(challenge.id, delta);
+}
+

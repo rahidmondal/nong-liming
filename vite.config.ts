@@ -22,6 +22,11 @@ export default defineConfig({
         'maskable-icon.svg',
         'images/Screenshot-vertical.png',
         'images/Screenshot-horizontal.png',
+        'images/watermark.jpg',
+        'icons/dok_kem.jpg',
+        'icons/dok_ma_khue.jpg',
+        'icons/khao_tok.jpg',
+        'icons/ya_praek.jpg',
         'sql-wasm.wasm',
       ],
       manifest: {

@@ -12,6 +12,7 @@ import type {
 import type { DailyChallenge } from '@/types/dailyChallenge';
 import type { WritingPadStat } from '@/types/writingPad';
 import type { LessonProgress } from '@/types/lesson';
+import type { UnalomeProgress } from '@/types/unalome';
 import { DEFAULT_DECK_CONFIG, DEFAULT_EASE_FACTOR } from '@/types/flashcard';
 import Dexie, { type EntityTable } from 'dexie';
 
@@ -33,6 +34,7 @@ const db = new Dexie('NongLimingDB') as Dexie & {
   dailyChallenges: EntityTable<DailyChallenge, 'id'>;
   writingPadStats: EntityTable<WritingPadStat, 'id'>;
   lessonProgress: EntityTable<LessonProgress, 'lessonId'>;
+  unalomeProgress: EntityTable<UnalomeProgress, 'nodeId'>;
 };
 
 db.version(1).stores({
@@ -181,6 +183,22 @@ db.version(6).stores({
   lessonProgress: 'lessonId',
 });
 
+db.version(7).stores({
+  unalomeProgress: 'nodeId, status',
+}).upgrade(async tx => {
+  const statsTable = tx.table<UserStats, number>('userStats');
+  const stats = await statsTable.get(1);
+  if (stats) {
+    const s = stats as Partial<UserStats>;
+    await statsTable.update(1, {
+      dokKemCount: s.dokKemCount ?? 0,
+      yaPraekCount: s.yaPraekCount ?? 0,
+      khaoTokCount: s.khaoTokCount ?? 0,
+      dokMaKhueCount: s.dokMaKhueCount ?? 0,
+    } as unknown as Partial<UserStats>);
+  }
+});
+
 export { db };
 
 const blobUrlCache = new Map<string, string>();
@@ -267,6 +285,10 @@ export async function getOrCreateUserStats(): Promise<UserStats> {
       cardsReviewedToday: 0,
       lastStudyDate: '',
       playbackSpeed: 1.0,
+      dokKemCount: 0,
+      yaPraekCount: 0,
+      khaoTokCount: 0,
+      dokMaKhueCount: 0,
     };
     await db.userStats.put(stats);
   }

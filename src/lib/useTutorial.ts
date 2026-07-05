@@ -6,12 +6,12 @@ const STORAGE_KEY = 'nong-liming-tutorial-done';
 
 const TUTORIAL_STEPS: DriveStep[] = [
   {
-    element: '#settings-link',
+    element: '#nav-unalome',
     popover: {
-      title: '⚙️ Settings',
-      description: 'Theme, data management, updates — all in one place.',
+      title: '🗺️ The Unalome Path',
+      description: 'Follow your guided curriculum path to Thai fluency! Unlock lessons and earn traditional Wai Kru offerings.',
       side: 'bottom',
-      align: 'end',
+      align: 'center',
     },
   },
   {
@@ -24,27 +24,28 @@ const TUTORIAL_STEPS: DriveStep[] = [
     },
   },
   {
-    element: '#nav-reference',
+    element: '#nav-tab-practice',
     popover: {
-      title: '📖 Reference',
-      description: 'Browse the Thai alphabet, numbers, and tone marks with Indic phonetic mappings.',
-      side: 'bottom',
+      title: '🛠️ Practice Hub',
+      description: 'Access the dictionary, smart reading, tone trainer, and other tools here.',
+      side: 'top',
       align: 'center',
     },
   },
   {
-    element: '#nav-builder',
+    element: '#nav-tab-profile',
     popover: {
-      title: '✏️ Builder',
-      description: 'Build words and practice writing Thai characters with the drawing pad.',
-      side: 'bottom',
-      align: 'center',
+      title: '👤 Profile & Settings',
+      description: 'Check your stats, manage decks, and adjust settings here.',
+      side: 'top',
+      align: 'end',
     },
   },
 ];
 
 export function useTutorial() {
   const driverRef = useRef<ReturnType<typeof driver> | null>(null);
+  const isUnmounting = useRef(false);
 
   const start = useCallback(() => {
     if (driverRef.current) {
@@ -57,7 +58,9 @@ export function useTutorial() {
       showButtons: ['next', 'previous', 'close'],
       steps: TUTORIAL_STEPS,
       onDestroyed: () => {
-        localStorage.setItem(STORAGE_KEY, 'true');
+        if (!isUnmounting.current) {
+          localStorage.setItem(STORAGE_KEY, 'true');
+        }
       },
       popoverClass: 'nong-liming-tutorial',
     });
@@ -81,6 +84,7 @@ export function useTutorial() {
 
   useEffect(() => {
     return () => {
+      isUnmounting.current = true;
       driverRef.current?.destroy();
     };
   }, []);
