@@ -9,15 +9,13 @@ export interface SessionTask {
   completed: boolean;
 }
 
-export class DailySessionGenerator {
-  static generateSession(): DailySession {
-    // In the future, this will generate a curated list of tasks based on user progress.
-    return {
-      sessionId: `session_${Date.now()}`,
-      tasks: [
-        { id: 'task_1', type: 'lesson', completed: false },
-        { id: 'task_2', type: 'flashcard', completed: false },
-      ],
-    };
-  }
+export function generateDailySession(): DailySession {
+  // In the future, this will generate a curated list of tasks based on user progress.
+  return {
+    sessionId: `session_${String(Date.now())}`,
+    tasks: [
+      { id: 'task_1', type: 'lesson', completed: false },
+      { id: 'task_2', type: 'flashcard', completed: false },
+    ],
+  };
 }

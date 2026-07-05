@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Flower, Leaf, Sparkles, Star } from 'lucide-react';
+import { Flower } from 'lucide-react';
 import { useWaiKru } from './useWaiKru';
 
 export function PhanKhru() {
@@ -12,34 +12,58 @@ export function PhanKhru() {
       id: 'dokKem',
       label: 'Dok Kem (Ixora)',
       desc: 'Sharp wit & intelligence',
-      icon: <img src={`${basePath}icons/dok_kem.jpg`} alt="Dok Kem" className="w-10 h-10 rounded-full shadow-sm object-cover" />,
+      icon: (
+        <img
+          src={`${basePath}icons/dok_kem.jpg`}
+          alt="Dok Kem"
+          className="w-10 h-10 rounded-full shadow-sm object-cover"
+        />
+      ),
       count: inventory.dokKem,
       bg: 'bg-red-500/10 dark:bg-red-400/20',
-      border: 'border-red-500/20 dark:border-red-400/30'
+      border: 'border-red-500/20 dark:border-red-400/30',
     },
     {
       id: 'yaPraek',
       label: 'Ya Praek (Grass)',
       desc: 'Patience & perseverance',
-      icon: <img src={`${basePath}icons/ya_praek.jpg`} alt="Ya Praek" className="w-10 h-10 rounded-full shadow-sm object-cover" />,
+      icon: (
+        <img
+          src={`${basePath}icons/ya_praek.jpg`}
+          alt="Ya Praek"
+          className="w-10 h-10 rounded-full shadow-sm object-cover"
+        />
+      ),
       count: inventory.yaPraek,
       bg: 'bg-green-500/10 dark:bg-green-400/20',
-      border: 'border-green-500/20 dark:border-green-400/30'
+      border: 'border-green-500/20 dark:border-green-400/30',
     },
     {
       id: 'khaoTok',
       label: 'Khao Tok (Rice)',
       desc: 'Discipline to bloom',
-      icon: <img src={`${basePath}icons/khao_tok.jpg`} alt="Khao Tok" className="w-10 h-10 rounded-full shadow-sm object-cover" />,
+      icon: (
+        <img
+          src={`${basePath}icons/khao_tok.jpg`}
+          alt="Khao Tok"
+          className="w-10 h-10 rounded-full shadow-sm object-cover"
+        />
+      ),
       count: inventory.khaoTok,
       bg: 'bg-yellow-500/10 dark:bg-yellow-400/20',
-      border: 'border-yellow-500/20 dark:border-yellow-400/30'
+      border: 'border-yellow-500/20 dark:border-yellow-400/30',
     },
     {
       id: 'dokMaKhue',
       label: 'Dok Ma Khue',
       desc: 'Humility & respect',
-      icon: <img src={`${basePath}icons/dok_ma_khue.jpg`} alt="Dok Ma Khue" className="w-10 h-10 rounded-full shadow-sm object-cover" />,
+      icon: (
+        <img
+          src={`${basePath}icons/dok_ma_khue.jpg`}
+          alt="Dok Ma Khue"
+          className="w-10 h-10 rounded-full shadow-sm object-cover"
+        />
+      ),
       count: inventory.dokMaKhue,
       bg: 'bg-purple-500/10 dark:bg-purple-400/20',
       border: 'border-purple-500/20 dark:border-purple-400/30',
