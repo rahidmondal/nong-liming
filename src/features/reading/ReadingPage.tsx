@@ -1,6 +1,8 @@
-import { ArrowLeft, BookOpenText } from 'lucide-react';
+import { ThaiManuscriptIcon as BookOpenText } from '@/components/ThaiIcons';
+import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SmartText } from '@/components/SmartText';
+import { PracticeSaveButton } from '@/components/PracticeSaveButton';
 
 const SAMPLE_STORY = `กาลครั้งหนึ่งนานมาแล้ว มีเด็กผู้ชายคนหนึ่งชื่อ นิก เขาชอบไปโรงเรียนมาก
 ทุกวันนิกจะตื่นเช้า กินข้าว แล้วเดินไปโรงเรียน
@@ -23,6 +25,9 @@ export function ReadingPage() {
         <div className="p-6 bg-card rounded-2xl border border-border shadow-sm">
           <h2 className="text-xl font-bold text-primary font-sarabun mb-4">เรื่องของนิก (Nick's Story)</h2>
           <SmartText text={SAMPLE_STORY} className="text-2xl font-sarabun whitespace-pre-wrap" />
+          <div className="mt-6">
+            <PracticeSaveButton kind="reading" contentKey="nicks-story" label="Nick’s story" />
+          </div>
         </div>
 
         <p className="text-sm text-muted-foreground mt-4 text-center">

@@ -26,9 +26,9 @@ type StudyPhase = 'loading' | 'front' | 'back' | 'done';
 
 const QUALITY_BUTTONS: { label: string; key: QualityLabel; color: string }[] = [
   { label: 'Again', key: 'again', color: 'bg-red-500 hover:bg-red-600' },
-  { label: 'Hard', key: 'hard', color: 'bg-orange-500 hover:bg-orange-600' },
-  { label: 'Good', key: 'good', color: 'bg-emerald-500 hover:bg-emerald-600' },
-  { label: 'Easy', key: 'easy', color: 'bg-blue-500 hover:bg-blue-600' },
+  { label: 'Hard', key: 'hard', color: 'bg-fuchsia-500 hover:bg-fuchsia-600' },
+  { label: 'Good', key: 'good', color: 'bg-purple-500 hover:bg-purple-600' },
+  { label: 'Easy', key: 'easy', color: 'bg-violet-500 hover:bg-violet-600' },
 ];
 
 interface CardWithNote {
@@ -493,7 +493,10 @@ export function StudyPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="w-full flex flex-col gap-2 relative z-10"
               >
-                <ReviewPreview card={current.card} config={schedulingConfig} />
+                <details className="rounded-xl border border-border p-3 text-sm">
+                  <summary className="cursor-pointer text-muted-foreground">How scheduling works</summary>
+                  <ReviewPreview card={current.card} config={schedulingConfig} />
+                </details>
                 <CardDetailsPanel card={current.card} />
               </motion.div>
             )}
@@ -568,9 +571,9 @@ export function StudyPage() {
               </div>
               <div className="bg-card rounded-xl border border-border p-4 text-center">
                 <p className="text-lg font-bold text-foreground">
-                  <span className="text-blue-400">{sessionStats.newSeen}</span>
+                  <span className="text-violet-400">{sessionStats.newSeen}</span>
                   {' / '}
-                  <span className="text-emerald-400">{sessionStats.reviewSeen}</span>
+                  <span className="text-purple-400">{sessionStats.reviewSeen}</span>
                 </p>
                 <p className="text-xs text-muted-foreground">New / Review</p>
               </div>

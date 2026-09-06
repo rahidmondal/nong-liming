@@ -3,11 +3,11 @@ interface ToneDiagramProps {
 }
 
 const TONE_COLORS: Record<string, string> = {
-  mid: '#3b82f6',
-  low: '#22c55e',
-  falling: '#ef4444',
-  high: '#f59e0b',
-  rising: '#a855f7',
+  mid: 'var(--chart-1)',
+  low: 'var(--chart-2)',
+  falling: 'var(--chart-3)',
+  high: 'var(--chart-4)',
+  rising: 'var(--primary)',
 };
 
 const TONE_PATHS: Record<string, string> = {

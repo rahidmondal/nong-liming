@@ -1,88 +1,109 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-// Global cache for voices to avoid multiple components overwriting onvoiceschanged
-let cachedVoices: SpeechSynthesisVoice[] = [];
-let voicesLoaded = false;
-const voiceListeners = new Set<() => void>();
+interface Playback {
+  owner: object;
+  synthesis: SpeechSynthesis;
+  finish: () => void;
+}
 
-const loadGlobalVoices = () => {
-  cachedVoices = window.speechSynthesis.getVoices();
-  if (cachedVoices.length > 0) {
-    voicesLoaded = true;
-    voiceListeners.forEach(listener => { listener(); });
-  }
-};
+// Speech synthesis has one queue for the whole page, shared by every Listen button.
+let activePlayback: Playback | null = null;
 
-if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-  loadGlobalVoices();
-  window.speechSynthesis.addEventListener('voiceschanged', loadGlobalVoices);
+function getSynthesis(): SpeechSynthesis | null {
+  return typeof window !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined'
+    ? ((window as Partial<Window>).speechSynthesis ?? null)
+    : null;
+}
+
+function cancelPlayback(synthesis: SpeechSynthesis) {
+  activePlayback?.finish();
+  synthesis.cancel();
+}
+
+function normalizedLanguage(lang: string): string {
+  return lang.replaceAll('_', '-').toLowerCase();
+}
+
+function selectVoice(voices: SpeechSynthesisVoice[], lang: string): SpeechSynthesisVoice | null {
+  const normalized = normalizedLanguage(lang);
+  const exact = voices.filter(voice => normalizedLanguage(voice.lang) === normalized);
+  const candidates =
+    exact.length > 0
+      ? exact
+      : voices.filter(voice => normalizedLanguage(voice.lang).split('-')[0] === normalized.split('-')[0]);
+  return candidates.find(voice => /google|microsoft/i.test(voice.name)) ?? candidates.at(0) ?? null;
 }
 
 export function useTTS(lang = 'th-TH', rate = 0.8) {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const owner = useRef({});
+  const voice = selectVoice(voices, lang);
 
   useEffect(() => {
-    const updateVoice = () => {
-      const bestVoice =
-        cachedVoices.find(v => v.lang === lang && (v.name.includes('Google') || v.name.includes('Microsoft'))) ??
-        cachedVoices.find(v => v.lang === lang);
-
-      if (bestVoice) {
-        setVoice(bestVoice);
-      }
+    const synthesis = getSynthesis();
+    if (!synthesis) return undefined;
+    const updateVoices = () => {
+      setVoices(synthesis.getVoices());
     };
-
-    if (voicesLoaded) {
-      updateVoice();
-    }
-
-    voiceListeners.add(updateVoice);
+    synthesis.addEventListener('voiceschanged', updateVoices);
+    updateVoices();
     return () => {
-      voiceListeners.delete(updateVoice);
+      synthesis.removeEventListener('voiceschanged', updateVoices);
+    };
+  }, []);
+
+  useEffect(() => {
+    const currentOwner = owner.current;
+    return () => {
+      if (activePlayback?.owner === currentOwner) cancelPlayback(activePlayback.synthesis);
     };
   }, [lang]);
 
   const speak = useCallback(
     (text: string) => {
-      window.speechSynthesis.cancel();
-
-      if (!text) return;
+      const synthesis = getSynthesis();
+      if (!synthesis) return;
+      cancelPlayback(synthesis);
+      if (!text.trim()) return;
 
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
-
+      utterance.lang = lang.replaceAll('_', '-');
       utterance.rate = rate;
-      utterance.pitch = 1.0;
+      utterance.pitch = 1;
+      utterance.voice = voice;
 
-      if (voice) {
-        utterance.voice = voice;
-      }
-
+      const playback: Playback = {
+        owner: owner.current,
+        synthesis,
+        finish: () => {
+          if (activePlayback !== playback) return;
+          activePlayback = null;
+          utterance.onstart = null;
+          utterance.onend = null;
+          utterance.onerror = null;
+          setIsSpeaking(false);
+        },
+      };
+      activePlayback = playback;
       utterance.onstart = () => {
-        setIsSpeaking(true);
+        if (activePlayback === playback) setIsSpeaking(true);
       };
-
-      const onEnd = () => {
-        setIsSpeaking(false);
-      };
-      utterance.onend = onEnd;
-      utterance.onerror = onEnd;
-
-      window.speechSynthesis.speak(utterance);
-
-      const timeoutMs = Math.max(2000, text.length * 300);
-      setTimeout(() => {
-        setIsSpeaking(false);
-      }, timeoutMs);
+      utterance.onend = playback.finish;
+      utterance.onerror = playback.finish;
+      try {
+        synthesis.speak(utterance);
+      } catch {
+        playback.finish();
+      }
     },
     [lang, voice, rate],
   );
 
   const stop = useCallback(() => {
-    window.speechSynthesis.cancel();
-    setIsSpeaking(false);
+    const synthesis = getSynthesis();
+    if (synthesis) cancelPlayback(synthesis);
   }, []);
 
-  return { speak, stop, isSpeaking };
+  return { speak, stop, isSpeaking, isAvailable: voice !== null };
 }

@@ -1,3 +1,4 @@
+import { composeSyllable } from './composeSyllable';
 import { consonants } from '@/data/consonants';
 import { tones } from '@/data/tones';
 import { vowels } from '@/data/vowels';
@@ -5,8 +6,9 @@ import { useTTS } from '@/hooks/useTTS';
 import type { ThaiConsonant, ThaiTone, ThaiVowel } from '@/types/alphabet';
 import { motion } from 'framer-motion';
 import { Check, ChevronDown, ChevronUp, RotateCcw, Volume2, X } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { incrementChallengeProgress } from '@/features/dailyChallenges/challengeGenerator';
+import { PracticeSaveButton } from '@/components/PracticeSaveButton';
 
 const FINAL_CONSONANT_SOUNDS = new Set(['k', 't', 'p', 'n', 'm', 'ng', 'y', 'w']);
 
@@ -109,7 +111,8 @@ export function WordBuilder() {
   const [selectedVowel, setSelectedVowel] = useState<string | null>(null);
   const [selectedTone, setSelectedTone] = useState<string | null>(null);
   const [finalConsonant, setFinalConsonant] = useState<string | null>(null);
-  const { speak } = useTTS();
+  const { speak, isAvailable } = useTTS();
+  const practised = useRef(new Set<string>());
 
   const consonantItems = useMemo(
     () =>
@@ -125,7 +128,7 @@ export function WordBuilder() {
     () =>
       builderVowels.map((v: ThaiVowel) => ({
         id: v.id,
-        thaiChar: v.thaiChar.replace(/อ/g, ''),
+        thaiChar: v.thaiChar.replace('อ', ''),
         label: `${v.thaiName} — ${v.english}`,
       })),
     [],
@@ -151,35 +154,15 @@ export function WordBuilder() {
     [],
   );
 
-  const composed = useMemo(() => {
+  const composition = useMemo(() => {
     const ic = consonants.find(c => c.id === initialConsonant);
     const v = builderVowels.find(v => v.id === selectedVowel);
     const t = toneMarks.find(t => t.id === selectedTone);
     const fc = finalConsonants.find(c => c.id === finalConsonant);
 
-    if (!ic) return '';
-
-    let baseConsonant = ic.thaiChar;
-    if (t) {
-      baseConsonant += t.thaiChar;
-    }
-
-    let result = '';
-
-    if (v) {
-      // Replace the FIRST occurrence of 'อ' with the baseConsonant + tone
-      result = v.thaiChar.replace('อ', baseConsonant);
-    } else {
-      result = baseConsonant;
-    }
-
-    if (fc) {
-      result += fc.thaiChar;
-    }
-
-    return result;
+    return composeSyllable(ic?.thaiChar ?? '', v?.thaiChar ?? '', t?.thaiChar ?? '', fc?.thaiChar ?? '');
   }, [initialConsonant, selectedVowel, selectedTone, finalConsonant]);
-
+  const composed = composition.text;
   const validation = useMemo(() => {
     const checks = [
       {
@@ -193,7 +176,7 @@ export function WordBuilder() {
     ];
 
     const requiredComplete = checks.filter(c => c.required).every(c => c.pass);
-    const isValid = requiredComplete;
+    const isValid = requiredComplete && composition.supported;
 
     return { checks, isValid };
   }, [initialConsonant, selectedVowel, selectedTone, finalConsonant]);
@@ -206,12 +189,13 @@ export function WordBuilder() {
   }, []);
 
   const handleSpeak = useCallback(() => {
-    if (!composed) return;
+    if (!composed || !composition.supported || !isAvailable) return;
     speak(composed);
-    if (validation.isValid) {
+    if (validation.isValid && !practised.current.has(composed)) {
+      practised.current.add(composed);
       void incrementChallengeProgress('build', 1);
     }
-  }, [composed, speak, validation.isValid]);
+  }, [composed, speak, validation.isValid, composition.supported, isAvailable]);
 
   return (
     <div className="space-y-6">
@@ -245,11 +229,11 @@ export function WordBuilder() {
           <div className="flex gap-3">
             <button
               onClick={handleSpeak}
-              disabled={!composed}
+              disabled={!composed || !composition.supported || !isAvailable}
               className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
             >
               <Volume2 className="w-4 h-4" />
-              Listen
+              {isAvailable ? 'Listen' : 'Thai audio unavailable'}
             </button>
             <button
               onClick={handleReset}
@@ -261,13 +245,14 @@ export function WordBuilder() {
           </div>
 
           {/* Validation checklist */}
+          <PracticeSaveButton kind="word" contentKey={composed} label={composed} disabled={!validation.isValid} />
           <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
             {validation.checks.map(check => (
               <div
                 key={check.label}
                 className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all ${
                   check.pass
-                    ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
+                    ? 'bg-purple-50 dark:bg-purple-950/30 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300'
                     : check.required
                       ? 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400'
                       : 'bg-secondary/50 border-border text-muted-foreground'
@@ -285,12 +270,14 @@ export function WordBuilder() {
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             className={`text-sm font-medium ${
-              validation.isValid ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'
+              validation.isValid ? 'text-purple-600 dark:text-purple-400' : 'text-muted-foreground'
             }`}
           >
             {validation.isValid
-              ? '✨ Valid Thai syllable structure!'
-              : 'Select at least an initial consonant and a vowel'}
+              ? 'Spelling pattern assembled. Check a dictionary for meaning and pronunciation.'
+              : initialConsonant && selectedVowel
+                ? 'This combination needs a spelling rule this builder does not support yet. Try another vowel or remove the final or tone mark.'
+                : 'Select an initial consonant and a vowel'}
           </motion.p>
         </div>
       </motion.div>
@@ -302,7 +289,7 @@ export function WordBuilder() {
           items={consonantItems}
           selected={initialConsonant}
           onSelect={setInitialConsonant}
-          accentColor="#059669"
+          accentColor="var(--primary)"
         />
 
         <SlotPicker
@@ -310,7 +297,7 @@ export function WordBuilder() {
           items={vowelItems}
           selected={selectedVowel}
           onSelect={setSelectedVowel}
-          accentColor="#3b82f6"
+          accentColor="var(--chart-1)"
         />
 
         <SlotPicker
@@ -318,7 +305,7 @@ export function WordBuilder() {
           items={toneItems}
           selected={selectedTone}
           onSelect={setSelectedTone}
-          accentColor="#f59e0b"
+          accentColor="var(--chart-4)"
           optional
         />
 
@@ -327,7 +314,7 @@ export function WordBuilder() {
           items={finalConsonantItems}
           selected={finalConsonant}
           onSelect={setFinalConsonant}
-          accentColor="#8b5cf6"
+          accentColor="var(--chart-3)"
           optional
         />
       </div>

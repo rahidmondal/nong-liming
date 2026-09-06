@@ -1,4 +1,6 @@
 import eslintConfigPrettier from 'eslint-config-prettier';
+import js from '@eslint/js';
+import globals from 'globals';
 import { dirname } from 'path';
 import tseslint from 'typescript-eslint';
 import { fileURLToPath } from 'url';
@@ -46,6 +48,18 @@ const eslintConfig = [
     },
   },
 
+  {
+    ...tseslint.configs.disableTypeChecked,
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      ...tseslint.configs.disableTypeChecked.languageOptions,
+      globals: globals.node,
+    },
+    rules: {
+      ...tseslint.configs.disableTypeChecked.rules,
+      ...js.configs.recommended.rules,
+    },
+  },
   eslintConfigPrettier,
 ];
 

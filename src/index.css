@@ -68,6 +68,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-feature: var(--feature);
+  --color-feature-foreground: var(--feature-foreground);
+  --color-feature-muted: var(--feature-muted);
+  --color-feature-action: var(--feature-action);
+  --color-feature-action-foreground: var(--feature-action-foreground);
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -75,7 +80,7 @@
 }
 
 :root {
-  /* Light Mode - Thaitone: Nuan (Warm White), Daeng Chaad (Crimson), Thong (Gold) */
+  /* BTS-inspired purple, lilac, and warm ivory. */
   --background: #fdfbf7;
   --foreground: #2c2825;
 
@@ -85,57 +90,119 @@
   --popover: #ffffff;
   --popover-foreground: #2c2825;
 
-  --primary: #10b981; /* Emerald 500 */
+  --primary: #8a2be2; /* BTS-inspired purple */
   --primary-foreground: #ffffff;
 
-  --secondary: #d1fae5; /* Emerald 100 */
+  --secondary: #f0e6ff; /* Pale lilac */
   --secondary-foreground: #2c2825;
 
-  --muted: #f2ece4;
-  --muted-foreground: #78716c;
+  --muted: #f1ecf6;
+  --muted-foreground: #706679;
 
-  --accent: #1b3a55; /* Kram (Indigo) */
+  --accent: #9b51e0;
   --accent-foreground: #ffffff;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
-  --border: #e8e0d5;
-  --input: #e8e0d5;
-  --ring: #10b981;
+  --border: #e7dfee;
+  --input: #e7dfee;
+  --ring: #8a2be2;
+  --chart-1: #7c3aed;
+  --chart-2: #a855f7;
+  --chart-3: #a63d9b;
+  --chart-4: #6d5bb5;
+  --feature: #8a2be2;
+  --feature-foreground: #fffaf0;
+  --feature-muted: #eee0ff;
+  --feature-action: #f0e6ff;
+  --feature-action-foreground: #8a2be2;
 
   --radius: 1rem; /* More organic and rounded */
 }
 
 .dark {
-  /* Dark Mode - Thaitone */
-  --background: #1c1917; /* Din (Dark Stone) */
+  /* Neutral violet surfaces keep the purple accents clear. */
+  --background: #19171c;
   --foreground: #fdfbf7;
 
-  --card: #292524;
+  --card: #25212c;
   --card-foreground: #fdfbf7;
 
-  --popover: #292524;
+  --popover: #25212c;
   --popover-foreground: #fdfbf7;
 
-  --primary: #34d399; /* Emerald 400 */
-  --primary-foreground: #022c22;
+  --primary: #cca6ff; /* Clear lavender with a warmer violet hue */
+  --primary-foreground: #261238;
 
-  --secondary: #064e3b; /* Emerald 900 */
-  --secondary-foreground: #1c1917;
+  --secondary: #493163; /* Rich plum */
+  --secondary-foreground: #f5effd;
 
-  --muted: #44403c;
-  --muted-foreground: #a8a29e;
+  --muted: #39323f;
+  --muted-foreground: #b1a7bc;
 
-  --accent: #60a5fa; /* Lighter Kram */
-  --accent-foreground: #1c1917;
+  --accent: #dbb8ff;
+  --accent-foreground: #261238;
 
   --destructive: #f87171;
   --destructive-foreground: #1c1917;
 
-  --border: #44403c;
-  --input: #44403c;
-  --ring: #34d399;
+  --border: #413747;
+  --input: #413747;
+  --ring: #cca6ff;
+  --chart-1: #c5a6f5;
+  --chart-2: #dfb0f4;
+  --chart-3: #eca9da;
+  --chart-4: #b4a1ef;
+  --feature: #b995f0;
+  --feature-foreground: #30243d;
+  --feature-muted: #432955;
+  --feature-action: #f0e3ff;
+  --feature-action-foreground: #4b246a;
+}
+
+/* The guided tour shares the app palette, including in dark mode. */
+.nong-liming-tutorial.driver-popover {
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+.nong-liming-tutorial.driver-popover * {
+  font-family: inherit;
+}
+.nong-liming-tutorial .driver-popover-progress-text,
+.nong-liming-tutorial .driver-popover-close-btn {
+  color: var(--muted-foreground);
+}
+.nong-liming-tutorial .driver-popover-footer button {
+  background: var(--secondary);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  padding: 0.55rem 0.8rem;
+  text-shadow: none;
+}
+.nong-liming-tutorial .driver-popover-footer .driver-popover-next-btn {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.nong-liming-tutorial button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.nong-liming-tutorial .driver-popover-arrow-side-left {
+  border-left-color: var(--popover);
+}
+.nong-liming-tutorial .driver-popover-arrow-side-right {
+  border-right-color: var(--popover);
+}
+.nong-liming-tutorial .driver-popover-arrow-side-top {
+  border-top-color: var(--popover);
+}
+.nong-liming-tutorial .driver-popover-arrow-side-bottom {
+  border-bottom-color: var(--popover);
 }
 
 @layer base {
@@ -145,17 +212,11 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Sarabun', 'Noto Sans Thai', 'Segoe UI', sans-serif;
-    background-image:
-      radial-gradient(circle at top right, rgba(16, 185, 129, 0.15), transparent 50%),
-      radial-gradient(circle at bottom left, rgba(209, 250, 229, 0.2), transparent 50%);
+    background-image: linear-gradient(150deg, #fdfbf7 55%, #f5efff 100%);
     background-attachment: fixed;
-    background-blend-mode: multiply;
   }
 
   .dark body {
-    background-image:
-      radial-gradient(circle at top right, rgba(52, 211, 153, 0.15), transparent 50%),
-      radial-gradient(circle at bottom left, rgba(6, 78, 59, 0.2), transparent 50%);
-    background-blend-mode: screen;
+    background-image: linear-gradient(150deg, #19171c 55%, #211a2b 100%);
   }
 }

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Flower } from 'lucide-react';
+import { ThaiLotusIcon as Flower } from '@/components/ThaiIcons';
 import { useWaiKru } from './useWaiKru';
 
 export function PhanKhru() {
@@ -35,8 +35,8 @@ export function PhanKhru() {
         />
       ),
       count: inventory.yaPraek,
-      bg: 'bg-green-500/10 dark:bg-green-400/20',
-      border: 'border-green-500/20 dark:border-green-400/30',
+      bg: 'bg-purple-500/10 dark:bg-purple-400/20',
+      border: 'border-purple-500/20 dark:border-purple-400/30',
     },
     {
       id: 'khaoTok',
@@ -50,8 +50,8 @@ export function PhanKhru() {
         />
       ),
       count: inventory.khaoTok,
-      bg: 'bg-yellow-500/10 dark:bg-yellow-400/20',
-      border: 'border-yellow-500/20 dark:border-yellow-400/30',
+      bg: 'bg-purple-500/10 dark:bg-purple-400/20',
+      border: 'border-purple-500/20 dark:border-purple-400/30',
     },
     {
       id: 'dokMaKhue',

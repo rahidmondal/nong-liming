@@ -1,0 +1,10 @@
+{
+  "startupFiles": [
+    "assets/index-B3BnciIK.js"
+  ],
+  "startupBytes": 618266,
+  "startupGzipBytes": 195126,
+  "previousStartupBytes": 1347443,
+  "reductionPercent": 54,
+  "note": "Build artifact sizes, not measured device loading times. Study chunks precache after window load; optional 3D caches after use."
+}

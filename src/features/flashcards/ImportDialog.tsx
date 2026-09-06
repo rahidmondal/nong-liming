@@ -1,5 +1,5 @@
 import { useToast } from '@/components/toast-provider';
-import { parseApkgFile, type ParsedApkg } from '@/lib/apkg-parser';
+import type { ParsedApkg } from '@/lib/apkg-parser';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FileUp, Loader2, X } from 'lucide-react';
 import { useRef, useState } from 'react';
@@ -42,6 +42,7 @@ export function ImportDialog({ open, onClose }: ImportDialogProps) {
 
     setStep('parsing');
     try {
+      const { parseApkgFile } = await import('@/lib/apkg-parser');
       const result = await parseApkgFile(file);
       if (result.decks.length === 0) {
         setErrorMessage('No cards found in this .apkg file.');

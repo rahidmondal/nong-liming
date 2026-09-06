@@ -6,7 +6,7 @@ export function usePWAUpdate() {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
   } = useRegisterSW({
-    immediate: true,
+    immediate: false,
   });
 
   const update = useCallback(() => {

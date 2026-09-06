@@ -1,149 +1,58 @@
-import { DailyChallengesPanel } from '@/features/dailyChallenges/DailyChallengesPanel';
-import { Mascot } from '@/features/landing/components/Mascot';
-import { getOverallStats, type OverallStats } from '@/features/stats/lib/stats';
-import { useTutorial } from '@/lib/useTutorial';
-import { motion } from 'framer-motion';
-import { Flame, Layers, Play, Settings, Zap } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { ThaiFlameIcon as Sparkles } from '@/components/ThaiIcons';
+import { Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { CourseHub } from '@/features/guidedStudy/CourseHub';
+import { DailyChallengesPanel } from '@/features/dailyChallenges/DailyChallengesPanel';
 import { PhanKhru } from '@/features/waikru/PhanKhru';
 
-function getStreakMessage(streak: number): string {
-  if (streak === 0) return "Start today's session!";
-  if (streak === 1) return 'Great start! 🌱';
-  if (streak <= 3) return 'Keep it up! 💪';
-  if (streak <= 7) return 'On a roll! 🔥';
-  if (streak <= 14) return 'Unstoppable! ⚡';
-  if (streak <= 30) return "You're on fire! 🔥🔥";
-  return 'Legendary! 🏆';
-}
-
 export function LandingPage() {
-  useTutorial();
-  const [stats, setStats] = useState<OverallStats | null>(null);
-
-  const loadStats = useCallback(async () => {
-    const data = await getOverallStats();
-    setStats(data);
-  }, []);
-
-  useEffect(() => {
-    void loadStats();
-  }, [loadStats]);
-
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 },
-  };
-
   return (
-    <div className="min-h-full w-full flex justify-center p-6 relative">
-      <div className="w-full max-w-md flex flex-col items-center">
-        <header className="w-full flex justify-between items-center py-4">
-          <div className="text-2xl font-bold text-primary font-sarabun drop-shadow-sm">น้องลีมิง</div>
-          <Link
-            to="/settings"
-            className="p-2 rounded-xl hover:bg-muted transition-colors shadow-sm bg-card"
-            aria-label="Settings"
-            id="settings-link"
-          >
-            <Settings className="w-5 h-5 text-muted-foreground" />
-          </Link>
-        </header>
-
-      <main className="flex-1 w-full flex flex-col items-center gap-8 mt-4 pb-8">
-        {/* Mascot Integration */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="w-full flex justify-center mt-2"
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-10">
+      <header className="flex justify-between items-center py-6">
+        <Link
+          to="/"
+          aria-label="น้องลีมิง — Nong LiMing home"
+          className="flex items-center gap-3 rounded-xl focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4"
         >
-          <Mascot />
-        </motion.div>
-
-        {/* Primary CTA: Daily Session */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="w-full mt-2"
+          <img src={`${import.meta.env.BASE_URL}logo-purple.svg`} alt="" className="h-12 w-12 shrink-0" />
+          <span className="flex flex-col gap-0.5">
+            <span className="font-bold text-xl leading-tight">น้องลีมิง</span>
+            <span className="text-[9px] font-semibold tracking-[0.2em] text-muted-foreground">NONG LIMING</span>
+          </span>
+        </Link>
+        <Link
+          to="/settings"
+          aria-label="Settings"
+          id="settings-link"
+          className="p-3 rounded-2xl bg-card border border-border hover:bg-muted"
         >
-          <Link
-            to="/decks"
-            id="nav-daily-session"
-            className="group relative flex flex-col items-center p-6 bg-gradient-to-br from-primary to-primary/80 rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer overflow-hidden border-2 border-primary/20"
-          >
-            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <div className="p-3 bg-white/20 backdrop-blur-sm rounded-full shadow-inner">
-                <Play className="w-8 h-8 text-white fill-white" />
-              </div>
-              <h2 className="font-bold text-3xl text-white font-sarabun tracking-tight">Start Daily Session</h2>
-            </div>
-            <p className="text-primary-foreground/90 font-medium">Continue The Unalome Path</p>
-          </Link>
-        </motion.div>
-
-        {/* Global Insights */}
-        {stats && (stats.totalCards > 0 || stats.totalReviews > 0) && (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="w-full"
-          >
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-card border border-border/50 rounded-2xl p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-center gap-1 mb-2">
-                  <Flame className={`w-5 h-5 ${stats.currentStreak > 0 ? 'text-orange-500' : 'text-muted-foreground'}`} />
-                </div>
-                <p className={`text-2xl font-bold ${stats.currentStreak > 0 ? 'text-orange-500' : 'text-foreground'}`}>
-                  {stats.currentStreak}
-                </p>
-                <p className="text-xs font-medium text-muted-foreground mt-1">day streak</p>
-              </div>
-              <div className="bg-card border border-border/50 rounded-2xl p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-center gap-1 mb-2">
-                  <Zap className="w-5 h-5 text-yellow-500" />
-                </div>
-                <p className="text-2xl font-bold text-foreground">{stats.reviewsToday}</p>
-                <p className="text-xs font-medium text-muted-foreground mt-1">today</p>
-              </div>
-              <div className="bg-card border border-border/50 rounded-2xl p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-center gap-1 mb-2">
-                  <Layers className="w-5 h-5 text-primary" />
-                </div>
-                <p className="text-2xl font-bold text-foreground">{stats.totalCards}</p>
-                <p className="text-xs font-medium text-muted-foreground mt-1">cards</p>
-              </div>
-            </div>
-            <p className="text-sm font-medium text-center text-muted-foreground mt-3 bg-muted/50 py-2 rounded-full w-4/5 mx-auto">
-              {getStreakMessage(stats.currentStreak)}
-            </p>
-          </motion.div>
-        )}
-
-        {/* PhanKhru & Daily Challenges */}
-        <motion.div variants={container} initial="hidden" animate="show" className="w-full space-y-6">
-          <motion.div variants={item} className="w-full">
-            <PhanKhru />
-          </motion.div>
-          
-          <motion.div variants={item} className="w-full">
+          <Settings className="w-5 h-5" />
+        </Link>
+      </header>
+      <main>
+        <div className="py-4 mb-4">
+          <p className="text-sm text-muted-foreground flex gap-2 items-center">
+            <Sparkles className="w-4 h-4 text-primary" />
+            Sawasdee krub! Let’s learn something useful.
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight mt-3">
+            A little Thai.
+            <br />
+            <span className="text-primary">A real step forward.</span>
+          </h1>
+          <p className="text-muted-foreground mt-3 leading-relaxed">
+            Learn the letters. Read your first words. Find your voice in everyday Thai.
+          </p>
+        </div>
+        <CourseHub />
+        <details className="mt-6 rounded-3xl border border-border bg-card p-5">
+          <summary className="font-semibold cursor-pointer">Extra practice & your offerings</summary>
+          <div className="mt-5 space-y-5">
             <DailyChallengesPanel />
-          </motion.div>
-        </motion.div>
+            <PhanKhru />
+          </div>
+        </details>
       </main>
-      </div>
     </div>
   );
 }

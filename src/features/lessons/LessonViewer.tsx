@@ -1,10 +1,11 @@
 import { lessons, type LessonNode } from '@/data/lessons';
 import { useTTS } from '@/hooks/useTTS';
 import { db } from '@/lib/db';
+import type { LessonProgress } from '@/types/lesson';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, Play, RotateCcw, Volume2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 interface ChatBubble {
@@ -25,23 +26,68 @@ export function LessonViewer() {
   const [currentNodeId, setCurrentNodeId] = useState<string>('start');
   const [isTyping, setIsTyping] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [completion, setCompletion] = useState<LessonProgress | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   const bottomRef = useRef<HTMLDivElement>(null);
+  const session = useRef(0);
+  const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const interactionBusy = useRef(true);
+  const saving = useRef(false);
+  const bubbleSequence = useRef(0);
+  const selectedOptions = useRef<LessonProgress['selectedOptions']>([]);
   const userStats = useLiveQuery(() => db.userStats.get(1));
   const { speak } = useTTS('th-TH', userStats?.playbackSpeed ?? 0.8);
+  const speakRef = useRef(speak);
 
-  const initLesson = () => {
+  useEffect(() => {
+    speakRef.current = speak;
+  }, [speak]);
+
+  const triggerSystemLines = useCallback((node: LessonNode, activeSession: number) => {
+    interactionBusy.current = true;
+    setIsTyping(true);
+    typingTimer.current = setTimeout(() => {
+      if (session.current !== activeSession) return;
+      typingTimer.current = null;
+      const newBubbles: ChatBubble[] = node.lines.map(line => ({
+        id: `${line.id}-${String(++bubbleSequence.current)}`,
+        sender: 'system',
+        thai: line.thai,
+        english: line.english,
+        transliteration: line.transliteration,
+      }));
+      setHistory(prev => [...prev, ...newBubbles]);
+      setIsTyping(false);
+      interactionBusy.current = false;
+      if (newBubbles.length > 0) speakRef.current(newBubbles[0].thai);
+    }, 800);
+  }, []);
+
+  const initLesson = useCallback(() => {
     if (!lesson) return;
+    const activeSession = ++session.current;
+    if (typingTimer.current !== null) clearTimeout(typingTimer.current);
+    selectedOptions.current = [];
+    saving.current = false;
     const startNode = lesson.nodes[lesson.startNodeId];
     setHistory([]);
     setCurrentNodeId(lesson.startNodeId);
     setIsCompleted(false);
-    void triggerSystemLines(startNode);
-  };
+    setCompletion(null);
+    setIsSaving(false);
+    setSaveError('');
+    triggerSystemLines(startNode, activeSession);
+  }, [lesson, triggerSystemLines]);
 
   useEffect(() => {
     initLesson();
-  }, [lesson]);
+    return () => {
+      session.current++;
+      if (typingTimer.current !== null) clearTimeout(typingTimer.current);
+    };
+  }, [initLesson]);
 
   // Auto-scroll to bottom of chat
   useEffect(() => {
@@ -50,39 +96,48 @@ export function LessonViewer() {
 
   if (!lesson) return <div className="p-6 text-center">Lesson not found.</div>;
 
-  const triggerSystemLines = async (node: LessonNode) => {
-    setIsTyping(true);
-
-    // Simulate thinking delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    const newBubbles: ChatBubble[] = node.lines.map(line => ({
-      id: `${line.id}-${Date.now().toString()}`,
-      sender: 'system',
-      thai: line.thai,
-      english: line.english,
-      transliteration: line.transliteration,
-    }));
-
-    setHistory(prev => [...prev, ...newBubbles]);
-    setIsTyping(false);
-
-    // Speak first system line automatically
-    if (newBubbles.length > 0) {
-      speak(newBubbles[0].thai);
+  const saveCompletion = async (record: LessonProgress) => {
+    if (saving.current) return;
+    const activeSession = session.current;
+    saving.current = true;
+    setIsSaving(true);
+    setSaveError('');
+    try {
+      await db.lessonProgress.put(record);
+      if (session.current === activeSession) setIsCompleted(true);
+    } catch {
+      if (session.current === activeSession) {
+        setSaveError('Your dialogue could not be saved. Retry to keep your completed progress.');
+      }
+    } finally {
+      if (session.current === activeSession) {
+        saving.current = false;
+        setIsSaving(false);
+      }
     }
   };
 
-  const handleChoice = async (choiceId: string) => {
+  const handleChoice = (choiceId: string) => {
+    if (interactionBusy.current) return;
     const node = lesson.nodes[currentNodeId];
     const choice = node.choices.find(c => c.id === choiceId);
     if (!choice) return;
+    interactionBusy.current = true;
+    selectedOptions.current = [
+      ...selectedOptions.current,
+      {
+        exchangeIndex: selectedOptions.current.length,
+        selectedOptionId: choice.id,
+        quality: choice.isCorrect === false ? 'poor' : 'good',
+      },
+    ];
 
     // 1. Add user choice to chat
+    const bubbleId = `${choice.id}-${String(++bubbleSequence.current)}`;
     setHistory(prev => [
       ...prev,
       {
-        id: `${choice.id}-${Date.now().toString()}`,
+        id: bubbleId,
         sender: 'user',
         thai: choice.thai,
         english: choice.english,
@@ -94,23 +149,19 @@ export function LessonViewer() {
 
     // 2. Process Next Step
     if (choice.nextLineId === 'COMPLETE') {
-      // Mark as finished
-      setIsCompleted(true);
-      try {
-        await db.lessonProgress.put({
-          lessonId: lesson.id,
-          completed: true,
-          completedAt: Date.now(),
-          exchangesCompleted: 0,
-          selectedOptions: [],
-        });
-      } catch (err) {
-        console.error('Failed to save lesson progress', err);
-      }
+      const record: LessonProgress = {
+        lessonId: lesson.id,
+        completed: true,
+        completedAt: Date.now(),
+        exchangesCompleted: selectedOptions.current.length,
+        selectedOptions: [...selectedOptions.current],
+      };
+      setCompletion(record);
+      void saveCompletion(record);
     } else {
       const nextNode = lesson.nodes[choice.nextLineId];
       setCurrentNodeId(nextNode.id);
-      await triggerSystemLines(nextNode);
+      triggerSystemLines(nextNode, session.current);
     }
   };
 
@@ -129,6 +180,7 @@ export function LessonViewer() {
         </div>
         <button
           onClick={initLesson}
+          disabled={isSaving}
           className="p-2 -mr-2 rounded-lg hover:bg-muted text-muted-foreground transition-colors"
           title="Restart lesson"
         >
@@ -220,7 +272,7 @@ export function LessonViewer() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             className="w-full py-8 flex flex-col items-center"
           >
-            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center text-emerald-500 mb-4">
+            <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center text-purple-500 mb-4">
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">Lesson Complete!</h2>
@@ -240,7 +292,30 @@ export function LessonViewer() {
       </main>
 
       {/* Choice Area (Input) */}
-      {!isTyping && !isCompleted && (
+      {completion && !isCompleted && (
+        <div className="p-4 bg-card border-t border-border">
+          {isSaving && (
+            <p role="status" className="text-sm text-muted-foreground">
+              Saving your dialogue…
+            </p>
+          )}
+          {saveError && (
+            <>
+              <p role="alert" className="text-sm text-destructive">
+                {saveError}
+              </p>
+              <button
+                onClick={() => void saveCompletion(completion)}
+                disabled={isSaving}
+                className="mt-3 rounded-xl bg-primary px-4 py-3 text-primary-foreground font-semibold"
+              >
+                Retry saving
+              </button>
+            </>
+          )}
+        </div>
+      )}
+      {!isTyping && !isCompleted && !completion && (
         <div className="p-4 bg-card/80 backdrop-blur-md border-t border-border shrink-0">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">
             Choose your reply
@@ -249,7 +324,9 @@ export function LessonViewer() {
             {currentNode.choices.map(choice => (
               <button
                 key={choice.id}
-                onClick={() => handleChoice(choice.id)}
+                onClick={() => {
+                  handleChoice(choice.id);
+                }}
                 className="w-full flex items-center justify-between p-3.5 bg-secondary text-secondary-foreground rounded-xl hover:bg-secondary/70 transition-colors text-left"
               >
                 <div className="flex-1 pr-4">

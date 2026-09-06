@@ -18,6 +18,7 @@ export default defineConfig({
       injectRegister: null,
       includeAssets: [
         'favicon.svg',
+        'logo-purple.svg',
         'pwa-icon.svg',
         'maskable-icon.svg',
         'images/Screenshot-vertical.png',
@@ -39,8 +40,8 @@ export default defineConfig({
         display: 'standalone',
         display_override: ['standalone', 'minimal-ui'],
         orientation: 'portrait-primary',
-        background_color: '#0b0f1a',
-        theme_color: '#0b0f1a',
+        background_color: '#19171c',
+        theme_color: '#8a2be2',
         lang: 'en',
         dir: 'ltr',
         categories: ['education', 'productivity'],
@@ -108,6 +109,8 @@ export default defineConfig({
         related_applications: [],
       },
       workbox: {
+        // Core screens stay precached. Optional 3D is cached only after it is opened.
+        globIgnores: ['**/templeScene-*.js'],
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.mode === 'navigate',
@@ -160,6 +163,7 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
+  build: { manifest: true },
   define: {
     'import.meta.env.PACKAGE_VERSION': JSON.stringify(packageJson.version),
   },

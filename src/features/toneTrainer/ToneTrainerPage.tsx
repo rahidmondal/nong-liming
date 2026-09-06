@@ -1,26 +1,50 @@
-import { ArrowLeft, CheckCircle2, Music, RotateCcw } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { ThaiBellIcon as Music } from '@/components/ThaiIcons';
+import { ArrowLeft, CheckCircle2, RotateCcw } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TONE_QUESTIONS } from './toneData';
 import { ToneQuiz } from './ToneQuiz';
+import { recordPractice } from '@/lib/practice-activity';
+import type { PracticeActivity } from '@/types/practice';
 
 export function ToneTrainerPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [completed, setCompleted] = useState(false);
+  const [runId, setRunId] = useState(() => crypto.randomUUID());
+  const pendingAnswer = useRef<PracticeActivity | null>(null);
+  const saving = useRef(false);
+  const [saveError, setSaveError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   // Shuffle questions once on mount
   const questions = useMemo(() => {
     return [...TONE_QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
   }, []);
 
-  const handleNext = (correct: boolean) => {
-    if (correct) setScore(s => s + 1);
-
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(i => i + 1);
-    } else {
-      setCompleted(true);
+  const handleNext = async (correct: boolean) => {
+    if (saving.current) return;
+    saving.current = true;
+    setIsSaving(true);
+    setSaveError('');
+    pendingAnswer.current ??= {
+      id: `tone:${runId}:${String(currentIndex)}`,
+      kind: 'tone',
+      label: questions[currentIndex].syllable,
+      occurredAt: Date.now(),
+      outcome: correct ? 'correct' : 'incorrect',
+    };
+    try {
+      await recordPractice(pendingAnswer.current);
+      if (pendingAnswer.current.outcome === 'correct') setScore(s => s + 1);
+      pendingAnswer.current = null;
+      if (currentIndex < questions.length - 1) setCurrentIndex(i => i + 1);
+      else setCompleted(true);
+    } catch {
+      setSaveError('Your tone answer could not be saved. Retry to continue.');
+    } finally {
+      saving.current = false;
+      setIsSaving(false);
     }
   };
 
@@ -28,6 +52,8 @@ export function ToneTrainerPage() {
     setCurrentIndex(0);
     setScore(0);
     setCompleted(false);
+    setRunId(crypto.randomUUID());
+    pendingAnswer.current = null;
   };
 
   return (
@@ -53,7 +79,26 @@ export function ToneTrainerPage() {
       <main className="flex-1 flex flex-col justify-center gap-6 mt-4">
         {!completed ? (
           <div className="w-full max-w-md mx-auto">
-            <ToneQuiz question={questions[currentIndex]} onNext={handleNext} />
+            <ToneQuiz question={questions[currentIndex]} onNext={correct => void handleNext(correct)} />
+            {isSaving && (
+              <p role="status" className="text-sm text-muted-foreground mt-4">
+                Saving your answer…
+              </p>
+            )}
+            {saveError && (
+              <div className="mt-4 space-y-3">
+                <p role="alert" className="text-sm text-destructive">
+                  {saveError}
+                </p>
+                <button
+                  disabled={isSaving}
+                  onClick={() => void handleNext(pendingAnswer.current?.outcome === 'correct')}
+                  className="rounded-xl bg-primary text-primary-foreground p-3"
+                >
+                  Retry saving answer
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-center space-y-6 py-8">
@@ -65,6 +110,9 @@ export function ToneTrainerPage() {
               <p className="text-muted-foreground">
                 You identified {score} out of {questions.length} tones correctly.
               </p>
+              <Link to="/stats" className="inline-block text-primary font-semibold">
+                Saved to your progress →
+              </Link>
             </div>
             <div className="flex justify-center gap-3 w-full max-w-60 mx-auto pt-4">
               <button

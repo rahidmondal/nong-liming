@@ -13,6 +13,8 @@ import type { DailyChallenge } from '@/types/dailyChallenge';
 import type { WritingPadStat } from '@/types/writingPad';
 import type { LessonProgress } from '@/types/lesson';
 import type { UnalomeProgress } from '@/types/unalome';
+import type { MissionProgress } from '@/features/guidedStudy/missionTypes';
+import type { PracticeActivity } from '@/types/practice';
 import { DEFAULT_DECK_CONFIG, DEFAULT_EASE_FACTOR } from '@/types/flashcard';
 import Dexie, { type EntityTable } from 'dexie';
 
@@ -35,6 +37,8 @@ const db = new Dexie('NongLimingDB') as Dexie & {
   writingPadStats: EntityTable<WritingPadStat, 'id'>;
   lessonProgress: EntityTable<LessonProgress, 'lessonId'>;
   unalomeProgress: EntityTable<UnalomeProgress, 'nodeId'>;
+  missionProgress: EntityTable<MissionProgress, 'id'>;
+  practiceActivities: EntityTable<PracticeActivity, 'id'>;
 };
 
 db.version(1).stores({
@@ -197,6 +201,14 @@ db.version(7).stores({
       dokMaKhueCount: s.dokMaKhueCount ?? 0,
     } as unknown as Partial<UserStats>);
   }
+});
+
+db.version(8).stores({
+  missionProgress: 'id, missionId, updatedAt',
+});
+
+db.version(9).stores({
+  practiceActivities: 'id, kind, occurredAt, [kind+outcome]',
 });
 
 export { db };

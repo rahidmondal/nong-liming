@@ -1,10 +1,12 @@
 import { ModeToggle } from '@/components/mode-toggle';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, Blocks, PenLine } from 'lucide-react';
-import { useState } from 'react';
+import { ThaiScriptIcon as Blocks, ThaiScriptIcon as PenLine } from '@/components/ThaiIcons';
+import { ArrowLeft } from 'lucide-react';
+import { lazy, useState } from 'react';
+import { PageBoundary } from '@/components/PageBoundary';
 import { Link } from 'react-router-dom';
 import { WordBuilder } from './word-builder/WordBuilder';
-import { WritingPad } from './writing-pad/WritingPad';
+const WritingPad = lazy(() => import('./writing-pad/WritingPad').then(module => ({ default: module.WritingPad })));
 
 type Tab = 'word-builder' | 'writing-pad';
 
@@ -70,7 +72,11 @@ export function BuilderPage() {
           className="flex-1"
         >
           {activeTab === 'word-builder' && <WordBuilder />}
-          {activeTab === 'writing-pad' && <WritingPad />}
+          {activeTab === 'writing-pad' && (
+            <PageBoundary>
+              <WritingPad />
+            </PageBoundary>
+          )}
         </motion.div>
       </AnimatePresence>
     </div>

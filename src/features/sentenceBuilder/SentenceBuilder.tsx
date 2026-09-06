@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { Loader2, Play, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTTS } from '@/hooks/useTTS';
+import { PracticeSaveButton } from '@/components/PracticeSaveButton';
 
 const DEFAULT_WORDS = [
   { word: 'ฉัน', meaning: 'I (female)' },
@@ -114,6 +115,12 @@ export function SentenceBuilder() {
         </div>
       </div>
 
+      <PracticeSaveButton
+        kind="sentence"
+        contentKey={sentence.join(' ')}
+        label={sentence.join(' ')}
+        disabled={sentence.length < 2 || sentence.join(' ').length > 800}
+      />
       {/* Word Pool */}
       <div className="bg-muted/30 rounded-2xl p-6 border border-border">
         <h3 className="text-sm font-semibold text-foreground mb-4">Word Pool</h3>

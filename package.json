@@ -10,6 +10,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "preview": "vite preview",
+    "check:performance": "node scripts/check-performance.mjs",
     "test": "vitest --run",
     "test:watch": "vitest",
     "test:watch-ui": "vitest --ui",
@@ -31,6 +32,7 @@
     "sql.js": "^1.14.1",
     "tailwind-merge": "^3.5.0",
     "tesseract.js": "^7.0.0",
+    "three": "^0.185.1",
     "workbox-window": "^7.4.0"
   },
   "devDependencies": {
@@ -43,6 +45,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/sql.js": "^1.4.11",
+    "@types/three": "^0.185.4",
     "@vitejs/plugin-react": "^5.2.0",
     "@vitest/coverage-v8": "4.0.18",
     "@vitest/ui": "4.0.18",

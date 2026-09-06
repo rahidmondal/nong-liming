@@ -2,9 +2,9 @@ import { ThaiCard } from '@/features/reference/components/ThaiCard';
 import type { ThaiVowel, VowelType } from '@/types/alphabet';
 
 const TYPE_CONFIG: Record<VowelType, { label: string; color: string }> = {
-  mono: { label: 'Monophthong', color: 'rgba(168,85,247,0.2)' },
-  dip: { label: 'Diphthong', color: 'rgba(245,158,11,0.2)' },
-  special: { label: 'Special', color: 'rgba(236,72,153,0.2)' },
+  mono: { label: 'Monophthong', color: 'var(--chart-1)' },
+  dip: { label: 'Diphthong', color: 'var(--chart-2)' },
+  special: { label: 'Special', color: 'var(--chart-3)' },
 };
 
 interface VowelChartProps {
@@ -23,10 +23,7 @@ export function VowelChart({ vowels }: VowelChartProps) {
       {(['mono', 'dip', 'special'] as const).map(type => (
         <section key={type}>
           <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-            <span
-              className="inline-block w-3 h-3 rounded-full"
-              style={{ backgroundColor: TYPE_CONFIG[type].color.replace('0.2', '0.8') }}
-            />
+            <span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: TYPE_CONFIG[type].color }} />
             {TYPE_CONFIG[type].label}
             <span className="text-sm font-normal text-muted-foreground">({groups[type].length})</span>
           </h3>

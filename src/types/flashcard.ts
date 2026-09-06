@@ -111,6 +111,7 @@ export interface MediaFile {
 }
 
 export interface UserStats {
+  courseDuration?: 30 | 45 | 60;
   id: number; // Expected to always be 1
   dailyGoal: number;
   freezeTokens: number;

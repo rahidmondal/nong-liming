@@ -1,4 +1,3 @@
- 
 import { db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { AlertCircle, ArrowRight } from 'lucide-react';
@@ -16,20 +15,20 @@ export function WeaknessDiagnostic() {
       .sort((a, b) => b.score - a.score)
       .slice(0, 5) // top 5 weakest
       .map(entry => entry.card);
-      
+
     if (topCards.length === 0) return [];
-    
+
     // Fetch associated notes to get front/back text
     const noteIds = topCards.map(c => c.noteId);
     const notes = await db.notes.where('id').anyOf(noteIds).toArray();
     const noteMap = new Map(notes.map(n => [n.id, n]));
-    
+
     return topCards.map(c => {
       const note = noteMap.get(c.noteId);
       return {
         ...c,
         front: note?.fields.Front ?? 'Unknown',
-        back: note?.fields.Back ?? 'Unknown'
+        back: note?.fields.Back ?? 'Unknown',
       };
     });
   }, []);
@@ -46,7 +45,7 @@ export function WeaknessDiagnostic() {
   return (
     <div className="bg-card border border-border shadow-sm rounded-xl p-5 mb-6">
       <h3 className="text-sm font-semibold flex items-center gap-2 text-foreground mb-4">
-        <AlertCircle className="w-4 h-4 text-orange-500" />
+        <AlertCircle className="w-4 h-4 text-purple-500" />
         Identified Weaknesses
       </h3>
       <div className="space-y-2">
@@ -57,20 +56,20 @@ export function WeaknessDiagnostic() {
           return (
             <div
               key={card.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-orange-500/5 border border-orange-500/10"
+              className="flex items-center justify-between p-3 rounded-lg bg-purple-500/5 border border-purple-500/10"
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl font-bold text-foreground font-sarabun w-8 text-center">{card.front}</span>
                 <div>
                   <p className="text-xs font-semibold text-muted-foreground">{card.back}</p>
-                  <p className="text-[10px] text-orange-600/80 dark:text-orange-400/80 mt-0.5">
+                  <p className="text-[10px] text-purple-600/80 dark:text-purple-400/80 mt-0.5">
                     Lapses: {card.lapses} • Ease: {(card.easeFactor / 100).toFixed(2)}
                   </p>
                 </div>
               </div>
               <Link
                 to={`/decks/${String(card.deckId)}/study`}
-                className="p-2 bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 dark:text-orange-400 rounded-lg transition-colors"
+                className="p-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 rounded-lg transition-colors"
                 title="Study this deck"
               >
                 <ArrowRight className="w-4 h-4" />
