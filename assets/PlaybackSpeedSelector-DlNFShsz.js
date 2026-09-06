@@ -1,0 +1,5 @@
+import{Z as e,et as t}from"./index-xJypdZ04.js";var n=t(),r=[.5,.75,1,1.25,1.5,2];function i(e){return e===1?`1x`:`${String(e)}x`}function a({currentSpeed:t,onSpeedChange:a,size:o=`small`}){let s=o===`small`;return(0,n.jsx)(`div`,{className:`flex items-center gap-1`,role:`radiogroup`,"aria-label":`Playback speed`,children:r.map(r=>{let o=Math.abs(t-r)<.01;return(0,n.jsx)(e.button,{whileTap:{scale:.92},onClick:()=>{a(r)},role:`radio`,"aria-checked":o,"aria-label":`${i(r)} speed`,className:`
+              rounded-md font-medium transition-all
+              ${s?`px-1.5 py-0.5 text-[10px]`:`px-2.5 py-1.5 text-xs`}
+              ${o?`bg-primary text-primary-foreground shadow-sm`:`bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground`}
+            `,children:i(r)},r)})})}function o({currentSpeed:t,onSpeedChange:a}){return(0,n.jsx)(e.button,{whileTap:{scale:.9},onClick:()=>{a(r[(r.findIndex(e=>Math.abs(e-t)<.01)+1)%r.length])},title:`Playback speed: ${i(t)}. Click to change.`,className:`px-1.5 py-0.5 text-[10px] font-semibold rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors`,children:i(t)})}export{o as n,a as t};

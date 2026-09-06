@@ -1,0 +1,1 @@
+import{g as e}from"./index-xJypdZ04.js";import{t}from"./practice-DQw6i2c3.js";async function n(n){if(!t(n))throw Error(`Invalid practice activity`);return e.transaction(`rw`,e.practiceActivities,async()=>await e.practiceActivities.get(n.id)?!1:(await e.practiceActivities.add(n),!0))}export{n as t};

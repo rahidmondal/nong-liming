@@ -1,0 +1,510 @@
+{
+  "_PlaybackSpeedSelector-DlNFShsz.js": {
+    "file": "assets/PlaybackSpeedSelector-DlNFShsz.js",
+    "name": "PlaybackSpeedSelector",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_PracticeSaveButton-D8KHh-b-.js": {
+    "file": "assets/PracticeSaveButton-D8KHh-b-.js",
+    "name": "PracticeSaveButton",
+    "imports": [
+      "index.html",
+      "_practice-activity-DS0UB5mj.js",
+      "_practice-DQw6i2c3.js"
+    ]
+  },
+  "_ToneDiagram-L4x1hM-y.js": {
+    "file": "assets/ToneDiagram-L4x1hM-y.js",
+    "name": "ToneDiagram",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_arrow-left-CxebUDdQ.js": {
+    "file": "assets/arrow-left-CxebUDdQ.js",
+    "name": "arrow-left",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_chart-column-B_Rv1bxt.js": {
+    "file": "assets/chart-column-B_Rv1bxt.js",
+    "name": "chart-column",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_chevron-up-DFvRx3qK.js": {
+    "file": "assets/chevron-up-DFvRx3qK.js",
+    "name": "chevron-up",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_circle-alert-CrwI-CX-.js": {
+    "file": "assets/circle-alert-CrwI-CX-.js",
+    "name": "circle-alert",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_circle-question-mark-C4-oNb-e.js": {
+    "file": "assets/circle-question-mark-C4-oNb-e.js",
+    "name": "circle-question-mark",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_clock-BFphw4Jt.js": {
+    "file": "assets/clock-BFphw4Jt.js",
+    "name": "clock",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_clsx-D195Xeun.js": {
+    "file": "assets/clsx-D195Xeun.js",
+    "name": "clsx"
+  },
+  "_dictionaryData-DjqCVQND.js": {
+    "file": "assets/dictionaryData-DjqCVQND.js",
+    "name": "dictionaryData",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_download-CSbIQCsu.js": {
+    "file": "assets/download-CSbIQCsu.js",
+    "name": "download",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_jszip.min-CC3eATIr.js": {
+    "file": "assets/jszip.min-CC3eATIr.js",
+    "name": "jszip.min",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_plus-gx7AY1Yz.js": {
+    "file": "assets/plus-gx7AY1Yz.js",
+    "name": "plus",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_practice-DQw6i2c3.js": {
+    "file": "assets/practice-DQw6i2c3.js",
+    "name": "practice"
+  },
+  "_practice-activity-DS0UB5mj.js": {
+    "file": "assets/practice-activity-DS0UB5mj.js",
+    "name": "practice-activity",
+    "imports": [
+      "index.html",
+      "_practice-DQw6i2c3.js"
+    ]
+  },
+  "_practice-backup-CoIa8hkR.js": {
+    "file": "assets/practice-backup-CoIa8hkR.js",
+    "name": "practice-backup",
+    "imports": [
+      "_practice-DQw6i2c3.js"
+    ]
+  },
+  "_rotate-ccw-BobzU1Je.js": {
+    "file": "assets/rotate-ccw-BobzU1Je.js",
+    "name": "rotate-ccw",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_study-session-BQ556ls4.js": {
+    "file": "assets/study-session-BQ556ls4.js",
+    "name": "study-session",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_sun-DIn8vOhr.js": {
+    "file": "assets/sun-DIn8vOhr.js",
+    "name": "sun",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_tones-DjlQoXWY.js": {
+    "file": "assets/tones-DjlQoXWY.js",
+    "name": "tones",
+    "imports": [
+      "index.html",
+      "_clsx-D195Xeun.js",
+      "_sun-DIn8vOhr.js"
+    ]
+  },
+  "_trash-2-ymZRWzym.js": {
+    "file": "assets/trash-2-ymZRWzym.js",
+    "name": "trash-2",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_trending-up-BNJ0_Tf2.js": {
+    "file": "assets/trending-up-BNJ0_Tf2.js",
+    "name": "trending-up",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_useTTS-B2spF8wk.js": {
+    "file": "assets/useTTS-B2spF8wk.js",
+    "name": "useTTS",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_volume-2-BTCpv-K8.js": {
+    "file": "assets/volume-2-BTCpv-K8.js",
+    "name": "volume-2",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "index.html": {
+    "file": "assets/index-xJypdZ04.js",
+    "name": "index",
+    "src": "index.html",
+    "isEntry": true,
+    "dynamicImports": [
+      "node_modules/.pnpm/workbox-window@7.4.1/node_modules/workbox-window/build/workbox-window.prod.es5.mjs",
+      "src/features/guidedStudy/templeScene.ts",
+      "src/features/builder/BuilderPage.tsx",
+      "src/features/flashcards/DecksPage.tsx",
+      "src/features/flashcards/StudyPage.tsx",
+      "src/features/reference/ReferencePage.tsx",
+      "src/features/settings/SettingsPage.tsx",
+      "src/features/stats/StatsPage.tsx",
+      "src/features/dictionary/DictionaryPage.tsx",
+      "src/features/toneTrainer/ToneTrainerPage.tsx",
+      "src/features/lessons/LessonViewer.tsx",
+      "src/features/lessons/LessonsOverview.tsx",
+      "src/features/unalome/UnalomePage.tsx",
+      "src/features/reading/ReadingPage.tsx",
+      "src/features/sentenceBuilder/SentencePracticePage.tsx",
+      "src/features/settings/SpacedRepetitionGuide.tsx",
+      "src/features/tools/ToolsHub.tsx",
+      "src/features/guidedStudy/GuidedStudyPage.tsx"
+    ],
+    "css": [
+      "assets/index-BGyRpZnF.css"
+    ]
+  },
+  "node_modules/.pnpm/workbox-window@7.4.1/node_modules/workbox-window/build/workbox-window.prod.es5.mjs": {
+    "file": "assets/workbox-window.prod.es5-BVDrCvfq.js",
+    "name": "workbox-window.prod.es5",
+    "src": "node_modules/.pnpm/workbox-window@7.4.1/node_modules/workbox-window/build/workbox-window.prod.es5.mjs",
+    "isDynamicEntry": true
+  },
+  "src/assets/Thai_1000_Common_Words_incl_Audio_Phonetics_Examples.apkg": {
+    "file": "assets/Thai_1000_Common_Words_incl_Audio_Phonetics_Examples-uIpCXeRl.apkg",
+    "src": "src/assets/Thai_1000_Common_Words_incl_Audio_Phonetics_Examples.apkg"
+  },
+  "src/assets/Thai_Read_Hear_Translate.apkg": {
+    "file": "assets/Thai_Read_Hear_Translate-CyAW_0We.apkg",
+    "src": "src/assets/Thai_Read_Hear_Translate.apkg"
+  },
+  "src/features/builder/BuilderPage.tsx": {
+    "file": "assets/BuilderPage-B3xCCVwe.js",
+    "name": "BuilderPage",
+    "src": "src/features/builder/BuilderPage.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_clsx-D195Xeun.js",
+      "_arrow-left-CxebUDdQ.js",
+      "_chevron-up-DFvRx3qK.js",
+      "_sun-DIn8vOhr.js",
+      "_rotate-ccw-BobzU1Je.js",
+      "_volume-2-BTCpv-K8.js",
+      "_tones-DjlQoXWY.js",
+      "_PracticeSaveButton-D8KHh-b-.js",
+      "_useTTS-B2spF8wk.js",
+      "_practice-activity-DS0UB5mj.js",
+      "_practice-DQw6i2c3.js"
+    ],
+    "dynamicImports": [
+      "src/features/builder/writing-pad/WritingPad.tsx"
+    ]
+  },
+  "src/features/builder/writing-pad/WritingPad.tsx": {
+    "file": "assets/WritingPad-BGUA_Y9z.js",
+    "name": "WritingPad",
+    "src": "src/features/builder/writing-pad/WritingPad.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_circle-alert-CrwI-CX-.js",
+      "_volume-2-BTCpv-K8.js",
+      "_useTTS-B2spF8wk.js"
+    ]
+  },
+  "src/features/dictionary/DictionaryPage.tsx": {
+    "file": "assets/DictionaryPage-AOC7KTok.js",
+    "name": "DictionaryPage",
+    "src": "src/features/dictionary/DictionaryPage.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_arrow-left-CxebUDdQ.js",
+      "_plus-gx7AY1Yz.js",
+      "_dictionaryData-DjqCVQND.js",
+      "_ToneDiagram-L4x1hM-y.js"
+    ]
+  },
+  "src/features/flashcards/DecksPage.tsx": {
+    "file": "assets/DecksPage-BW3TpNhA.js",
+    "name": "DecksPage",
+    "src": "src/features/flashcards/DecksPage.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_arrow-left-CxebUDdQ.js",
+      "_chart-column-B_Rv1bxt.js",
+      "_clock-BFphw4Jt.js",
+      "_download-CSbIQCsu.js",
+      "_plus-gx7AY1Yz.js",
+      "_trash-2-ymZRWzym.js",
+      "_study-session-BQ556ls4.js"
+    ],
+    "dynamicImports": [
+      "src/lib/apkg-parser.ts"
+    ],
+    "assets": [
+      "assets/Thai_1000_Common_Words_incl_Audio_Phonetics_Examples-uIpCXeRl.apkg",
+      "assets/Thai_Read_Hear_Translate-CyAW_0We.apkg"
+    ]
+  },
+  "src/features/flashcards/StudyPage.tsx": {
+    "file": "assets/StudyPage-4I_rnULX.js",
+    "name": "StudyPage",
+    "src": "src/features/flashcards/StudyPage.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_arrow-left-CxebUDdQ.js",
+      "_chevron-up-DFvRx3qK.js",
+      "_circle-question-mark-C4-oNb-e.js",
+      "_clock-BFphw4Jt.js",
+      "_rotate-ccw-BobzU1Je.js",
+      "_trending-up-BNJ0_Tf2.js",
+      "_study-session-BQ556ls4.js"
+    ]
+  },
+  "src/features/guidedStudy/GuidedStudyPage.tsx": {
+    "file": "assets/GuidedStudyPage-y01pTpYa.js",
+    "name": "GuidedStudyPage",
+    "src": "src/features/guidedStudy/GuidedStudyPage.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_arrow-left-CxebUDdQ.js",
+      "_rotate-ccw-BobzU1Je.js",
+      "_volume-2-BTCpv-K8.js",
+      "_useTTS-B2spF8wk.js"
+    ]
+  },
+  "src/features/guidedStudy/templeScene.ts": {
+    "file": "assets/templeScene-Rs_QkADM.js",
+    "name": "templeScene",
+    "src": "src/features/guidedStudy/templeScene.ts",
+    "isDynamicEntry": true
+  },
+  "src/features/lessons/LessonViewer.tsx": {
+    "file": "assets/LessonViewer-BTalFVpI.js",
+    "name": "LessonViewer",
+    "src": "src/features/lessons/LessonViewer.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_arrow-left-CxebUDdQ.js",
+      "_rotate-ccw-BobzU1Je.js",
+      "_volume-2-BTCpv-K8.js",
+      "_useTTS-B2spF8wk.js"
+    ]
+  },
+  "src/features/lessons/LessonsOverview.tsx": {
+    "file": "assets/LessonsOverview-BOh6MN1d.js",
+    "name": "LessonsOverview",
+    "src": "src/features/lessons/LessonsOverview.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_arrow-left-CxebUDdQ.js"
+    ]
+  },
+  "src/features/reading/ReadingPage.tsx": {
+    "file": "assets/ReadingPage-BxmFAXE9.js",
+    "name": "ReadingPage",
+    "src": "src/features/reading/ReadingPage.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_arrow-left-CxebUDdQ.js",
+      "_PracticeSaveButton-D8KHh-b-.js",
+      "_dictionaryData-DjqCVQND.js",
+      "_practice-activity-DS0UB5mj.js",
+      "_practice-DQw6i2c3.js"
+    ]
+  },
+  "src/features/reference/ReferencePage.tsx": {
+    "file": "assets/ReferencePage-Du1U_smp.js",
+    "name": "ReferencePage",
+    "src": "src/features/reference/ReferencePage.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_clsx-D195Xeun.js",
+      "_arrow-left-CxebUDdQ.js",
+      "_sun-DIn8vOhr.js",
+      "_volume-2-BTCpv-K8.js",
+      "_tones-DjlQoXWY.js",
+      "_PlaybackSpeedSelector-DlNFShsz.js",
+      "_ToneDiagram-L4x1hM-y.js",
+      "_useTTS-B2spF8wk.js"
+    ]
+  },
+  "src/features/sentenceBuilder/SentencePracticePage.tsx": {
+    "file": "assets/SentencePracticePage-D-uvx_AQ.js",
+    "name": "SentencePracticePage",
+    "src": "src/features/sentenceBuilder/SentencePracticePage.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_arrow-left-CxebUDdQ.js",
+      "_trash-2-ymZRWzym.js",
+      "_PracticeSaveButton-D8KHh-b-.js",
+      "_useTTS-B2spF8wk.js",
+      "_practice-activity-DS0UB5mj.js",
+      "_practice-DQw6i2c3.js"
+    ]
+  },
+  "src/features/settings/SettingsPage.tsx": {
+    "file": "assets/SettingsPage-EK_Ccai2.js",
+    "name": "SettingsPage",
+    "src": "src/features/settings/SettingsPage.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_arrow-left-CxebUDdQ.js",
+      "_circle-question-mark-C4-oNb-e.js",
+      "_clock-BFphw4Jt.js",
+      "_download-CSbIQCsu.js",
+      "_sun-DIn8vOhr.js",
+      "_trash-2-ymZRWzym.js",
+      "_PlaybackSpeedSelector-DlNFShsz.js",
+      "_useTTS-B2spF8wk.js",
+      "_practice-backup-CoIa8hkR.js",
+      "_practice-DQw6i2c3.js"
+    ],
+    "dynamicImports": [
+      "src/lib/backup-utils.ts"
+    ]
+  },
+  "src/features/settings/SpacedRepetitionGuide.tsx": {
+    "file": "assets/SpacedRepetitionGuide-Dm1aAu00.js",
+    "name": "SpacedRepetitionGuide",
+    "src": "src/features/settings/SpacedRepetitionGuide.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_arrow-left-CxebUDdQ.js",
+      "_circle-question-mark-C4-oNb-e.js",
+      "_clock-BFphw4Jt.js",
+      "_trending-up-BNJ0_Tf2.js"
+    ]
+  },
+  "src/features/stats/StatsPage.tsx": {
+    "file": "assets/StatsPage-0FZeEqHM.js",
+    "name": "StatsPage",
+    "src": "src/features/stats/StatsPage.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_arrow-left-CxebUDdQ.js",
+      "_chart-column-B_Rv1bxt.js",
+      "_circle-alert-CrwI-CX-.js"
+    ],
+    "dynamicImports": [
+      "src/features/stats/components/LearningCurve.tsx"
+    ]
+  },
+  "src/features/stats/components/LearningCurve.tsx": {
+    "file": "assets/LearningCurve-BdOLVElj.js",
+    "name": "LearningCurve",
+    "src": "src/features/stats/components/LearningCurve.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_clsx-D195Xeun.js"
+    ]
+  },
+  "src/features/toneTrainer/ToneTrainerPage.tsx": {
+    "file": "assets/ToneTrainerPage-DptY7lxQ.js",
+    "name": "ToneTrainerPage",
+    "src": "src/features/toneTrainer/ToneTrainerPage.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_arrow-left-CxebUDdQ.js",
+      "_rotate-ccw-BobzU1Je.js",
+      "_ToneDiagram-L4x1hM-y.js",
+      "_useTTS-B2spF8wk.js",
+      "_practice-activity-DS0UB5mj.js",
+      "_practice-DQw6i2c3.js"
+    ]
+  },
+  "src/features/tools/ToolsHub.tsx": {
+    "file": "assets/ToolsHub-ByuU1csb.js",
+    "name": "ToolsHub",
+    "src": "src/features/tools/ToolsHub.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html"
+    ]
+  },
+  "src/features/unalome/UnalomePage.tsx": {
+    "file": "assets/UnalomePage-ClPzJLNY.js",
+    "name": "UnalomePage",
+    "src": "src/features/unalome/UnalomePage.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_arrow-left-CxebUDdQ.js"
+    ]
+  },
+  "src/lib/apkg-parser.ts": {
+    "file": "assets/apkg-parser-0Q-JTKRD.js",
+    "name": "apkg-parser",
+    "src": "src/lib/apkg-parser.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_jszip.min-CC3eATIr.js"
+    ]
+  },
+  "src/lib/backup-utils.ts": {
+    "file": "assets/backup-utils-x69JHOVU.js",
+    "name": "backup-utils",
+    "src": "src/lib/backup-utils.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_jszip.min-CC3eATIr.js",
+      "_practice-backup-CoIa8hkR.js",
+      "_practice-DQw6i2c3.js"
+    ]
+  }
+}
