@@ -1,0 +1,6 @@
+{
+  "entry": "assets/index-DlkYawMz.js",
+  "entryBytes": 1347443,
+  "entryGzipBytes": 405016,
+  "note": "Before route splitting; home also automatically imported the 577 KB Three.js chunk."
+}

@@ -1,24 +1,13 @@
 import { useToast } from '@/components/toast-provider';
-import { parseApkgFile } from '@/lib/apkg-parser';
 import { db } from '@/lib/db';
 import { importApkgToDb } from '@/lib/import-utils';
 import { getTodaysCounts } from '@/lib/study-session';
 import type { Deck } from '@/types/flashcard';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion } from 'framer-motion';
-import {
-  ArrowLeft,
-  BarChart3,
-  Clock,
-  Download,
-  FileUp,
-  Layers,
-  Library,
-  Pencil,
-  Plus,
-  Sparkles,
-  Trash2,
-} from 'lucide-react';
+import { ThaiManuscriptIcon as Layers, ThaiManuscriptIcon as Library } from '@/components/ThaiIcons';
+import { ThaiFlameIcon as Sparkles } from '@/components/ThaiIcons';
+import { ArrowLeft, BarChart3, Clock, Download, FileUp, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AddCardDialog } from './AddCardDialog';
@@ -100,6 +89,7 @@ export function DecksPage() {
     const toastId = toast.show('Loading sample decks...', { type: 'loading', persistent: true });
 
     try {
+      const { parseApkgFile } = await import('@/lib/apkg-parser');
       const samples = [
         { name: 'Thai 1000 Words', url: thai1000Url },
         { name: 'Thai Read & Hear', url: thaiReadUrl },
@@ -199,7 +189,7 @@ export function DecksPage() {
             className="flex-1 flex flex-col items-center justify-center text-center gap-6 py-16"
           >
             <div className="relative">
-              <div className="w-24 h-24 rounded-2xl bg-linear-to-br from-emerald-400/20 to-primary/20 flex items-center justify-center border border-border">
+              <div className="w-24 h-24 rounded-2xl bg-linear-to-br from-purple-400/20 to-primary/20 flex items-center justify-center border border-border">
                 <Layers className="w-10 h-10 text-primary/60" />
               </div>
               <motion.div
@@ -301,7 +291,7 @@ export function DecksPage() {
                             void navigate(`/decks/${String(deckId)}/study`);
                         }}
                       >
-                        <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400 mr-4">
+                        <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400 mr-4">
                           <Layers className="w-6 h-6" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -317,11 +307,11 @@ export function DecksPage() {
                             {counts && counts.newCount + counts.learningCount + counts.reviewCount > 0 && (
                               <span className="flex items-center gap-1 font-medium">
                                 <Clock className="w-3 h-3" />
-                                <span className="text-blue-500">{counts.newCount}</span>
+                                <span className="text-violet-500">{counts.newCount}</span>
                                 <span className="text-muted-foreground">/</span>
-                                <span className="text-orange-500">{counts.learningCount}</span>
+                                <span className="text-fuchsia-500">{counts.learningCount}</span>
                                 <span className="text-muted-foreground">/</span>
-                                <span className="text-emerald-500">{counts.reviewCount}</span>
+                                <span className="text-purple-500">{counts.reviewCount}</span>
                               </span>
                             )}
                           </div>

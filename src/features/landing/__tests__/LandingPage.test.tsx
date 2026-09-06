@@ -51,5 +51,10 @@ describe('LandingPage', () => {
   it('renders the Start Daily Session CTA', async () => {
     await renderWithProviders(<LandingPage />);
     expect(screen.getByText(/Start Daily Session/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Start Daily Session/i })).toHaveAttribute(
+      'href',
+      '/learn/first-words?day=lesson-first-words',
+    );
+    expect(screen.getByRole('link', { name: /Learn the script/i })).toHaveAttribute('href', '/reference');
   });
 });

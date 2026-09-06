@@ -15,8 +15,8 @@ export function ToneOption({ type, label, selected, correct, disabled, onClick }
 
   if (selected) {
     if (correct === true) {
-      bgColorClass = 'bg-emerald-100 dark:bg-emerald-900/30';
-      borderColorClass = 'border-emerald-500';
+      bgColorClass = 'bg-purple-100 dark:bg-purple-900/30';
+      borderColorClass = 'border-purple-500';
     } else if (correct === false) {
       bgColorClass = 'bg-red-100 dark:bg-red-900/30';
       borderColorClass = 'border-red-500';
@@ -26,8 +26,8 @@ export function ToneOption({ type, label, selected, correct, disabled, onClick }
     }
   } else if (correct === true && disabled) {
     // Show correct option if they guessed wrong
-    bgColorClass = 'bg-emerald-100 dark:bg-emerald-900/30 opacity-70';
-    borderColorClass = 'border-emerald-500';
+    bgColorClass = 'bg-purple-100 dark:bg-purple-900/30 opacity-70';
+    borderColorClass = 'border-purple-500';
   }
 
   return (

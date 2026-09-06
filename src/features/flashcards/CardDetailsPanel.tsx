@@ -19,11 +19,11 @@ function getRatingColor(rating: number): string {
     case 1:
       return 'text-red-500 bg-red-500/10';
     case 2:
-      return 'text-orange-500 bg-orange-500/10';
+      return 'text-fuchsia-500 bg-fuchsia-500/10';
     case 3:
-      return 'text-emerald-500 bg-emerald-500/10';
+      return 'text-purple-500 bg-purple-500/10';
     case 4:
-      return 'text-blue-500 bg-blue-500/10';
+      return 'text-violet-500 bg-violet-500/10';
     default:
       return 'text-muted-foreground bg-muted';
   }

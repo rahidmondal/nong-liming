@@ -1,4 +1,5 @@
-import { ArrowLeft, MessageSquareText } from 'lucide-react';
+import { ThaiPavilionIcon as MessageSquareText } from '@/components/ThaiIcons';
+import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SentenceBuilder } from './SentenceBuilder';
 

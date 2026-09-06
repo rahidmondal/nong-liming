@@ -1,7 +1,15 @@
 import { fireConfetti } from '@/lib/confetti';
 import type { ChallengeItem } from '@/types/dailyChallenge';
 import { motion } from 'framer-motion';
-import { Blocks, CheckCircle2, Layers, PenLine, RefreshCw, Sparkles, Trophy } from 'lucide-react';
+import {
+  ThaiScriptIcon as Blocks,
+  ThaiManuscriptIcon as Layers,
+  ThaiScriptIcon as PenLine,
+  ThaiLotusIcon as Trophy,
+  ThaiFlameIcon,
+} from '@/components/ThaiIcons';
+import { ThaiFlameIcon as Sparkles } from '@/components/ThaiIcons';
+import { CheckCircle2, RefreshCw } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useDailyChallenges } from './useDailyChallenges';
@@ -28,7 +36,7 @@ function ChallengeCard({ challenge, index }: { challenge: ChallengeItem; index: 
         to={route}
         className={`group flex items-center gap-3 p-3 rounded-xl border transition-all ${
           challenge.completed
-            ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/50'
+            ? 'bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800/50'
             : 'bg-card border-border hover:border-primary/50 hover:shadow-sm'
         }`}
       >
@@ -36,7 +44,7 @@ function ChallengeCard({ challenge, index }: { challenge: ChallengeItem; index: 
         <div
           className={`shrink-0 p-2 rounded-lg ${
             challenge.completed
-              ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400'
+              ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400'
               : 'bg-primary/10 text-primary'
           }`}
         >
@@ -47,7 +55,7 @@ function ChallengeCard({ challenge, index }: { challenge: ChallengeItem; index: 
         <div className="flex-1 min-w-0">
           <p
             className={`text-sm font-medium truncate ${
-              challenge.completed ? 'text-emerald-700 dark:text-emerald-300 line-through' : 'text-foreground'
+              challenge.completed ? 'text-purple-700 dark:text-purple-300 line-through' : 'text-foreground'
             }`}
           >
             {challenge.title}
@@ -59,14 +67,14 @@ function ChallengeCard({ challenge, index }: { challenge: ChallengeItem; index: 
         <div className="shrink-0 flex flex-col items-end gap-1">
           <span
             className={`text-xs font-semibold ${
-              challenge.completed ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'
+              challenge.completed ? 'text-purple-600 dark:text-purple-400' : 'text-muted-foreground'
             }`}
           >
             {challenge.progress}/{challenge.target}
           </span>
           <div className="w-14 h-1.5 bg-muted rounded-full overflow-hidden">
             <motion.div
-              className={`h-full rounded-full ${challenge.completed ? 'bg-emerald-500' : 'bg-primary'}`}
+              className={`h-full rounded-full ${challenge.completed ? 'bg-purple-500' : 'bg-primary'}`}
               initial={{ width: 0 }}
               animate={{ width: `${String(Math.min(100, progress))}%` }}
               transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
@@ -122,7 +130,7 @@ export function DailyChallengesPanel() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             {allCompleted ? (
-              <Trophy className="w-5 h-5 text-amber-500" />
+              <Trophy className="w-5 h-5 text-purple-500" />
             ) : (
               <Sparkles className="w-5 h-5 text-primary" />
             )}
@@ -132,7 +140,7 @@ export function DailyChallengesPanel() {
             <span
               className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                 allCompleted
-                  ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                  ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
                   : 'bg-primary/10 text-primary'
               }`}
             >
@@ -154,9 +162,9 @@ export function DailyChallengesPanel() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="mb-3 p-3 bg-gradient-to-r from-amber-50 to-emerald-50 dark:from-amber-950/20 dark:to-emerald-950/20 rounded-lg border border-amber-200/50 dark:border-amber-800/30"
+            className="mb-3 p-3 bg-gradient-to-r from-purple-50 to-purple-50 dark:from-purple-950/20 dark:to-purple-950/20 rounded-lg border border-purple-200/50 dark:border-purple-800/30"
           >
-            <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 text-center">
+            <p className="text-xs font-semibold text-purple-700 dark:text-purple-300 text-center">
               🎉 All challenges completed! Great work today!
             </p>
           </motion.div>
@@ -172,7 +180,8 @@ export function DailyChallengesPanel() {
         {/* Streak info */}
         {challenges.completionStreakDays > 0 && (
           <p className="text-[10px] text-muted-foreground text-center mt-3">
-            🔥 {challenges.completionStreakDays} day challenge streak
+            <ThaiFlameIcon className="inline-block w-4 h-4 mr-1" /> {challenges.completionStreakDays} day challenge
+            streak
           </p>
         )}
       </div>

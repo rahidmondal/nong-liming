@@ -4,19 +4,37 @@ import { db } from '@/lib/db';
 import type { UserStats } from '@/types/flashcard';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BarChart3, BookOpen, Flame, Layers, Snowflake, Star, Target, Zap } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import {
+  ThaiManuscriptIcon as BookOpen,
+  ThaiFlameIcon as Flame,
+  ThaiManuscriptIcon as Layers,
+  ThaiLotusIcon as Star,
+  ThaiFlameIcon as Zap,
+} from '@/components/ThaiIcons';
+import { ArrowLeft, BarChart3, Snowflake, Target } from 'lucide-react';
+import { lazy, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ConsistencyHeatmap } from './components/ConsistencyHeatmap';
-import { LearningCurve } from './components/LearningCurve';
+import { PageBoundary } from '@/components/PageBoundary';
+const LearningCurve = lazy(() =>
+  import('./components/LearningCurve').then(module => ({ default: module.LearningCurve })),
+);
 import { WeaknessDiagnostic } from './components/WeaknessDiagnostic';
+import { buildCoursePlan } from '@/features/guidedStudy/coursePlan';
+import { PracticeOverview } from './PracticeOverview';
 
 export function StatsPage() {
   const [overall, setOverall] = useState<OverallStats | null>(null);
   const [deckStats, setDeckStats] = useState<DeckStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showRetention, setShowRetention] = useState(false);
 
   const userStats = useLiveQuery<UserStats | undefined>(() => db.userStats.get(1));
+  const courseProgress = useLiveQuery(() => db.missionProgress.toArray(), [], []);
+  const courseDays = buildCoursePlan(userStats?.courseDuration ?? 45);
+  const completedDays = courseDays.filter(day =>
+    courseProgress.some(progress => progress.id === day.id && progress.lastCompletedAt),
+  );
 
   const loadStats = useCallback(async () => {
     const [o, ds] = await Promise.all([getOverallStats(), getDeckStats()]);
@@ -55,16 +73,37 @@ export function StatsPage() {
     <div className="min-h-full flex flex-col items-center p-6 max-w-md mx-auto">
       {/* Header */}
       <header className="w-full flex items-center gap-3 py-6">
-        <Link to="/decks" className="p-2 -ml-2 rounded-lg hover:bg-card transition-colors" aria-label="Back to decks">
+        <Link to="/" className="p-2 -ml-2 rounded-lg hover:bg-card transition-colors" aria-label="Back to home">
           <ArrowLeft className="w-5 h-5 text-muted-foreground" />
         </Link>
         <h1 className="text-2xl font-bold text-primary font-sarabun flex items-center gap-2">
           <BarChart3 className="w-6 h-6" />
-          Statistics
+          Your progress
         </h1>
       </header>
 
       <main className="flex-1 w-full flex flex-col gap-6 mt-2">
+        <section className="rounded-2xl bg-primary/10 border border-primary/20 p-5">
+          <h2 className="font-bold text-lg">Your Thai course</h2>
+          <p className="text-3xl font-bold text-primary mt-3">
+            {completedDays.length}
+            <span className="text-base text-muted-foreground"> / {courseDays.length} study days</span>
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            {completedDays.filter(day => day.kind === 'lesson').length} core lessons and{' '}
+            {completedDays.filter(day => day.kind === 'review').length} review days completed.
+          </p>
+          <Link to="/" className="inline-block font-semibold text-primary mt-4">
+            Continue your course →
+          </Link>
+        </section>
+        <PracticeOverview />
+        <div>
+          <h2 className="font-bold text-lg">Flashcard activity</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            The streak, daily goal and charts below track your flashcard practice.
+          </p>
+        </div>
         {/* Overview Cards */}
         {overall && (
           <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 gap-3">
@@ -86,7 +125,7 @@ export function StatsPage() {
 
             <motion.div variants={item} className="bg-card rounded-xl border border-border p-4">
               <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                <Flame className="w-4 h-4 text-orange-500" />
+                <Flame className="w-4 h-4 text-fuchsia-500" />
                 <span className="text-xs font-medium">Streak</span>
               </div>
               <p className="text-2xl font-bold text-foreground">
@@ -97,7 +136,7 @@ export function StatsPage() {
 
             <motion.div variants={item} className="bg-card rounded-xl border border-border p-4">
               <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                <Zap className="w-4 h-4 text-yellow-500" />
+                <Zap className="w-4 h-4 text-purple-500" />
                 <span className="text-xs font-medium">Today</span>
               </div>
               <p className="text-2xl font-bold text-foreground">{overall.reviewsToday}</p>
@@ -136,13 +175,13 @@ export function StatsPage() {
                   />
                 </div>
                 {userStats.cardsReviewedToday >= userStats.dailyGoal && (
-                  <p className="text-[10px] text-emerald-500 font-medium">Goal Met! Streak secured.</p>
+                  <p className="text-[10px] text-purple-500 font-medium">Goal Met! Streak secured.</p>
                 )}
               </div>
             </div>
 
             <div className="bg-card rounded-xl border border-border p-4">
-              <div className="flex items-center gap-2 text-blue-500 mb-2">
+              <div className="flex items-center gap-2 text-violet-500 mb-2">
                 <Snowflake className="w-5 h-5" />
                 <span className="font-semibold">Freeze Tokens</span>
               </div>
@@ -170,13 +209,13 @@ export function StatsPage() {
             <div className="space-y-3">
               {(
                 [
-                  { label: 'New', count: overall.cardBreakdown.new, color: 'bg-blue-500' },
+                  { label: 'New', count: overall.cardBreakdown.new, color: 'bg-violet-500' },
                   {
                     label: 'Learning',
                     count: overall.cardBreakdown.learning,
-                    color: 'bg-orange-500',
+                    color: 'bg-fuchsia-500',
                   },
-                  { label: 'Review', count: overall.cardBreakdown.review, color: 'bg-emerald-500' },
+                  { label: 'Review', count: overall.cardBreakdown.review, color: 'bg-purple-500' },
                 ] as const
               ).map(s => (
                 <div key={s.label}>
@@ -202,7 +241,17 @@ export function StatsPage() {
 
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <ConsistencyHeatmap />
-          <LearningCurve />
+          <details
+            className="rounded-xl border border-border bg-card p-4 my-4"
+            onToggle={event => { setShowRetention(event.currentTarget.open); }}
+          >
+            <summary className="text-sm font-semibold cursor-pointer">Flashcard retention chart</summary>
+            {showRetention && (
+              <PageBoundary>
+                <LearningCurve />
+              </PageBoundary>
+            )}
+          </details>
           <WeaknessDiagnostic />
         </motion.div>
 
@@ -225,16 +274,16 @@ export function StatsPage() {
                   <span>
                     <span className="font-semibold text-foreground">{ds.totalCards}</span> cards
                   </span>
-                  <span className="text-blue-500">{ds.newCards} new</span>
-                  <span className="text-orange-500">{ds.learningCards} learning</span>
-                  <span className="text-emerald-500">{ds.reviewCards} review</span>
+                  <span className="text-violet-500">{ds.newCards} new</span>
+                  <span className="text-fuchsia-500">{ds.learningCards} learning</span>
+                  <span className="text-purple-500">{ds.reviewCards} review</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span>Avg Ease: {ds.averageEase.toFixed(2)}</span>
                   {ds.totalCards > 0 && (
                     <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-emerald-500 rounded-full"
+                        className="h-full bg-purple-500 rounded-full"
                         style={{
                           width: `${String((ds.reviewCards / ds.totalCards) * 100)}%`,
                         }}

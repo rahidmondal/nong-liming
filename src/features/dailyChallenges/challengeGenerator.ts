@@ -178,7 +178,7 @@ export async function generateChallenges(streakDays: number): Promise<ChallengeI
       id: generateId(),
       type: 'build',
       title: `Build ${String(targets.build)} syllables`,
-      description: `Construct ${String(targets.build)} valid Thai syllables in Word Builder`,
+      description: `Construct ${String(targets.build)} spelling patterns in Word Builder`,
       target: targets.build,
       progress: 0,
       completed: false,
@@ -188,7 +188,7 @@ export async function generateChallenges(streakDays: number): Promise<ChallengeI
       id: generateId(),
       type: 'review',
       title: `Review ${String(targets.review)} cards`,
-      description: `Review flashcards with 80%+ accuracy`,
+      description: `Complete your daily flashcard reviews`,
       target: targets.review,
       progress: 0,
       completed: false,
@@ -305,4 +305,3 @@ export async function incrementChallengeProgress(type: 'write' | 'build' | 'revi
 
   await updateChallengeProgress(challenge.id, delta);
 }
-

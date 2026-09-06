@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Clock, TrendingUp, HelpCircle, BrainCircuit } from 'lucide-react';
+import { ThaiManuscriptIcon as BrainCircuit } from '@/components/ThaiIcons';
+import { ArrowLeft, Clock, TrendingUp, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function SpacedRepetitionGuide() {
@@ -49,7 +50,7 @@ export function SpacedRepetitionGuide() {
 
         <section className="space-y-4">
           <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
-            <HelpCircle className="w-5 h-5 text-blue-500" />
+            <HelpCircle className="w-5 h-5 text-violet-500" />
             What do the buttons actually do?
           </h3>
           <div className="grid gap-3">
@@ -67,7 +68,7 @@ export function SpacedRepetitionGuide() {
             </div>
 
             <div className="p-4 bg-card border border-border shadow-sm rounded-xl flex gap-3 items-start">
-              <span className="w-16 shrink-0 inline-block px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 font-bold text-xs rounded text-center">
+              <span className="w-16 shrink-0 inline-block px-2 py-1 bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600 dark:text-fuchsia-400 font-bold text-xs rounded text-center">
                 HARD
               </span>
               <div>
@@ -80,7 +81,7 @@ export function SpacedRepetitionGuide() {
             </div>
 
             <div className="p-4 bg-card border border-border shadow-sm rounded-xl flex gap-3 items-start">
-              <span className="w-16 shrink-0 inline-block px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold text-xs rounded text-center">
+              <span className="w-16 shrink-0 inline-block px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 font-bold text-xs rounded text-center">
                 GOOD
               </span>
               <div>
@@ -93,7 +94,7 @@ export function SpacedRepetitionGuide() {
             </div>
 
             <div className="p-4 bg-card border border-border shadow-sm rounded-xl flex gap-3 items-start">
-              <span className="w-16 shrink-0 inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold text-xs rounded text-center">
+              <span className="w-16 shrink-0 inline-block px-2 py-1 bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 font-bold text-xs rounded text-center">
                 EASY
               </span>
               <div>
@@ -109,7 +110,7 @@ export function SpacedRepetitionGuide() {
 
         <section className="space-y-4">
           <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
-            <Clock className="w-5 h-5 text-amber-500" />
+            <Clock className="w-5 h-5 text-purple-500" />
             Learning vs. Review States
           </h3>
           <div className="p-5 bg-card border border-border shadow-sm rounded-xl space-y-3">

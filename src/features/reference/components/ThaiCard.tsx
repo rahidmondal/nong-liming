@@ -25,11 +25,12 @@ export function ThaiCard({
   accentColor,
 }: ThaiCardProps) {
   const userStats = useLiveQuery(() => db.userStats.get(1));
-  const { speak, isSpeaking } = useTTS('th-TH', userStats?.playbackSpeed ?? 0.8);
+  const { speak, stop, isSpeaking, isAvailable } = useTTS('th-TH', userStats?.playbackSpeed ?? 0.8);
 
   const handleSpeak = (e: React.MouseEvent) => {
     e.stopPropagation();
-    speak(audioText ?? thaiChar);
+    if (isSpeaking) stop();
+    else speak(audioText ?? thaiChar);
   };
 
   return (
@@ -74,6 +75,8 @@ export function ThaiCard({
         {/* Audio button */}
         <button
           onClick={handleSpeak}
+          disabled={!isAvailable}
+          title={isAvailable ? 'Listen in Thai' : 'Thai speech voice unavailable on this device'}
           aria-label={`Speak ${thaiChar}`}
           className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/25 text-primary transition-colors"
         >

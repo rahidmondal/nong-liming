@@ -1,4 +1,5 @@
-import { ArrowLeft, BookA } from 'lucide-react';
+import { ThaiManuscriptIcon as BookA } from '@/components/ThaiIcons';
+import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AddFromDictionaryDialog } from './AddFromDictionaryDialog';

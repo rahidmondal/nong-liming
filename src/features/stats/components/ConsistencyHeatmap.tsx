@@ -48,11 +48,11 @@ export function ConsistencyHeatmap() {
     <div className="bg-card border border-border shadow-sm rounded-xl p-5 mb-6">
       <h3 className="text-sm font-semibold text-foreground mb-4">30-Day Consistency</h3>
       <div className="flex gap-1 overflow-x-auto pb-2">
-        {heatmapData.map((day) => {
+        {heatmapData.map(day => {
           let colorClass = 'bg-muted'; // 0
-          if (day.count > 0 && day.count <= 10) colorClass = 'bg-emerald-200 dark:bg-emerald-900/60';
-          else if (day.count > 10 && day.count <= 30) colorClass = 'bg-emerald-400 dark:bg-emerald-600/80';
-          else if (day.count > 30) colorClass = 'bg-emerald-600 dark:bg-emerald-400';
+          if (day.count > 0 && day.count <= 10) colorClass = 'bg-purple-200 dark:bg-purple-900/60';
+          else if (day.count > 10 && day.count <= 30) colorClass = 'bg-purple-400 dark:bg-purple-600/80';
+          else if (day.count > 30) colorClass = 'bg-purple-600 dark:bg-purple-400';
 
           return (
             <div
@@ -67,9 +67,9 @@ export function ConsistencyHeatmap() {
         <span>Less</span>
         <div className="flex gap-1">
           <div className="w-3 h-3 rounded-sm bg-muted" />
-          <div className="w-3 h-3 rounded-sm bg-emerald-200 dark:bg-emerald-900/60" />
-          <div className="w-3 h-3 rounded-sm bg-emerald-400 dark:bg-emerald-600/80" />
-          <div className="w-3 h-3 rounded-sm bg-emerald-600 dark:bg-emerald-400" />
+          <div className="w-3 h-3 rounded-sm bg-purple-200 dark:bg-purple-900/60" />
+          <div className="w-3 h-3 rounded-sm bg-purple-400 dark:bg-purple-600/80" />
+          <div className="w-3 h-3 rounded-sm bg-purple-600 dark:bg-purple-400" />
         </div>
         <span>More</span>
       </div>

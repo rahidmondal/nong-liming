@@ -1,15 +1,17 @@
 import { PlaybackSpeedSelector } from '@/components/PlaybackSpeedSelector';
 import { useTheme } from '@/components/theme-provider';
 import { useToast } from '@/components/toast-provider';
-import { exportAndDownload, importBackup } from '@/lib/backup-utils';
+import { clearPracticeHistory } from '@/lib/clear-practice-history';
 import { APP_VERSION } from '@/lib/constants';
+import { replayTutorial } from '@/lib/useTutorial';
+import { useTTS } from '@/hooks/useTTS';
 import { db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { usePWAInstall, usePWAUpdate } from '@/lib/usePWA';
 import { motion } from 'framer-motion';
+import { ThaiManuscriptIcon as BrainCircuit } from '@/components/ThaiIcons';
 import {
   ArrowLeft,
-  BrainCircuit,
   Check,
   ChevronRight,
   Clock,
@@ -55,6 +57,7 @@ export function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const userStats = useLiveQuery(() => db.userStats.get(1));
+  const { speak, stop, isAvailable, isSpeaking } = useTTS('th-TH', userStats?.playbackSpeed ?? 0.8);
 
   useEffect(() => {
     if ('storage' in navigator && 'estimate' in navigator.storage) {
@@ -67,6 +70,7 @@ export function SettingsPage() {
   const handleExportData = useCallback(async () => {
     const id = toast.show('Exporting full backup…', { type: 'loading', persistent: true });
     try {
+      const { exportAndDownload } = await import('@/lib/backup-utils');
       await exportAndDownload();
       toast.update(id, { type: 'success', message: 'Backup exported!', persistent: false });
     } catch {
@@ -78,6 +82,7 @@ export function SettingsPage() {
     async (file: File) => {
       const id = toast.show('Restoring backup…', { type: 'loading', persistent: true });
       try {
+        const { importBackup } = await import('@/lib/backup-utils');
         const result = await importBackup(file);
         toast.update(id, {
           type: 'success',
@@ -114,10 +119,7 @@ export function SettingsPage() {
   const handleClearHistory = useCallback(async () => {
     const id = toast.show('Clearing study history…', { type: 'loading', persistent: true });
     try {
-      await db.transaction('rw', db.studySessions, db.reviewLogs, async () => {
-        await db.studySessions.clear();
-        await db.reviewLogs.clear();
-      });
+      await clearPracticeHistory();
       setShowClearHistoryConfirm(false);
       toast.update(id, { type: 'success', message: 'Study history cleared', persistent: false });
     } catch {
@@ -157,9 +159,8 @@ export function SettingsPage() {
   }, [install, canInstall, toast]);
 
   const handleStartTutorial = useCallback(() => {
-    localStorage.removeItem('nong-liming-tutorial-done');
-    toast.show('Tutorial will start on the home page', { type: 'success' });
-  }, [toast]);
+    replayTutorial();
+  }, []);
 
   const container = {
     hidden: { opacity: 0 },
@@ -211,7 +212,7 @@ export function SettingsPage() {
               </div>
             </div>
             {/* Playback Speed */}
-            <div className="p-4 border-t border-border">
+            <div id="settings-audio" className="p-4 border-t border-border">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-medium text-foreground">Playback Speed</p>
@@ -224,6 +225,24 @@ export function SettingsPage() {
                     size="medium"
                   />
                 )}
+              </div>
+              <div className="mt-3 space-y-2">
+                <button
+                  type="button"
+                  disabled={!isAvailable}
+                  onClick={() => {
+                    if (isSpeaking) stop();
+                    else speak('สวัสดีค่ะ ขอบคุณค่ะ');
+                  }}
+                  className="rounded-lg border border-border px-3 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSpeaking ? 'Stop audio' : 'Test Thai audio'}
+                </button>
+                <p className="text-xs text-muted-foreground" role="status">
+                  {isAvailable
+                    ? 'Thai audio is ready. Test it at your selected playback speed.'
+                    : 'No Thai voice is available on this device. Add a Thai speech voice or try another browser.'}
+                </p>
               </div>
             </div>
           </div>
@@ -266,8 +285,8 @@ export function SettingsPage() {
               onClick={handleCheckUpdate}
               className="w-full flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors text-left"
             >
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <RefreshCw className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 bg-violet-100 dark:bg-violet-900/30 rounded-lg">
+                <RefreshCw className="w-5 h-5 text-violet-600 dark:text-violet-400" />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">Check for Updates</p>
@@ -296,8 +315,8 @@ export function SettingsPage() {
               to="/settings/algorithm"
               className="w-full flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors text-left"
             >
-              <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
-                <BrainCircuit className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                <BrainCircuit className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">How the Algorithm Works</p>
@@ -309,7 +328,7 @@ export function SettingsPage() {
         </motion.section>
 
         {/* ── Data Management ── */}
-        <motion.section variants={item}>
+        <motion.section id="settings-backup" variants={item}>
           <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-1">Data</h2>
           <div className="bg-card border border-border rounded-xl overflow-hidden divide-y divide-border">
             {/* Export */}
@@ -317,8 +336,8 @@ export function SettingsPage() {
               onClick={() => void handleExportData()}
               className="w-full flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors text-left"
             >
-              <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
-                <Download className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                <Download className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">Export Full Backup</p>
@@ -332,8 +351,8 @@ export function SettingsPage() {
               onClick={() => fileInputRef.current?.click()}
               className="w-full flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors text-left"
             >
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <Upload className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 bg-violet-100 dark:bg-violet-900/30 rounded-lg">
+                <Upload className="w-5 h-5 text-violet-600 dark:text-violet-400" />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">Import Backup</p>
@@ -350,22 +369,25 @@ export function SettingsPage() {
                 }}
                 className="w-full flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors text-left"
               >
-                <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
-                  <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                  <Clock className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-foreground">Clear Study History</p>
-                  <p className="text-xs text-muted-foreground">Reset progress, keep decks & cards</p>
+                  <p className="text-xs text-muted-foreground">Clear course, practice history & rewards</p>
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </button>
             ) : (
-              <div className="p-4 bg-amber-500/5">
-                <p className="text-sm font-medium text-foreground mb-3">Clear all sessions and review logs?</p>
+              <div className="p-4 bg-purple-500/5">
+                <p className="text-sm font-medium text-foreground mb-3">
+                  Clear lessons, practice entries, reviews, writing history, challenges, graduated words and rewards?
+                  Decks, cards, card schedules and preferences will stay.
+                </p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => void handleClearHistory()}
-                    className="flex-1 px-4 py-2 text-sm font-semibold bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
+                    className="flex-1 px-4 py-2 text-sm font-semibold bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
                   >
                     Yes, clear history
                   </button>

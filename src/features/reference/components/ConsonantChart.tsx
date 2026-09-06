@@ -2,9 +2,9 @@ import { ThaiCard } from '@/features/reference/components/ThaiCard';
 import type { ThaiConsonant } from '@/types/alphabet';
 
 const CLASS_CONFIG: Record<string, { label: string; color: string }> = {
-  mid: { label: 'Mid', color: '#3b82f6' },
-  high: { label: 'High', color: '#ef4444' },
-  low: { label: 'Low', color: '#22c55e' },
+  mid: { label: 'Mid', color: 'var(--chart-1)' },
+  high: { label: 'High', color: 'var(--chart-3)' },
+  low: { label: 'Low', color: 'var(--chart-2)' },
 };
 
 interface ConsonantChartProps {

@@ -19,7 +19,6 @@ type RecognitionState =
 
 export function WritingPad() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const isDrawingRef = useRef(false);
   const [hasStrokes, setHasStrokes] = useState(false);
   const [level, setLevel] = useState<DifficultyLevel>(1);
@@ -70,14 +69,10 @@ export function WritingPad() {
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d', { willReadFrequently: true });
-    const container = containerRef.current;
-    if (!canvas || !ctx || !container) return;
-
-    const rect = container.getBoundingClientRect();
-    // Width is full wrapper width, height is capped to maintain somewhat wide aspect for lines.
-    const width = Math.min(rect.width - 32, 600);
-    const height = level === 1 ? width : Math.min(width * 0.4, 250);
-
+    if (!canvas || !ctx) return;
+    // Keep a stable bitmap while CSS resizes the pad, preserving drawing and undo.
+    const width = 600;
+    const height = level === 1 ? 600 : 240;
     canvas.width = width;
     canvas.height = height;
 
@@ -85,14 +80,6 @@ export function WritingPad() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawGrid(ctx, canvas.width, canvas.height, level);
   }, [level, drawGrid]);
-
-  useEffect(() => {
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-    };
-  }, [resizeCanvas]);
 
   // When level changes, clear and resize
   useEffect(() => {
@@ -119,7 +106,10 @@ export function WritingPad() {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    return {
+      x: ((e.clientX - rect.left) * canvas.width) / rect.width,
+      y: ((e.clientY - rect.top) * canvas.height) / rect.height,
+    };
   };
 
   const getTouchCoords = (e: TouchEvent): { x: number; y: number } => {
@@ -127,7 +117,10 @@ export function WritingPad() {
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
-    return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+    return {
+      x: ((touch.clientX - rect.left) * canvas.width) / rect.width,
+      y: ((touch.clientY - rect.top) * canvas.height) / rect.height,
+    };
   };
 
   const beginStroke = (x: number, y: number) => {
@@ -168,8 +161,12 @@ export function WritingPad() {
   const onMouseMove = (e: React.MouseEvent) => {
     continueStroke(getMouseCoords(e).x, getMouseCoords(e).y);
   };
-  const onMouseUp = () => { endStroke(); };
-  const onMouseLeave = () => { endStroke(); };
+  const onMouseUp = () => {
+    endStroke();
+  };
+  const onMouseLeave = () => {
+    endStroke();
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -275,7 +272,7 @@ export function WritingPad() {
       }
 
       const { text: rawText, confidence } = await recognizeThaiText(processedImage, level);
-      
+
       const thaiOnly = rawText
         .replace(/[^\u0E00-\u0E7F]/g, '') // remove spaces and punctuation
         .normalize('NFC')
@@ -291,7 +288,7 @@ export function WritingPad() {
           let stat = await db.writingPadStats.where('character').equals(char).first();
           stat ??= { character: char, attempts: 0, successes: 0, avgConfidence: 0, lastAttempt: 0 };
           const isSuccess = confidence > 60;
-          
+
           if (isSuccess) {
             void addOffering('dokMaKhue', 1);
             void incrementChallengeProgress('write', 1);
@@ -338,12 +335,12 @@ export function WritingPad() {
     <div className="space-y-6">
       <DifficultySelector level={level} setLevel={setLevel} disabled={recognition.status === 'loading'} />
 
-      <div ref={containerRef} className="flex flex-col items-center gap-4">
-        <div className="relative p-2 bg-card rounded-2xl border border-border shadow-lg">
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative p-2 bg-card rounded-2xl border border-border shadow-lg w-full max-w-[616px]">
           <canvas
             ref={canvasRef}
             className="rounded-xl cursor-crosshair touch-none bg-white"
-            style={{ display: 'block' }}
+            style={{ display: 'block', width: '100%', height: 'auto' }}
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
@@ -408,19 +405,19 @@ export function WritingPad() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
                   Recognition Result
                 </h3>
                 <span
                   className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                     recognition.confidence > 70
-                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300'
+                      ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300'
                       : recognition.confidence > 40
                         ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300'
                         : 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-300'
                   }`}
                 >
-                  {Math.round(recognition.confidence)}% confidence
+                  {Math.round(recognition.confidence)}% OCR confidence
                 </span>
               </div>
 
@@ -429,10 +426,15 @@ export function WritingPad() {
                   {recognition.fullText}
                 </p>
                 <CharacterFeedback characters={recognition.characters} confidenceScore={recognition.confidence} />
+                <p className="text-xs text-muted-foreground text-center">
+                  OCR confidence estimates what the software read. It does not grade your handwriting or spelling.
+                </p>
               </div>
 
               <button
-                onClick={() => { speak(recognition.fullText); }}
+                onClick={() => {
+                  speak(recognition.fullText);
+                }}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20"
               >
                 <Volume2 className="w-4 h-4" /> Listen to Text

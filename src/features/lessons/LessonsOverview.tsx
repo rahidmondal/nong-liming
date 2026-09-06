@@ -1,9 +1,9 @@
- 
 import { lessons } from '@/data/lessons';
 import { db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CheckCircle2, Lock, MessageCircle } from 'lucide-react';
+import { ThaiPavilionIcon as MessageCircle } from '@/components/ThaiIcons';
+import { ArrowLeft, CheckCircle2, Lock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 export function LessonsOverview() {
@@ -63,7 +63,7 @@ export function LessonsOverview() {
                       <div
                         className={`p-2.5 rounded-xl ${
                           isCompleted
-                            ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
+                            ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
                             : unlocked
                               ? 'bg-primary/10 text-primary'
                               : 'bg-muted text-muted-foreground'

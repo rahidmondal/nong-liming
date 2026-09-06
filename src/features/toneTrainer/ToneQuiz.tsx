@@ -1,6 +1,7 @@
 import { useTTS } from '@/hooks/useTTS';
 import { Play } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import type { ToneQuestion } from './toneData';
 import { ToneOption } from './ToneOption';
 
@@ -12,28 +13,46 @@ interface ToneQuizProps {
 const TONES: ('mid' | 'low' | 'falling' | 'high' | 'rising')[] = ['mid', 'low', 'falling', 'high', 'rising'];
 
 export function ToneQuiz({ question, onNext }: ToneQuizProps) {
-  const { speak, isSpeaking } = useTTS('th-TH');
+  const { speak, isSpeaking, isAvailable } = useTTS('th-TH');
   const [selectedTone, setSelectedTone] = useState<string | null>(null);
+  const pendingNext = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const answered = useRef(false);
 
   useEffect(() => {
     setSelectedTone(null);
+    answered.current = false;
     const timer = setTimeout(() => {
       speak(question.syllable);
     }, 500);
     return () => {
       clearTimeout(timer);
+      if (pendingNext.current) clearTimeout(pendingNext.current);
     };
   }, [question, speak]);
 
   const handleSelect = (tone: string) => {
-    if (selectedTone) return; // already answered
+    if (answered.current || !isAvailable) return;
+    answered.current = true;
     setSelectedTone(tone);
     const correct = tone === question.tone;
 
-    setTimeout(() => {
+    pendingNext.current = setTimeout(() => {
       onNext(correct);
     }, 1500);
   };
+
+  if (!isAvailable)
+    return (
+      <div role="status" className="rounded-2xl border border-border bg-card p-6 space-y-3">
+        <h2 className="text-lg font-bold">Thai audio is unavailable</h2>
+        <p className="text-sm text-muted-foreground">
+          This listening quiz needs a Thai speech voice on your device. You can still study the written tone rules.
+        </p>
+        <Link to="/learn/tone-clues" className="inline-block font-semibold text-primary">
+          Learn tone clues →
+        </Link>
+      </div>
+    );
 
   return (
     <div className="w-full flex flex-col items-center gap-8">

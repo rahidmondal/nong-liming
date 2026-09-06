@@ -11,7 +11,13 @@ import { VowelChart } from '@/features/reference/components/VowelChart';
 import { db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, Hash, Languages, Music, Type } from 'lucide-react';
+import {
+  ThaiNumberIcon as Hash,
+  ThaiScriptIcon as Languages,
+  ThaiBellIcon as Music,
+  ThaiScriptIcon as Type,
+} from '@/components/ThaiIcons';
+import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -49,10 +55,16 @@ export function ReferencePage() {
       </header>
 
       {/* Tab Navigation */}
-      <nav className="flex gap-1 p-1 bg-secondary/50 rounded-xl mb-6 overflow-x-auto">
+      <nav
+        id="reference-tabs"
+        aria-label="Thai reference sections"
+        className="flex gap-1 p-1 bg-secondary/50 rounded-xl mb-6 overflow-x-auto"
+      >
         {TABS.map(tab => (
           <button
             key={tab.key}
+            aria-label={tab.label}
+            aria-pressed={activeTab === tab.key}
             onClick={() => {
               setActiveTab(tab.key);
             }}
@@ -86,7 +98,7 @@ export function ReferencePage() {
           {activeTab === 'numbers' && (
             <div>
               <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-full bg-blue-400" />
+                <span className="inline-block w-3 h-3 rounded-full bg-violet-400" />
                 Thai Numerals
                 <span className="text-sm font-normal text-muted-foreground">({numbers.length})</span>
               </h3>
@@ -106,7 +118,7 @@ export function ReferencePage() {
           {activeTab === 'tones' && (
             <div>
               <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-full bg-amber-400" />
+                <span className="inline-block w-3 h-3 rounded-full bg-purple-400" />
                 Tone Marks
                 <span className="text-sm font-normal text-muted-foreground">({tones.length})</span>
               </h3>
